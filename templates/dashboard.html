@@ -4,45 +4,74 @@
     <meta charset="UTF-8">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        .sidebar-link { @apply flex items-center gap-4 px-6 py-4 text-[#ad1457] font-semibold transition-all rounded-2xl mx-4; }
-        .sidebar-link:hover { @apply bg-pink-50 translate-x-2; }
-        .card { @apply bg-white border border-pink-50 rounded-[35px] p-8 shadow-sm; }
-    </style>
+    <title>Ultraze V2 - Dashboard</title>
 </head>
-<body class="flex min-h-screen bg-[#fffafb]">
-
-    <aside class="w-80 bg-white border-r border-pink-100 flex flex-col py-10">
-        <div class="px-10 mb-12">
-            <h2 class="text-2xl font-black text-[#f06292] italic italic tracking-tighter">ULTRAZE V2</h2>
+<body class="bg-[#0b1120] text-slate-300 font-sans min-h-screen flex">
+    <aside class="w-72 border-r border-slate-800 flex flex-col p-6">
+        <div class="flex items-center gap-3 mb-12">
+            <div class="bg-sky-500 p-2 rounded-lg text-white font-bold italic">U</div>
+            <h1 class="text-xl font-black text-white tracking-tighter italic">ULTRAZE <span class="text-sky-500">V2</span></h1>
         </div>
-
-        <nav class="flex-1 space-y-1">
-            <a href="/dashboard" class="sidebar-link bg-pink-100/50"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
-            <a href="/ventes" class="sidebar-link"><i class="fa-solid fa-cart-shopping"></i> Ventes</a>
-            <a href="/salaires" class="sidebar-link"><i class="fa-solid fa-hand-holding-dollar"></i> Salaires</a>
-            <a href="/utilisateurs" class="sidebar-link"><i class="fa-solid fa-users-gear"></i> Utilisateurs</a>
-            <a href="/stocks" class="sidebar-link"><i class="fa-solid fa-box-open"></i> Stocks / Produits</a>
-            <div class="h-[1px] bg-pink-50 my-6 mx-8"></div>
-            <a href="/clotures" class="sidebar-link text-pink-400"><i class="fa-solid fa-file-invoice-dollar"></i> Clôtures Hebdo</a>
-            <a href="/irs" class="sidebar-link text-red-400"><i class="fa-solid fa-triangle-exclamation"></i> Alertes IRS</a>
+        <nav class="flex-1 space-y-2">
+            <a href="/dashboard" class="flex items-center gap-4 p-4 bg-slate-800/50 rounded-xl text-sky-400 font-bold"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+            <a href="/ventes" class="flex items-center gap-4 p-4 hover:bg-slate-800 rounded-xl transition-all"><i class="fa-solid fa-receipt"></i> Ventes</a>
+            <a href="/salaires" class="flex items-center gap-4 p-4 hover:bg-slate-800 rounded-xl transition-all"><i class="fa-solid fa-wallet"></i> Salaires</a>
+            <a href="/utilisateurs" class="flex items-center gap-4 p-4 hover:bg-slate-800 rounded-xl transition-all"><i class="fa-solid fa-users"></i> Utilisateurs</a>
+            <a href="/stocks" class="flex items-center gap-4 p-4 hover:bg-slate-800 rounded-xl transition-all"><i class="fa-solid fa-box"></i> Types de ventes</a>
+            <div class="h-[1px] bg-slate-800 my-6"></div>
+            <a href="/clotures" class="flex items-center gap-4 p-4 text-emerald-400"><i class="fa-solid fa-calendar-check"></i> Clôture Hebdo</a>
+            <a href="/irs" class="flex items-center gap-4 p-4 text-rose-500"><i class="fa-solid fa-circle-exclamation"></i> Avertissement IRS</a>
         </nav>
     </aside>
 
-    <main class="flex-1 p-12">
-        <header class="flex justify-between items-center mb-16">
-            <h1 class="text-4xl font-light text-[#880e4f]">Interface <span class="font-bold">Premium</span></h1>
-            <div class="text-right">
-                <p class="text-xs font-bold text-pink-300 uppercase tracking-widest">Shinoza Corporate</p>
+    <main class="flex-1 p-10 overflow-y-auto">
+        <header class="flex justify-between items-start mb-12">
+            <div>
+                <h2 class="text-3xl font-bold text-white mb-1">Tableau de Bord</h2>
+                <p class="text-slate-500 text-sm italic">Système fondé par Shinoza</p>
+            </div>
+            <div class="bg-slate-800 p-2 rounded-2xl flex items-center gap-4 pr-6">
+                <div class="bg-slate-700 w-10 h-10 rounded-full flex items-center justify-center text-white"><i class="fa-solid fa-user"></i></div>
+                <div>
+                    <p class="text-xs font-bold text-white">{{ user.name }} ({{ user.role }})</p>
+                    <p class="text-[10px] text-sky-400 font-mono">{{ user.entreprise }}</p>
+                </div>
             </div>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="card">
-                <p class="text-[10px] font-bold text-pink-300 uppercase mb-4 tracking-widest">CA Total Entreprises</p>
-                <h3 class="text-5xl font-light text-[#ad1457]">0 <span class="text-lg">$</span></h3>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+            <div class="bg-slate-800/40 p-8 rounded-[30px] border border-slate-800">
+                <p class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">Chiffre d'Affaires Net</p>
+                <h3 class="text-4xl font-bold text-white">{{ stats.ca }} €</h3>
+                <p class="text-sky-500 text-[10px] mt-2 font-bold uppercase italic">Semaine Actuelle</p>
             </div>
+            <div class="bg-slate-800/40 p-8 rounded-[30px] border border-slate-800">
+                <p class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">Taxes IRS (35%)</p>
+                <h3 class="text-4xl font-bold text-rose-500">{{ stats.taxes }} €</h3>
+                <p class="text-slate-600 text-[10px] mt-2 font-bold uppercase">Provisionné auto</p>
             </div>
+            <div class="bg-slate-800/40 p-8 rounded-[30px] border border-slate-800">
+                <p class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">Total Salaires</p>
+                <h3 class="text-4xl font-bold text-emerald-400">{{ stats.salaires }} €</h3>
+                <p class="text-slate-600 text-[10px] mt-2 font-bold uppercase">Fixe + Commissions</p>
+            </div>
+            <div class="bg-slate-800/40 p-8 rounded-[30px] border border-slate-800">
+                <p class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">Bénéfice Réel</p>
+                <h3 class="text-4xl font-bold text-sky-400">{{ stats.benefice }} €</h3>
+                <p class="text-sky-900 text-[10px] mt-2 font-bold uppercase">Net Final</p>
+            </div>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 p-10 rounded-[40px] shadow-2xl">
+            <h4 class="text-xl font-bold text-white mb-4">Rapport IRS & Clôtures</h4>
+            <p class="text-slate-400 text-sm max-w-2xl mb-8">
+                Tous les dimanches à 23h59, le système génère automatiquement le rapport fiscal pour la semaine. 
+                Assurez-vous que toutes les ventes sont enregistrées pour éviter les amendes de l'IRS.
+            </p>
+            <button class="bg-sky-500 hover:bg-sky-400 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg shadow-sky-500/20">
+                Générer Clôture Manuelle
+            </button>
+        </div>
     </main>
 </body>
 </html>
