@@ -29,21 +29,30 @@ def login_process():
         return redirect(url_for('dashboard'))
     return redirect(url_for('login'))
 
+# ... (tes imports)
+
 @app.route('/dashboard')
 def dashboard():
     if 'user' not in session: return redirect(url_for('login'))
     user = session['user']
     
-    if user['role'] == 'SYSTEM_ADMIN':
+    if user.get('role') == 'SYSTEM_ADMIN':
         return render_template('admin_master.html', entreprises=charger_config_entreprises())
     
-    # Stats Entreprise
-    ventes = [v for v in charger_ventes() if v['entreprise'] == user['entreprise']]
-    ca = sum(v['net'] for v in ventes)
-    ent_cfg = charger_config_entreprises().get(user['entreprise'], {"taxe_irs": 15})
-    taxe = int(ca * (ent_cfg.get('taxe_irs', 15) / 100))
+    # On utilise .get() pour éviter le crash si l'entreprise n'existe pas
+    ventes_all = charger_ventes() or []
+    ventes = [v for v in ventes_all if v.get('entreprise') == user.get('entreprise')]
     
+    ca = sum(v.get('net', 0) for v in ventes)
+    
+    # Récupération de la taxe configurée
+    config = charger_config_entreprises().get(user.get('entreprise'), {})
+    taux_irs = config.get('taxe_irs', 15) # 15% par défaut
+    
+    taxe = int(ca * (taux_irs / 100))
     return render_template('dashboard.html', stats={'ca': ca, 'taxes': taxe, 'benefice': ca - taxe})
+
+# ... (le reste de tes routes)
 
 @app.route('/ventes')
 def ventes():
