@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8"><script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
     <title>Ventes | Ultraze</title>
 </head>
 <body class="bg-[#fff9fa] flex min-h-screen text-[#880e4f]">
@@ -27,50 +28,78 @@
         <div class="grid grid-cols-1 xl:grid-cols-3 gap-10">
             <div class="bg-white p-10 rounded-[45px] shadow-xl border border-pink-50 h-fit">
                 <h3 class="text-xl font-black mb-8 italic">Ajouter une vente</h3>
-                <form class="space-y-5">
+                <form action="/add_vente" method="POST" class="space-y-5">
                     <div>
                         <label class="text-[10px] font-bold text-pink-300 uppercase px-2 italic">Article / Service</label>
-                        <select class="w-full p-4 rounded-2xl bg-pink-50/50 border-none outline-none mt-1">
-                            <option>Menu Classique</option>
-                            <option>Boisson</option>
+                        <select name="article" class="w-full p-4 rounded-2xl bg-pink-50/50 border-none outline-none mt-1 font-bold">
+                            {% if types_ventes %}
+                                {% for type in types_ventes %}
+                                    <option value="{{ type }}">{{ type }}</option>
+                                {% endfor %}
+                            {% else %}
+                                <option value="Menu Classique">Menu Classique</option>
+                                <option value="Boisson">Boisson</option>
+                            {% endif %}
                         </select>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="text-[10px] font-bold text-pink-300 uppercase px-2 italic">Quantité</label>
-                            <input type="number" value="1" class="w-full p-4 rounded-2xl bg-pink-50/50 border-none outline-none mt-1">
+                            <input type="number" name="quantite" value="1" min="1" class="w-full p-4 rounded-2xl bg-pink-50/50 border-none outline-none mt-1 font-bold">
                         </div>
                         <div>
                             <label class="text-[10px] font-bold text-pink-300 uppercase px-2 italic">Montant Net ($)</label>
-                            <input type="number" placeholder="0" class="w-full p-4 rounded-2xl bg-pink-50/50 border-none outline-none mt-1">
+                            <input type="number" name="montant" placeholder="0" required class="w-full p-4 rounded-2xl bg-pink-50/50 border-none outline-none mt-1 font-bold">
                         </div>
                     </div>
-                    <button class="w-full bg-[#f06292] text-white font-black py-5 rounded-2xl shadow-lg shadow-pink-100 hover:scale-[1.02] transition">VALIDER LA VENTE</button>
+                    <button type="submit" class="w-full bg-[#f06292] text-white font-black py-5 rounded-2xl shadow-lg shadow-pink-100 hover:scale-[1.02] transition uppercase">
+                        VALIDER LA VENTE
+                    </button>
                 </form>
             </div>
 
             <div class="xl:col-span-2 bg-white p-10 rounded-[45px] shadow-xl border border-pink-50">
                 <h3 class="text-xl font-black mb-8 italic">Ventes effectuées</h3>
-                <table class="w-full text-left">
-                    <thead>
-                        <tr class="text-[10px] text-pink-300 uppercase tracking-widest border-b border-pink-50">
-                            <th class="pb-4">Vendeur</th>
-                            <th class="pb-4">Article</th>
-                            <th class="pb-4">Qté</th>
-                            <th class="pb-4 text-right">Total Net</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-sm">
-                        {% for v in ventes %}
-                        <tr class="border-b border-pink-50/50">
-                            <td class="py-4 font-bold">{{ v.vendeur }}</td>
-                            <td class="py-4">{{ v.item }}</td>
-                            <td class="py-4"><span class="bg-pink-50 px-3 py-1 rounded-full text-[10px]">{{ v.qty }}</span></td>
-                            <td class="py-4 text-right font-black text-[#ad1457]">{{ v.net }} $</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="text-[10px] text-pink-300 uppercase tracking-widest border-b border-pink-50">
+                                <th class="pb-4 px-2">Vendeur</th>
+                                <th class="pb-4 px-2">Article</th>
+                                <th class="pb-4 px-2">Qté</th>
+                                <th class="pb-4 px-2">Total Net</th>
+                                <th class="pb-4 px-2 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm">
+                            {% if ventes %}
+                                {% for v in ventes %}
+                                <tr class="border-b border-pink-50/50 hover:bg-pink-50/20 transition-colors">
+                                    <td class="py-4 px-2 font-bold">{{ v.vendeur }}</td>
+                                    <td class="py-4 px-2 text-gray-500">{{ v.article }}</td>
+                                    <td class="py-4 px-2">
+                                        <span class="bg-pink-50 text-[#ad1457] px-3 py-1 rounded-full text-[10px] font-bold">
+                                            {{ v.quantite }}
+                                        </span>
+                                    </td>
+                                    <td class="py-4 px-2 font-black text-[#ad1457]">{{ v.montant_net }} $</td>
+                                    <td class="py-4 px-2 text-right">
+                                        <a href="/delete_vente/{{ v.id }}" 
+                                           onclick="return confirm('Supprimer cette transaction ?')"
+                                           class="text-red-300 hover:text-red-600 transition p-2">
+                                            Supprimer
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="py-10 text-center text-gray-400 italic">Aucune transaction enregistrée aujourd'hui.</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </main>
