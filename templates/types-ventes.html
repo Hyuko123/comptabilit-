@@ -1,83 +1,61 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <title>Gestion des Stocks | Ultraze V2</title>
-</head>
-<body class="flex min-h-screen bg-[#fff9fa]">
-    <div class="p-12 w-full">
-        <div class="flex justify-between items-center mb-12">
-            <h1 class="text-3xl font-bold text-[#880e4f]"><i class="fa-solid fa-tags mr-2"></i> Catalogue Produits & Stocks</h1>
-            <a href="/dashboard" class="bg-pink-100 text-pink-700 px-6 py-2 rounded-full font-bold text-sm">Retour Dashboard</a>
-        </div>
+<main class="ml-72 flex-1 p-12">
+    <header class="mb-12">
+        <h2 class="text-4xl font-light">Gestion du <span class="font-black italic text-[#f06292]">Catalogue & Stocks</span></h2>
+    </header>
 
-        {% if session['role'] in ['Patron', 'Co-Patron', 'Manager', 'Admin Global'] %}
-        <div class="bg-white p-8 rounded-[35px] border border-pink-100 mb-8 max-w-xl shadow-sm">
-            <h3 class="font-bold text-pink-700 mb-4">Créer un nouveau produit</h3>
-            <form method="POST" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <input type="hidden" name="action" value="creer">
-                <input type="text" name="nom" placeholder="Nom de l'article" required class="p-3 border rounded-xl outline-none border-pink-100">
-                <input type="number" step="0.01" name="prix" placeholder="Prix ($)" required class="p-3 border rounded-xl outline-none border-pink-100">
-                <input type="number" name="stock" placeholder="Stock Initial" required class="p-3 border rounded-xl outline-none border-pink-100">
-                <button type="submit" class="sm:col-span-3 bg-[#f06292] text-white font-bold p-3 rounded-xl">Enregistrer le produit</button>
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-10">
+        
+        <div class="bg-white p-10 rounded-[45px] shadow-xl border border-pink-50 h-fit">
+            <h3 class="text-xl font-black mb-8 italic text-[#ad1457]">Nouvel Article</h3>
+            <form action="/add_to_catalog" method="POST" class="space-y-5">
+                <div>
+                    <label class="text-[10px] font-bold text-pink-300 uppercase px-2">Nom de l'objet</label>
+                    <input type="text" name="item_name" placeholder="ex: Kit de réparation" required class="w-full p-4 rounded-2xl bg-pink-50/50 border-none outline-none mt-1 font-bold text-[#ad1457]">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[10px] font-bold text-pink-300 uppercase px-2">Prix ($)</label>
+                        <input type="number" name="item_price" placeholder="500" required class="w-full p-4 rounded-2xl bg-pink-50/50 border-none outline-none mt-1">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-pink-300 uppercase px-2">Stock Initial</label>
+                        <input type="number" name="item_stock" placeholder="50" required class="w-full p-4 rounded-2xl bg-pink-50/50 border-none outline-none mt-1">
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-[#f06292] text-white font-black py-5 rounded-2xl shadow-lg shadow-pink-100 hover:scale-[1.02] transition uppercase tracking-widest">
+                    Ajouter au commerce
+                </button>
             </form>
         </div>
-        {% endif %}
 
-        <div class="bg-white rounded-[35px] border border-pink-100 p-8 shadow-sm">
-            <table class="w-full text-left">
-                <thead>
-                    <tr class="text-pink-400 text-xs uppercase border-b border-pink-50">
-                        <th class="pb-4">Nom</th>
-                        <th class="pb-4">Prix Unitaire</th>
-                        <th class="pb-4">Quantité en Stock</th>
-                        {% if session['role'] in ['Patron', 'Co-Patron', 'Manager'] %}
-                        <th class="pb-4 text-right">Actions</th>
-                        {% endif %}
-                    </tr>
-</aside>
-            <aside class="w-72 bg-white border-r border-pink-50 flex flex-col fixed h-full z-50">
-    <div class="p-10 mb-6"><h1 class="text-[#f06292] text-2xl font-black italic">ULTRAZE V2</h1></div>
-    <nav class="flex-1 px-4 space-y-1">
-        <a href="/dashboard" class="flex items-center gap-3 px-6 py-4 text-[#ad1457] font-bold hover:bg-pink-50 rounded-2xl transition">Dashboard</a>
-        <a href="/ventes" class="flex items-center gap-3 px-6 py-4 text-[#ad1457] font-bold hover:bg-pink-50 rounded-2xl transition">Ventes</a>
-        <a href="/salaires" class="flex items-center gap-3 px-6 py-4 text-[#ad1457] font-bold hover:bg-pink-50 rounded-2xl transition">Salaires</a>
-        <a href="/utilisateurs" class="flex items-center gap-3 px-6 py-4 text-[#ad1457] font-bold hover:bg-pink-50 rounded-2xl transition">Utilisateurs</a>
-        <a href="/types-ventes" class="flex items-center gap-3 px-6 py-4 text-[#ad1457] font-bold hover:bg-pink-50 rounded-2xl transition">Stocks / Types</a>
-        <div class="h-px bg-pink-50 my-6 mx-6"></div>
-        <a href="/clotures" class="flex items-center gap-3 px-6 py-4 text-pink-400 font-bold hover:bg-pink-50 rounded-2xl transition">Clôtures</a>
-        <a href="/irs" class="flex items-center gap-3 px-6 py-4 text-red-400 font-bold hover:bg-red-50 rounded-2xl transition italic">Avertissement IRS</a>
-    </nav>
-    <div class="p-8 border-t border-pink-50">
-        <a href="/logout" class="text-[10px] font-black text-gray-300 uppercase">Déconnexion</a>
-    </div>
-</aside>
-                </thead>
-                <tbody class="divide-y divide-pink-50 text-sm">
-                    {% for prod in produits %}
-                    <tr>
-                        <td class="py-4 font-bold text-pink-950">{{ prod.nom }}</td>
-                        <td class="py-4 text-pink-600">{{ prod.prix }} $</td>
-                        <td class="py-4">
-                            <span class="px-3 py-1 rounded-full font-bold {% if prod.stock > 5 %}bg-emerald-50 text-emerald-600{% else%}"bg-red-50 text-red-500"{% endif %}">{{ prod.stock }}</span>
-                        </td>
-                        {% if session['role'] in ['Patron', 'Co-Patron', 'Manager'] %}
-                        <td class="py-4 text-right">
-                            <form method="POST" class="inline-flex gap-2">
-                                <input type="hidden" name="action" value="modifier_stock">
-                                <input type="hidden" name="produit_id" value="{{ prod.id }}">
-                                <button type="submit" name="mouvement" value="10" class="bg-pink-100 text-pink-700 px-2 py-1 rounded-lg text-xs font-bold">+10</button>
-                                <button type="submit" name="mouvement" value="-10" class="bg-red-50 text-red-600 px-2 py-1 rounded-lg text-xs font-bold">-10</button>
+        <div class="xl:col-span-2 bg-white p-10 rounded-[45px] shadow-xl border border-pink-50">
+            <h3 class="text-xl font-black mb-8 italic text-[#ad1457]">Inventaire en temps réel</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {% for item in catalogue %}
+                <div class="flex items-center justify-between p-6 bg-pink-50/30 rounded-3xl border border-pink-50">
+                    <div>
+                        <p class="font-black text-[#ad1457]">{{ item.nom }}</p>
+                        <p class="text-xs text-pink-300 font-bold uppercase">{{ item.prix }}$ / unité</p>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="text-right">
+                            <p class="text-[10px] font-bold text-gray-400 uppercase">En stock</p>
+                            <p class="text-xl font-black {% if item.stock < 10 %}text-red-400{% else %}text-[#f06292]{% endif %}">
+                                {{ item.stock }}
+                            </p>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <form action="/update_stock/{{ item.nom }}/add" method="POST">
+                                <button class="bg-white p-1 rounded-lg shadow-sm hover:bg-green-50 text-green-500">+</button>
                             </form>
-                        </td>
-                        {% endif %}
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                            <form action="/update_stock/{{ item.nom }}/remove" method="POST">
+                                <button class="bg-white p-1 rounded-lg shadow-sm hover:bg-red-50 text-red-400">-</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
-</body>
-</html>
+</main>
