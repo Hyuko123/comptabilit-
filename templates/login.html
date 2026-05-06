@@ -21,7 +21,12 @@
                 <input type="text" name="username" placeholder="Identifiant" class="w-full bg-[#1c2128] border border-gray-700 rounded-lg p-4 focus:border-blue-500 outline-none">
                 <input type="password" name="password" placeholder="••••••••••••" class="w-full bg-[#1c2128] border border-gray-700 rounded-lg p-4 focus:border-blue-500 outline-none">
                 <button class="w-full bg-gradient-to-r from-[#1eb1a6] to-[#2b7fff] py-4 rounded-xl font-bold shadow-lg hover:opacity-90 transition">Se connecter</button>
-            </form>
+            <form method="POST" action="/login">
+    <input type="text" name="username" placeholder="Identifiant">
+    <input type="password" name="password" placeholder="Mot de passe">
+    
+    <button type="submit">Se connecter</button>
+</form>
             
             <div class="mt-8 p-4 bg-[#161b22] rounded-lg border border-gray-800 text-xs text-gray-400">
                 <p class="font-bold text-white mb-1">Exemple de format :</p>
