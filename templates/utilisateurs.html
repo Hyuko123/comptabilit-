@@ -1,65 +1,55 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Effectifs | Ultraze V2</title>
+</head>
+<body class="bg-[#0a0f18] text-slate-300 p-8">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-2xl font-bold text-white mb-8 italic">Gestion des <span class="text-sky-500">Utilisateurs</span></h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div class="bg-slate-900 border border-slate-800 p-8 rounded-[30px]">
+                <h2 class="text-white font-bold mb-6">Enrôler un nouveau membre</h2>
+                <form action="/add_user" method="POST" class="space-y-4">
+                    <input type="text" name="new_name" placeholder="Prénom Nom" class="w-full bg-slate-800 p-4 rounded-xl border-none outline-none" required>
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="text" name="new_username" placeholder="Identifiant" class="bg-slate-800 p-4 rounded-xl border-none outline-none" required>
+                        <input type="password" name="new_password" placeholder="Mot de passe" class="bg-slate-800 p-4 rounded-xl border-none outline-none" required>
+                    </div>
+                    
+                    <select name="new_entreprise" class="w-full bg-slate-800 p-4 rounded-xl border-none outline-none">
+                        {% for ent in entreprises %}
+                        <option value="{{ ent }}">{{ ent }}</option>
+                        {% endfor %}
+                    </select>
 
-app = Flask(__name__, template_folder='../templates')
-app.secret_key = 'ultraze_secret_v2'
+                    <div class="grid grid-cols-2 gap-2 text-[10px]">
+                        {% for grade in ['Patron', 'Co patron', 'Manager', 'Employé expérimenté', 'Employé'] %}
+                        <label class="flex items-center gap-2 p-3 bg-slate-800 rounded-lg cursor-pointer hover:bg-sky-900/30 transition-all">
+                            <input type="radio" name="new_role" value="{{ grade }}" required class="accent-sky-500">
+                            {{ grade }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <button class="w-full bg-sky-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-sky-900/20">CRÉER LE COMPTE</button>
+                </form>
+            </div>
 
-# Base de données simulée avec toutes tes entreprises
-entreprises_liste = [
-    "Restaurant Vinewood", "Burger Shot", "REX Diner + LTD", "Pop Chiken",
-    "Unicorn", "Bahamas", "Fête Forraine", "Agence d'évènementiel", "Le Clown",
-    "Benny's", "LS Custom", "Garage Paleto", "REX Garage", "Custom Mirror", "Auto Repair 68",
-    "Dynasty 8", "LTD Little Seoul", "LTD Groove Street", "Ammunation", "Car Dealer",
-    "Taxi", "Psychologue", "Transport et livraison", "Salon de tatouage Aguja", "Salon de tatouage Vespucci"
-]
-
-# Utilisateur admin par défaut
-users_db = {
-    "admin": {"password": "admin123", "name": "Shinoza", "role": "MASTER", "entreprise": "ADMINISTRATION"}
-}
-
-@app.route('/')
-def login():
-    return render_template('login.html')
-
-@app.route('/login_process', methods=['POST'])
-def login_process():
-    u = request.form.get('username')
-    p = request.form.get('password')
-    if u in users_db and users_db[u]['password'] == p:
-        session['user'] = users_db[u]
-        session['user']['username'] = u
-        return redirect(url_for('dashboard'))
-    return redirect(url_for('login'))
-
-@app.route('/dashboard')
-def dashboard():
-    if 'user' not in session: return redirect(url_for('login'))
-    # On initialise des valeurs à 0 pour éviter l'erreur 500 sur le dashboard
-    stats = {'ca_net': 0, 'taxes': 0, 'salaires': 0, 'benefice': 0}
-    return render_template('dashboard.html', user=session['user'], stats=stats)
-
-@app.route('/utilisateurs')
-def utilisateurs():
-    if 'user' not in session: return redirect(url_for('login'))
-    return render_template('utilisateurs.html', user=session['user'], entreprises=entreprises_liste, all_users=users_db)
-
-@app.route('/add_user', methods=['POST'])
-def add_user():
-    new_u = request.form.get('new_username')
-    users_db[new_u] = {
-        "password": request.form.get('new_password'),
-        "name": request.form.get('new_name'),
-        "role": request.form.get('new_role'),
-        "entreprise": request.form.get('new_entreprise')
-    }
-    return redirect(url_for('utilisateurs'))
-
-@app.route('/ventes')
-def ventes():
-    if 'user' not in session: return redirect(url_for('login'))
-    return render_template('ventes.html', user=session['user'])
-
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('login'))
+            <div class="space-y-4">
+                <h2 class="text-white font-bold">Membres enregistrés</h2>
+                {% for username, data in all_users.items() %}
+                <div class="p-4 bg-slate-900 border border-slate-800 rounded-2xl flex justify-between items-center">
+                    <div>
+                        <p class="text-white font-bold">{{ data.name }} <span class="text-sky-500 text-[10px]">@{{ username }}</span></p>
+                        <p class="text-[10px] text-slate-500 uppercase">{{ data.entreprise }} — {{ data.role }}</p>
+                    </div>
+                    <div class="w-2 h-2 rounded-full bg-emerald-500 shadow-lg shadow-emerald-500/50"></div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
