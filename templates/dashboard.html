@@ -2,149 +2,96 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultraze V2 | Premium Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #05070a; color: #e2e8f0; }
-        .glass-card { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        .sidebar-item:hover { background: linear-gradient(90deg, rgba(56, 189, 248, 0.1) 0%, transparent 100%); border-left: 3px solid #0ea5e9; }
-        .active-link { background: linear-gradient(90deg, rgba(56, 189, 248, 0.15) 0%, transparent 100%); border-left: 3px solid #0ea5e9; color: #38bdf8; }
-        .sidebar { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .cyan-glow { box-shadow: 0 0 20px rgba(14, 165, 233, 0.15); }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #030508; }
+        .sidebar { background: rgba(6, 9, 15, 0.95); backdrop-filter: blur(20px); border-right: 1px solid rgba(255,255,255,0.05); }
+        .glass { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 24px; }
+        .cyan-glow { box-shadow: 0 0 15px rgba(14, 165, 233, 0.1); }
     </style>
 </head>
-<body class="overflow-x-hidden">
+<body class="text-slate-300">
 
-    <aside id="sidebar" class="fixed left-0 top-0 h-full w-72 bg-[#0a0f18] border-r border-white/5 z-50 sidebar -translate-x-full lg:translate-x-0">
-        <div class="p-8">
-            <div class="flex items-center gap-3 mb-10">
-                <div class="w-10 h-10 bg-sky-500 rounded-xl flex items-center justify-center cyan-glow">
-                    <i class="fa-solid fa-gem text-black text-xl"></i>
-                </div>
-                <span class="text-xl font-bold tracking-tight text-white italic">ULTRAZE <span class="text-sky-500 font-light">V2</span></span>
-            </div>
-
-            <nav class="space-y-4">
-                <p class="text-[10px] uppercase tracking-[2px] text-gray-500 font-bold mb-4">Menu Principal</p>
-                <a href="/" class="sidebar-item active-link flex items-center gap-4 p-4 rounded-r-xl transition-all duration-300">
-                    <i class="fa-solid fa-grid-2 text-lg"></i> Dashboard
-                </a>
-                <a href="/ventes" class="sidebar-item flex items-center gap-4 p-4 text-gray-400 hover:text-white rounded-r-xl transition-all">
-                    <i class="fa-solid fa-receipt"></i> Ventes
-                </a>
-                <a href="/salaires" class="sidebar-item flex items-center gap-4 p-4 text-gray-400 hover:text-white rounded-r-xl transition-all">
-                    <i class="fa-solid fa-wallet"></i> Salaires
-                </a>
-                <a href="/utilisateurs" class="sidebar-item flex items-center gap-4 p-4 text-gray-400 hover:text-white rounded-r-xl transition-all">
-                    <i class="fa-solid fa-user-group"></i> Utilisateurs
-                </a>
-                
-                <p class="text-[10px] uppercase tracking-[2px] text-gray-500 font-bold pt-6 mb-4">Finance & Légal</p>
-                <a href="#" class="sidebar-item flex items-center gap-4 p-4 text-gray-400 hover:text-white rounded-r-xl transition-all">
-                    <i class="fa-solid fa-tags"></i> Types de ventes
-                </a>
-                <a href="#" class="sidebar-item flex items-center gap-4 p-4 text-gray-400 hover:text-white rounded-r-xl transition-all">
-                    <i class="fa-solid fa-box-archive"></i> Taxes / Clôture
-                </a>
-                <a href="#" class="sidebar-item flex items-center gap-4 p-4 text-red-400/70 hover:text-red-400 rounded-r-xl transition-all">
-                    <i class="fa-solid fa-triangle-exclamation"></i> Avertissement IRS
-                </a>
-            </nav>
+    <nav class="fixed left-0 top-0 h-full w-64 sidebar p-6 z-50">
+        <div class="flex items-center gap-3 mb-12 px-2">
+            <div class="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center text-black font-bold shadow-lg shadow-sky-500/20 italic">U</div>
+            <span class="text-white font-bold tracking-tighter text-lg uppercase italic">Ultraze <span class="text-sky-500">V2</span></span>
         </div>
-    </aside>
 
-    <main class="lg:ml-72 min-h-screen p-6 md:p-12">
-        
+        <div class="space-y-1">
+            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest px-4 mb-4 opacity-50">Gestion</p>
+            <a href="/dashboard" class="flex items-center gap-4 px-4 py-3 text-sky-400 bg-sky-500/5 border-l-2 border-sky-500 transition-all rounded-r-lg">
+                <i class="fa-solid fa-house-chimney text-sm"></i> Dashboard
+            </a>
+            <a href="/ventes" class="flex items-center gap-4 px-4 py-3 hover:bg-white/5 transition-all rounded-lg opacity-70 hover:opacity-100">
+                <i class="fa-solid fa-receipt text-sm"></i> Ventes
+            </a>
+            <a href="/salaires" class="flex items-center gap-4 px-4 py-3 hover:bg-white/5 transition-all rounded-lg opacity-70 hover:opacity-100">
+                <i class="fa-solid fa-vault text-sm"></i> Salaires
+            </a>
+            <a href="/utilisateurs" class="flex items-center gap-4 px-4 py-3 hover:bg-white/5 transition-all rounded-lg opacity-70 hover:opacity-100">
+                <i class="fa-solid fa-users-gear text-sm"></i> Utilisateurs
+            </a>
+        </div>
+
+        <div class="mt-12 space-y-1">
+            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest px-4 mb-4 opacity-50">Légal</p>
+            <a href="#" class="flex items-center gap-4 px-4 py-3 hover:bg-red-500/5 text-red-400/60 hover:text-red-400 transition-all rounded-lg">
+                <i class="fa-solid fa-triangle-exclamation text-sm"></i> Alertes IRS
+            </a>
+        </div>
+    </nav>
+
+    <main class="ml-64 p-10">
         <header class="flex justify-between items-center mb-12">
-            <button onclick="toggleSidebar()" class="lg:hidden w-12 h-12 glass-card rounded-full flex items-center justify-center">
-                <i class="fa-solid fa-bars-staggered text-sky-500"></i>
-            </button>
-            
-            <div class="hidden md:block">
-                <h1 class="text-3xl font-bold text-white tracking-tight">Bonjour, <span class="text-sky-500">Admin</span></h1>
-                <p class="text-gray-500 text-sm mt-1">Voici l'état de vos finances pour la <span class="text-gray-300">Semaine 19</span></p>
+            <div>
+                <h1 class="text-3xl font-light text-white tracking-tight italic">Pilotage <span class="font-bold text-sky-500">Comptable</span></h1>
+                <p class="text-gray-500 text-xs mt-1 uppercase tracking-widest">Session : Amare Mactavish — Grade : <span class="text-gray-300">Co-Patron</span></p>
             </div>
-
-            <div class="flex items-center gap-6">
-                <div class="text-right hidden sm:block">
-                    <p class="text-white font-semibold text-sm">Amare Mactavish</p>
-                    <p class="text-sky-500 text-[10px] uppercase font-bold tracking-widest">Co-Patron</p>
-                </div>
-                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 p-[1px]">
-                    <div class="w-full h-full bg-[#0a0f18] rounded-2xl flex items-center justify-center">
-                        <i class="fa-solid fa-user-tie text-white"></i>
-                    </div>
-                </div>
+            <div class="glass px-4 py-2 flex items-center gap-4">
+                <span class="text-xs font-bold text-white tracking-tighter">SÉCURISÉ</span>
+                <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
             </div>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-            <div class="glass-card p-8 rounded-[32px] relative overflow-hidden group">
-                <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
-                    <i class="fa-solid fa-chart-line text-6xl text-sky-500"></i>
-                </div>
-                <p class="text-gray-400 text-xs uppercase font-bold tracking-widest mb-4">CA Net Taxable</p>
-                <h2 class="text-5xl font-light text-white italic">0<span class="text-sky-500 text-2xl ml-2">$</span></h2>
-                <div class="mt-6 flex items-center gap-2 text-[10px] text-emerald-400 bg-emerald-500/10 w-fit px-3 py-1 rounded-full">
-                    <i class="fa-solid fa-arrow-trend-up"></i> +12.5% vs semaine dernière
-                </div>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+            <div class="glass p-6 cyan-glow">
+                <p class="text-[10px] font-bold text-gray-500 uppercase mb-2 tracking-widest">CA Net Taxable</p>
+                <p class="text-3xl font-light text-white">0<span class="text-sky-500 text-sm ml-1">$</span></p>
             </div>
-
-            <div class="glass-card p-8 rounded-[32px] border-l-4 border-l-red-500/50">
-                <p class="text-gray-400 text-xs uppercase font-bold tracking-widest mb-4">Provisions Taxes</p>
-                <h2 class="text-5xl font-light text-white italic">0<span class="text-red-500 text-2xl ml-2">$</span></h2>
-                <p class="mt-4 text-gray-500 text-xs">Calcul automatique IRS (20%)</p>
+            <div class="glass p-6">
+                <p class="text-[10px] font-bold text-gray-500 uppercase mb-2 tracking-widest">Salaires</p>
+                <p class="text-3xl font-light text-white">0<span class="text-sky-500 text-sm ml-1">$</span></p>
             </div>
-
-            <div class="glass-card p-8 rounded-[32px]">
-                <p class="text-gray-400 text-xs uppercase font-bold tracking-widest mb-4">Bénéfice Réel</p>
-                <h2 class="text-5xl font-light text-white italic">0<span class="text-indigo-400 text-2xl ml-2">$</span></h2>
-                <div class="mt-6 h-1 w-full bg-gray-800 rounded-full overflow-hidden">
-                    <div class="h-full bg-indigo-500 w-2/3"></div>
-                </div>
+            <div class="glass p-6">
+                <p class="text-[10px] font-bold text-gray-500 uppercase mb-2 tracking-widest">Taxes</p>
+                <p class="text-3xl font-light text-white text-red-500/80">0<span class="text-red-500 text-sm ml-1">$</span></p>
+            </div>
+            <div class="glass p-6 bg-gradient-to-br from-sky-500/10 to-transparent">
+                <p class="text-[10px] font-bold text-sky-500 uppercase mb-2 tracking-widest">Bénéfice</p>
+                <p class="text-3xl font-bold text-white">0<span class="text-sky-500 text-sm ml-1">$</span></p>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div class="glass-card p-8 rounded-[32px]">
-                <h3 class="text-xl font-bold text-white mb-6">Dernières Activités</h3>
-                <div class="space-y-6">
-                    <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-xl bg-sky-500/20 flex items-center justify-center text-sky-500 text-xs">
-                                <i class="fa-solid fa-plus"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm font-semibold text-white">Vente Menu Premium</p>
-                                <p class="text-[10px] text-gray-500">Il y a 2 minutes par Rossi</p>
-                            </div>
-                        </div>
-                        <span class="text-sky-400 font-bold">+150$</span>
-                    </div>
-                </div>
+        <div class="glass p-8">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-white font-bold italic tracking-tight">Mises à jour appliquées <span class="text-sky-500 opacity-50 ml-2">V1.2</span></h3>
+                <button class="text-[10px] font-bold bg-sky-500 text-black px-4 py-2 rounded-full uppercase tracking-tighter">Actualiser</button>
             </div>
-
-            <div class="glass-card p-8 rounded-[32px] bg-gradient-to-br from-sky-500/10 to-transparent border-sky-500/20">
-                <i class="fa-solid fa-shield-check text-sky-500 text-3xl mb-4"></i>
-                <h3 class="text-xl font-bold text-white mb-2">Conformité IRS</h3>
-                <p class="text-gray-400 text-sm leading-relaxed mb-6">
-                    Votre clôture de la semaine 18 a été validée. Pensez à vérifier les stocks avant la clôture de dimanche soir.
-                </p>
-                <button class="w-full py-4 bg-sky-500 hover:bg-sky-400 text-black font-extrabold rounded-2xl transition-all shadow-lg shadow-sky-500/20">
-                    GÉNÉRER LA CLÔTURE HEBDO
-                </button>
+            <div class="grid grid-cols-2 gap-8 text-sm">
+                <div class="p-4 bg-white/5 rounded-xl border border-white/5">
+                    <p class="text-sky-400 font-bold mb-1 italic">Dashboard Intelligent</p>
+                    <p class="text-xs text-gray-400">Alertes globales, indicateurs de période, suivi taxes.</p>
+                </div>
+                <div class="p-4 bg-white/5 rounded-xl border border-white/5">
+                    <p class="text-sky-400 font-bold mb-1 italic">Ventes & Stocks</p>
+                    <p class="text-xs text-gray-400">Recherche avancée, correction de ventes, alertes négatives.</p>
+                </div>
             </div>
         </div>
     </main>
 
-    <script>
-        function toggleSidebar() {
-            const sb = document.getElementById('sidebar');
-            sb.classList.toggle('-translate-x-full');
-        }
-    </script>
 </body>
 </html>
