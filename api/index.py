@@ -92,21 +92,34 @@ def utilisateurs():
     return render_template('utilisateurs.html', all_users=mes_employes, entreprises=liste_entreprises)
     
 @app.route('/add_user', methods=['POST'])
-def add_user_process():  # Changement de nom ici pour éviter le conflit
-    if 'user' not in session: return redirect(url_for('login'))
-    
-    users = charger_users()
-    new_uid = request.form.get('new_username').lower().strip()
-    
-    users[new_uid] = {
-        "password": request.form.get('new_password'),
-        "name": request.form.get('new_name'),
-        "role": request.form.get('new_role'),
-        "entreprise": request.form.get('new_entreprise'),
-        "telephone": "N/A", "iban": "N/A", "prime": 0, "avance": 0
-    }
-    sauvegarder_users(users)
-    return redirect(url_for('utilisateurs'))
+def add_user():
+    try:
+        # 1. Récupération des données du formulaire
+        uid = request.form.get('new_username')
+        name = request.form.get('new_name')
+        password = request.form.get('new_password')
+        role = request.form.get('new_role')
+        entreprise = request.form.get('new_entreprise')
+
+        # 2. Chargement des utilisateurs actuels
+        users = charger_utilisateurs() # Ta fonction qui lit le JSON
+
+        # 3. Ajout du nouvel utilisateur
+        users[uid] = {
+            "name": name,
+            "password": password,
+            "role": role,
+            "entreprise": entreprise
+        }
+
+        # 4. Sauvegarde
+        sauvegarder_utilisateurs(users)
+        
+        return redirect(url_for('utilisateurs')) # Redirige vers la page de liste
+
+    except Exception as e:
+        print(f"Erreur lors de la création : {e}")
+        return f"Erreur interne : {e}", 500
     
 @app.route('/delete_user/<uid>')
 def delete_user(uid):
