@@ -111,12 +111,3 @@ def admin_panel():
     users = User.query.all()
     return render_template('admin.html', users=users)
 
-if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-        # Création du compte Patron par défaut si vide
-        if not User.query.filter_by(username='admin').first():
-            admin = User(username='admin', password=generate_password_hash('admin123'), role='Patron')
-            db.session.add(admin)
-            db.session.commit()
-    app.run(debug=True)
