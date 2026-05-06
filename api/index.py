@@ -2,9 +2,9 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import os
 
 app = Flask(__name__, template_folder='../templates')
-app.secret_key = 'ultraze_admin_secret'
+app.secret_key = 'ultraze_admin_v2_key'
 
-# Liste des entreprises complète
+# Liste des entreprises (extraite de tes screens)
 entreprises_liste = [
     "Restaurant Vinewood", "Burger Shot", "REX Diner + LTD", "Pop Chiken",
     "Unicorn", "Bahamas", "Fête Forraine", "Agence d'évènementiel", "Le Clown",
@@ -13,7 +13,7 @@ entreprises_liste = [
     "Taxi", "Psychologue", "Transport et livraison", "Salon de tatouage Aguja", "Salon de tatouage Vespucci"
 ]
 
-# Changement du nom par défaut en Admin
+# Utilisateur Admin par défaut
 users_db = {
     "admin": {"password": "admin123", "name": "Admin", "role": "MASTER", "entreprise": "ADMINISTRATION"}
 }
@@ -40,7 +40,6 @@ def dashboard():
     stats = {'ca': "4.650", 'taxes': "1.628", 'benefice': "465"}
     return render_template('dashboard.html', stats=stats)
 
-# Routes pour toutes les catégories du menu
 @app.route('/ventes')
 def ventes(): return render_template('ventes.html')
 
