@@ -1,10 +1,15 @@
 from flask import Flask, render_template, request, redirect, url_for, session
-import os
 
 app = Flask(__name__, template_folder='../templates')
-app.secret_key = 'shinoza_ultraze_v2_key'
+app.secret_key = 'ultraze_master_key'
 
-# --- LOGIQUE DE CONNEXION ---
+# Simulation de base de données des entreprises et taxes
+# Dans un vrai projet, ceci serait dans ta base de données
+entreprises_db = {
+    "Rex Diner + LTD": {"taxes_irs": 35, "grades": {"Patron": 65, "Co Patron": 63, "Manager": 60, "Employé": 55}},
+    "Ultraze Corp": {"taxes_irs": 20, "grades": {"Patron": 100}}
+}
+
 @app.route('/')
 def login():
     return render_template('login.html')
@@ -14,55 +19,44 @@ def login_process():
     u = request.form.get('username')
     p = request.form.get('password')
     
-    # Ton accès admin secret (Invisible dans le HTML)
+    # ACCÈS MASTER ADMIN (Shinoza)
     if u == "admin" and p == "admin123":
-        session['user'] = {'name': 'Shinoza', 'role': 'Patron Global', 'entreprise': 'Ultraze Corp'}
-        return redirect(url_for('dashboard'))
+        session['user'] = {'name': 'Shinoza', 'role': 'MASTER', 'entreprise': 'ADMINISTRATION'}
+        return redirect(url_for('admin_panel'))
     
-    # Simuler une connexion entreprise pour le test (Ex: Rex Diner)
+    # ACCÈS ENTREPRISE (Exemple)
     if u == "rex" and p == "rex123":
         session['user'] = {'name': 'Amare', 'role': 'Patron', 'entreprise': 'Rex Diner + LTD'}
         return redirect(url_for('dashboard'))
 
     return redirect(url_for('login'))
 
-# --- ROUTES DASHBOARD & CATÉGORIES ---
+# --- PANEL ADMIN UNIQUE (ADMIN ONLY) ---
+@app.route('/admin-master')
+def admin_panel():
+    if session.get('user', {}).get('role') != 'MASTER':
+        return "Accès interdit", 403
+    return render_template('admin_master.html', entreprises=entreprises_db)
+
+# --- ROUTES CLASSIQUES ---
 @app.route('/dashboard')
 def dashboard():
     if 'user' not in session: return redirect(url_for('login'))
-    # Les stats sont calculées ici (Simulation selon tes images)
-    stats = {'ca': 4650, 'salaires': 2558, 'taxes': 1628, 'benefice': 465}
-    return render_template('dashboard.html', user=session['user'], stats=stats)
+    # On récupère les taxes spécifiques à l'entreprise de l'utilisateur
+    ent = session['user']['entreprise']
+    config = entreprises_db.get(ent, {"taxes_irs": 0, "grades": {}})
+    return render_template('dashboard.html', user=session['user'], config=config)
 
 @app.route('/ventes')
 def ventes():
     if 'user' not in session: return redirect(url_for('login'))
     return render_template('ventes.html', user=session['user'])
 
-@app.route('/salaires')
-def salaires():
-    if 'user' not in session: return redirect(url_for('login'))
-    return render_template('salaires.html', user=session['user'])
-
 @app.route('/utilisateurs')
 def utilisateurs():
     if 'user' not in session: return redirect(url_for('login'))
+    # Si c'est l'admin, il voit tout. Si c'est un patron, il ne voit que ses employés.
     return render_template('utilisateurs.html', user=session['user'])
-
-@app.route('/stocks')
-def stocks():
-    if 'user' not in session: return redirect(url_for('login'))
-    return render_template('stocks.html', user=session['user'])
-
-@app.route('/clotures')
-def clotures():
-    if 'user' not in session: return redirect(url_for('login'))
-    return render_template('clotures.html', user=session['user'])
-
-@app.route('/irs')
-def irs():
-    if 'user' not in session: return redirect(url_for('login'))
-    return render_template('irs.html', user=session['user'])
 
 @app.route('/logout')
 def logout():
