@@ -73,25 +73,43 @@ def ventes():
 
 @app.route('/utilisateurs')
 def utilisateurs():
-    if 'user' not in session: return redirect(url_for('login'))
+    if 'user' not in session: 
+        return redirect(url_for('login'))
     
     user_logged = session['user']
     all_u = charger_users()
-    config_ent = charger_config_entreprises() # On charge la config
     
-    # Filtrage des employés par entreprise
+    # 1. On récupère la config pour avoir la liste des entreprises
+    # Si charger_config_entreprises() est vide, on met une liste par défaut
+    config_ent = charger_config_entreprises() or {"Burger Shot": {}, "LTD": {}, "Unicorn": {}}
+    
+    # 2. Filtrage : Un patron ne voit que ses gars, l'admin voit tout
     if user_logged.get('role') == "SYSTEM_ADMIN":
         mes_employes = all_u
-        liste_entreprises = list(config_ent.keys())
+        liste_pour_select = list(config_ent.keys())
     else:
         ent_name = user_logged.get('entreprise')
         mes_employes = {k: v for k, v in all_u.items() if v.get('entreprise') == ent_name}
-        liste_entreprises = [ent_name] # Le patron ne peut choisir que son entreprise
+        # Le patron ne peut créer des gens que dans sa propre entreprise
+        liste_pour_select = [ent_name]
     
-    # C'EST ICI QUE CA BLOQUAIT : il faut passer 'entreprises' au HTML
+    # 3. On envoie TOUT au HTML (all_users ET entreprises)
     return render_template('utilisateurs.html', 
                            all_users=mes_employes, 
-                           entreprises=liste_entreprises)
+                           entreprises=liste_pour_select)
+
+@app.route('/delete_user/<uid>')
+def delete_user(uid):
+    if 'user' not in session: return redirect(url_for('login'))
+    
+    users = charger_users()
+    if uid in users:
+        # Optionnel : vérifier ici que le gars qui supprime est bien le patron de la même entreprise
+        del users[uid]
+        sauvegarder_users(users)
+        
+    return redirect(url_for('utilisateurs'))
+    
 @app.route('/add_user', methods=['POST'])
 def add_user():
     if 'user' not in session: return redirect(url_for('login'))
