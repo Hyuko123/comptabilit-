@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session
-# Importation des bases de données depuis le fichier externe
-from config import PRODUITS_PAR_ENTREPRISE, USERS_DB
+from config import PRODUITS_PAR_ENTREPRISE # Tes prix statiques
+# On importe nos nouvelles fonctions de sauvegarde
+from database import charger_ventes, sauvegarder_ventes, charger_users
 
 app = Flask(__name__, template_folder='../templates')
 app.secret_key = 'ultraze_v2_core'
