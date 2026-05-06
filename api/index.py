@@ -248,26 +248,24 @@ def types_ventes_page():
 # Route pour ajouter un nouvel article au catalogue
 @app.route('/add_to_catalog', methods=['POST'])
 def add_to_catalog():
-    if 'user' not in session:
-        return redirect(url_for('login'))
+    if 'user' not in session: return redirect(url_for('login'))
     
-    # Récupération des données du formulaire
     nom = request.form.get('item_name')
     prix = request.form.get('item_price')
+    stock = request.form.get('item_stock') # Ajout du stock initial
     
     if nom and prix:
         try:
-            # Enregistrement dans la table "catalogue" de Supabase
             supabase.table("catalogue").insert({
                 "nom": nom, 
-                "prix": float(prix)
+                "prix": float(prix),
+                "stock": int(stock or 0)
             }).execute()
         except Exception as e:
             print(f"Erreur catalogue: {e}")
             
-    return redirect(url_for('ventes_page'))
-
-# Route pour modifier le stock (+ ou -)
+    return redirect(url_for('types_ventes_page')) # On reste sur la page stocks
+    
 @app.route('/update_stock/<nom>/<action>')
 def update_stock(nom, action):
     res = supabase.table("catalogue").select("stock").eq("nom", nom).single().execute()
