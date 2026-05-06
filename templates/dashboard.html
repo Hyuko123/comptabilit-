@@ -1,32 +1,46 @@
-@app.route('/dashboard')
-def dashboard():
-    if 'user' not in session: 
-        return redirect(url_for('login'))
-    
-    user = session['user']
-    user_ent = user.get('entreprise', 'Burger Shot') # Valeur par défaut pour éviter le crash
-    
-    # On charge les données ou on met des listes vides si ça échoue
-    try:
-        ventes_all = charger_ventes() or []
-        config_all = charger_config_entreprises() or {}
-    except:
-        ventes_all, config_all = [], {}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Dashboard | Ultraze V2</title>
+</head>
+<body class="bg-[#fff9fa] flex min-h-screen font-sans">
+    <aside class="w-72 bg-white border-r border-pink-50 flex flex-col fixed h-full z-50">
+        <div class="p-10 mb-6"><h1 class="text-[#f06292] text-2xl font-black italic">ULTRAZE V2</h1></div>
+        <nav class="flex-1 px-4 space-y-1">
+            <a href="/dashboard" class="flex items-center gap-3 px-6 py-4 bg-pink-50 text-[#ad1457] font-bold rounded-2xl italic">Dashboard</a>
+            <a href="/ventes" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Ventes</a>
+            <a href="/salaires" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Salaires</a>
+            <a href="/utilisateurs" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Utilisateurs</a>
+            <div class="h-px bg-pink-50 my-6 mx-6"></div>
+            <a href="/clotures" class="flex items-center gap-3 px-6 py-4 text-pink-400 font-bold hover:bg-pink-50 rounded-2xl transition">Clôtures</a>
+        </nav>
+        <div class="p-8 border-t border-pink-50"><a href="/logout" class="text-[10px] font-black text-gray-300 uppercase tracking-widest">Déconnexion</a></div>
+    </aside>
 
-    # Filtrage
-    mes_ventes = [v for v in ventes_all if v.get('entreprise') == user_ent]
-    ca = sum(v.get('net', 0) for v in mes_ventes)
-    
-    # IRS
-    ent_data = config_all.get(user_ent, {})
-    taux_irs = ent_data.get('taxe_irs', 15)
-    
-    stats = {
-        'ca': ca,
-        'taxes': int(ca * (taux_irs / 100)),
-        'benefice': int(ca * (1 - (taux_irs / 100))),
-        'nom_user': user.get('name', 'Utilisateur'),
-        'entreprise': user_ent
-    }
-    
-    return render_template('dashboard.html', stats=stats)
+    <main class="ml-72 flex-1 p-16">
+        <header class="mb-12">
+            <p class="text-pink-400 font-bold uppercase tracking-widest text-[10px] mb-2">{{ stats.entreprise }}</p>
+            <h2 class="text-5xl font-light text-[#880e4f]">Bienvenue, <span class="font-black italic text-[#f06292]">{{ stats.nom_user }}</span></h2>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white p-10 rounded-[45px] shadow-xl border border-pink-50">
+                <p class="text-[10px] font-bold text-pink-300 uppercase mb-4 tracking-widest italic">Chiffre d'Affaires</p>
+                <h3 class="text-5xl font-black text-[#ad1457] italic">{{ stats.ca }} $</h3>
+            </div>
+            
+            <div class="bg-white p-10 rounded-[45px] shadow-xl border border-pink-50">
+                <p class="text-[10px] font-bold text-pink-300 uppercase mb-4 tracking-widest italic">Taxes IRS</p>
+                <h3 class="text-5xl font-black text-red-400 italic">{{ stats.taxes }} $</h3>
+            </div>
+
+            <div class="bg-[#f06292] p-10 rounded-[45px] text-white shadow-2xl shadow-pink-200">
+                <p class="text-[10px] font-bold opacity-70 uppercase mb-4 tracking-widest italic">Bénéfice Net</p>
+                <h3 class="text-5xl font-black italic">{{ stats.benefice }} $</h3>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
