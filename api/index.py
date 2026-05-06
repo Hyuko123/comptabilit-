@@ -1,67 +1,39 @@
 from flask import Flask, render_template, request, redirect, url_for, session
+# Importation des bases de données depuis le fichier externe
+from config import PRODUITS_PAR_ENTREPRISE, USERS_DB
 
 app = Flask(__name__, template_folder='../templates')
 app.secret_key = 'ultraze_v2_core'
 
-# Configuration des produits par entreprise
-# Tu peux ajouter toutes tes entreprises et leurs articles ici
-PRODUITS_PAR_ENTREPRISE = {
-    "Burger Shot": {
-        "Menu Burger": 75,
-        "Frites": 20,
-        "Soda": 15
-    },
-    "Unicorn": {
-        "Entrée Club": 100,
-        "Bouteille Champagne": 500,
-        "Cocktail": 50
-    },
-    "LTD Little Seoul": {
-        "Sachet de chips": 10,
-        "Eau": 5,
-        "Barre chocolatée": 8
-    },
-    "ADMINISTRATION": {
-        "Service Admin": 0,
-        "Licence": 1000
-    }
-}
-
-# Admin par défaut
-users_db = {
-    "admin": {"password": "admin123", "name": "Admin", "role": "MASTER", "entreprise": "ADMINISTRATION"},
-    "shinoza": {"password": "123", "name": "Shinoza", "role": "BOSS", "entreprise": "Burger Shot"}
-}
-
-# On filtre les ventes par entreprise pour que personne ne voie les ventes des autres
+# On garde uniquement la base des ventes en mémoire ici (ou on peut aussi la déplacer)
 ventes_db = []
 
 @app.context_processor
 def inject_vars():
     user = session.get('user')
-    # On récupère les produits spécifiques à l'entreprise de l'utilisateur
     produits = {}
     if user:
         entreprise = user.get('entreprise')
         produits = PRODUITS_PAR_ENTREPRISE.get(entreprise, {})
-    
     return dict(user=user, produits=produits)
 
 @app.route('/')
-def login(): return render_template('login.html')
+def login(): 
+    return render_template('login.html')
 
 @app.route('/login_process', methods=['POST'])
 def login_process():
     u, p = request.form.get('username'), request.form.get('password')
-    if u in users_db and users_db[u]['password'] == p:
-        session['user'] = users_db[u]
+    # Utilisation de USERS_DB importé
+    if u in USERS_DB and USERS_DB[u]['password'] == p:
+        session['user'] = USERS_DB[u]
         return redirect(url_for('dashboard'))
     return redirect(url_for('login'))
 
+# --- SECTION VENTES ---
 @app.route('/ventes')
 def ventes():
     if 'user' not in session: return redirect(url_for('login'))
-    # On ne montre que les ventes de l'entreprise de l'utilisateur
     entreprise_user = session['user']['entreprise']
     ventes_filtrees = [v for v in ventes_db if v['entreprise'] == entreprise_user]
     return render_template('ventes.html', ventes=ventes_filtrees)
@@ -70,25 +42,29 @@ def ventes():
 def add_vente():
     if 'user' not in session: return redirect(url_for('login'))
     
+    vente_id = request.form.get('vente_id')
     user = session['user']
     entreprise = user['entreprise']
     item = request.form.get('item')
     qty = int(request.form.get('qty', 1))
     
-    # Récupération du prix spécifique à l'entreprise
     prix_unitaire = PRODUITS_PAR_ENTREPRISE.get(entreprise, {}).get(item, 0)
     total_net = prix_unitaire * qty
-    
-    nouvelle_vente = {
-        "id": len(ventes_db) + 1,
-        "vendeur": user['name'],
-        "entreprise": entreprise, # On stocke l'entreprise pour le filtrage
-        "item": item,
-        "qty": qty,
-        "net": total_net
-    }
-    
-    ventes_db.append(nouvelle_vente)
+
+    if vente_id:
+        for v in ventes_db:
+            if str(v['id']) == str(vente_id):
+                v['item'], v['qty'], v['net'] = item, qty, total_net
+                break
+    else:
+        ventes_db.append({
+            "id": len(ventes_db) + 1,
+            "vendeur": user['name'],
+            "entreprise": entreprise,
+            "item": item,
+            "qty": qty,
+            "net": total_net
+        })
     return redirect(url_for('ventes'))
 
 @app.route('/delete_vente/<int:vente_id>')
@@ -97,7 +73,36 @@ def delete_vente(vente_id):
     ventes_db = [v for v in ventes_db if v['id'] != vente_id]
     return redirect(url_for('ventes'))
 
-# Les autres routes restent identiques...
+# --- SECTION SALAIRES ---
+@app.route('/salaires')
+def salaires():
+    if 'user' not in session: return redirect(url_for('login'))
+    
+    entreprise_actuelle = session['user']['entreprise']
+    liste_salaires = []
+    ca_global_entreprise = 0
+
+    for username, data in USERS_DB.items():
+        if data['entreprise'] == entreprise_actuelle:
+            ventes_perso = [v for v in ventes_db if v['vendeur'] == data['name'] and v['entreprise'] == entreprise_actuelle]
+            ca_perso = sum(v['net'] for v in ventes_perso)
+            ca_global_entreprise += ca_perso
+
+            liste_salaires.append({
+                "nom": data['name'],
+                "role": data['role'],
+                "taux": data.get('taux', 55),
+                "ca_perso": ca_perso,
+                "nombre_ventes": len(ventes_perso),
+                "prime": data.get('prime', 0),
+                "avance": data.get('avance', 0),
+                "telephone": data.get('telephone', "N/A"),
+                "iban": data.get('iban', "N/A"),
+                "paye": False
+            })
+
+    return render_template('salaires.html', employes=liste_salaires, ca_total_entreprise=ca_global_entreprise)
+
 @app.route('/dashboard')
 def dashboard():
     if 'user' not in session: return redirect(url_for('login'))
