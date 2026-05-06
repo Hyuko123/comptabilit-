@@ -223,51 +223,37 @@ def logout():
     session.clear()
     return redirect(url_for('login'))
 
-@app.route('/add_to_catalog', methods=['POST'])
-def add_to_catalog():
-    if 'user' not in session:
-        return redirect(url_for('login'))
-    
-    # Récupération des données du formulaire
-    nom = request.form.get('item_name')
-    prix = request.form.get('item_price')
-    
-    if nom and prix:
-        try:
-            # Enregistrement dans la table "catalogue" de Supabase
-            supabase.table("catalogue").insert({
-                "nom": nom, 
-                "prix": float(prix)
-            }).execute()
-        except Exception as e:
-            print(f"Erreur catalogue: {e}")
-            
-    return redirect(url_for('ventes_page'))
+# Route pour afficher la page Stocks
+@app.route('/types-ventes')
+def types_ventes_page():
+    if 'user' not in session: return redirect(url_for('login'))
+    # On récupère tout le catalogue pour l'afficher
+    res = supabase.table("catalogue").select("*").order("nom").execute()
+    return render_template('type-ventes.html', catalogue=res.data)
 
-# Route pour AJOUTER un nouvel article
+# Route pour ajouter un nouvel article au catalogue
 @app.route('/add_to_catalog', methods=['POST'])
 def add_to_catalog():
     nom = request.form.get('item_name')
     prix = request.form.get('item_price')
     stock = request.form.get('item_stock')
     
-    supabase.table("catalogue").insert({
-        "nom": nom, 
-        "prix": float(prix), 
-        "stock": int(stock)
-    }).execute()
+    if nom and prix:
+        supabase.table("catalogue").insert({
+            "nom": nom, 
+            "prix": float(prix),
+            "stock": int(stock) if stock else 0
+        }).execute()
     return redirect('/types-ventes')
 
-# Route pour AJUSTER le stock (+1 ou -1)
-@app.route('/update_stock/<name>/<action>', methods=['POST'])
-def update_stock(name, action):
-    # On récupère le stock actuel
-    res = supabase.table("catalogue").select("stock").eq("nom", name).single().execute()
+# Route pour modifier le stock (+ ou -)
+@app.route('/update_stock/<nom>/<action>')
+def update_stock(nom, action):
+    res = supabase.table("catalogue").select("stock").eq("nom", nom).single().execute()
     current_stock = res.data['stock']
     
-    new_stock = current_stock + 1 if action == "add" else current_stock - 1
+    new_stock = current_stock + 1 if action == 'add' else current_stock - 1
+    if new_stock < 0: new_stock = 0
     
-    supabase.table("catalogue").update({"stock": max(0, new_stock)}).eq("nom", name).execute()
+    supabase.table("catalogue").update({"stock": new_stock}).eq("nom", nom).execute()
     return redirect('/types-ventes')
-if __name__ == '__main__':
-    app.run(debug=True)
