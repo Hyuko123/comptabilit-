@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8"><script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
     <title>Ventes | Ultraze</title>
 </head>
 <body class="bg-[#fff9fa] flex min-h-screen text-[#880e4f]">
@@ -17,41 +18,55 @@
             <a href="/clotures" class="flex items-center gap-3 px-6 py-4 text-pink-400 font-bold hover:bg-pink-50 rounded-2xl transition">Clôtures</a>
             <a href="/irs" class="flex items-center gap-3 px-6 py-4 text-red-400 font-bold hover:bg-red-50 rounded-2xl transition italic">Avertissement IRS</a>
         </nav>
+        <div class="p-8 border-t border-pink-50">
+            <a href="/logout" class="text-[10px] font-black text-gray-300 uppercase">Déconnexion</a>
+        </div>
     </aside>
 
     <main class="ml-72 flex-1 p-12">
         <header class="mb-12">
-            <h2 class="text-4xl font-light">Gestion des <span class="font-black italic text-[#f06292]">Ventes</span></h2>
+            <h2 class="text-4xl font-light text-[#880e4f]">Gestion des <span class="font-black italic text-[#f06292]">Ventes</span></h2>
+            <p class="text-pink-300 text-xs font-bold uppercase mt-2 italic">{{ user.entreprise }}</p>
         </header>
 
         <div class="grid grid-cols-1 xl:grid-cols-3 gap-10">
             <div class="bg-white p-10 rounded-[45px] shadow-xl border border-pink-50 h-fit">
                 <h3 class="text-xl font-black mb-8 italic">Ajouter une vente</h3>
-                <form action="/add_vente" method="POST" class="space-y-5">
+                <form action="/add_vente" method="POST" class="space-y-5" id="venteForm">
                     <div>
-                        <label class="text-[10px] font-bold text-pink-300 uppercase px-2 italic">Connecté en tant que : <span class="text-[#f06292]">{{ user.name }}</span></label>
+                        <label class="text-[10px] font-bold text-pink-300 uppercase px-2 italic">Vendeur : <span class="text-[#f06292]">{{ user.name }}</span></label>
                     </div>
-                    <select name="item" class="w-full p-4 rounded-2xl bg-pink-50 border-none outline-none mt-1">
-                        <option value="Menu Classique">Menu Classique</option>
-                        <option value="Menu Burger">Menu Burger</option>
+
+                    <select name="item" id="itemSelect" class="w-full p-4 rounded-2xl bg-pink-50 border-none outline-none mt-1 font-bold text-[#ad1457]">
+                        <option value="" disabled selected>Choisir un article...</option>
+                        {% for nom, prix in produits.items() %}
+                            <option value="{{ nom }}" data-price="{{ prix }}">{{ nom }} ({{ prix }}$)</option>
+                        {% endfor %}
                     </select>
+
                     <div class="grid grid-cols-2 gap-4">
-                        <input type="number" name="qty" placeholder="Qté" class="p-4 rounded-2xl bg-pink-50 border-none outline-none">
-                        <input type="number" name="net" placeholder="Montant Net" class="p-4 rounded-2xl bg-pink-50 border-none outline-none">
+                        <div>
+                            <label class="text-[9px] font-bold text-pink-200 uppercase px-2">Quantité</label>
+                            <input type="number" name="qty" id="qtyInput" value="1" min="1" class="w-full p-4 rounded-2xl bg-pink-50 border-none outline-none">
+                        </div>
+                        <div>
+                            <label class="text-[9px] font-bold text-pink-200 uppercase px-2">Total Net ($)</label>
+                            <input type="number" name="net" id="netInput" readonly class="w-full p-4 rounded-2xl bg-pink-100/50 border-none outline-none font-black text-[#ad1457]">
+                        </div>
                     </div>
-                    <button type="submit" class="w-full bg-[#f06292] text-white font-black py-5 rounded-2xl shadow-lg hover:scale-[1.02] transition">VALIDER LA VENTE</button>
+                    <button type="submit" class="w-full bg-[#f06292] text-white font-black py-5 rounded-2xl shadow-lg hover:scale-[1.02] transition shadow-pink-200">VALIDER LA VENTE</button>
                 </form>
             </div>
 
             <div class="xl:col-span-2 bg-white p-10 rounded-[45px] shadow-xl border border-pink-50">
-                <h3 class="text-xl font-black mb-8 italic">Historique</h3>
+                <h3 class="text-xl font-black mb-8 italic">Historique de l'entreprise</h3>
                 <table class="w-full text-left">
                     <thead>
                         <tr class="text-[10px] text-pink-300 uppercase border-b border-pink-50">
                             <th class="pb-4">Vendeur</th>
                             <th class="pb-4">Article</th>
                             <th class="pb-4">Qté</th>
-                            <th class="pb-4">Total Net</th>
+                            <th class="pb-4">Net Total</th>
                             <th class="pb-4 text-right">Actions</th>
                         </tr>
                     </thead>
@@ -59,12 +74,12 @@
                         {% for v in ventes %}
                         <tr class="border-b border-pink-50/50 hover:bg-pink-50/20 transition">
                             <td class="py-4 font-bold">{{ v.vendeur }}</td>
-                            <td class="py-4">{{ v.item }}</td>
-                            <td class="py-4 text-xs">{{ v.qty }}</td>
+                            <td class="py-4 italic">{{ v.item }}</td>
+                            <td class="py-4"><span class="bg-pink-50 px-3 py-1 rounded-full font-bold text-xs">{{ v.qty }}</span></td>
                             <td class="py-4 font-black text-[#ad1457]">{{ v.net }} $</td>
-                            <td class="py-4 text-right space-x-2">
-                                <button class="text-pink-300 hover:text-[#f06292] text-xs font-bold uppercase">Modifier</button>
-                                <a href="/delete_vente/{{ v.id }}" class="text-red-300 hover:text-red-500 text-xs font-bold uppercase">Supprimer</a>
+                            <td class="py-4 text-right space-x-3">
+                                <button class="text-pink-300 hover:text-[#f06292] text-[10px] font-black uppercase tracking-tighter">Modifier</button>
+                                <a href="/delete_vente/{{ v.id }}" class="text-red-300 hover:text-red-500 text-[10px] font-black uppercase tracking-tighter">Supprimer</a>
                             </td>
                         </tr>
                         {% endfor %}
@@ -73,5 +88,24 @@
             </div>
         </div>
     </main>
+
+    <script>
+        const itemSelect = document.getElementById('itemSelect');
+        const qtyInput = document.getElementById('qtyInput');
+        const netInput = document.getElementById('netInput');
+
+        function calculateTotal() {
+            const selectedOption = itemSelect.options[itemSelect.selectedIndex];
+            const price = selectedOption.getAttribute('data-price');
+            const qty = qtyInput.value;
+
+            if (price && qty) {
+                netInput.value = price * qty;
+            }
+        }
+
+        itemSelect.addEventListener('change', calculateTotal);
+        qtyInput.addEventListener('input', calculateTotal);
+    </script>
 </body>
 </html>
