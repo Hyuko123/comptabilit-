@@ -73,27 +73,28 @@ def ventes():
 
 @app.route('/utilisateurs')
 def utilisateurs():
-    if 'user' not in session: 
+    if 'user' not in session:
         return redirect(url_for('login'))
     
     user_logged = session['user']
-    all_u = charger_users()
+    all_users_dict = charger_users() or {}
+    config_ent = charger_config_entreprises() or {}
     
-    # 1. On récupère la config pour avoir la liste des entreprises
-    # Si charger_config_entreprises() est vide, on met une liste par défaut
-    config_ent = charger_config_entreprises() or {"Burger Shot": {}, "LTD": {}, "Unicorn": {}}
+    # Sécurité : on définit des listes vides par défaut
+    mes_employes = {}
+    liste_pour_select = []
     
-    # 2. Filtrage : Un patron ne voit que ses gars, l'admin voit tout
     if user_logged.get('role') == "SYSTEM_ADMIN":
-        mes_employes = all_u
+        mes_employes = all_users_dict
         liste_pour_select = list(config_ent.keys())
+        if not liste_pour_select: # Si config vide
+            liste_pour_select = ["Burger Shot", "LTD", "Unicorn"]
     else:
-        ent_name = user_logged.get('entreprise')
-        mes_employes = {k: v for k, v in all_u.items() if v.get('entreprise') == ent_name}
-        # Le patron ne peut créer des gens que dans sa propre entreprise
+        ent_name = user_logged.get('entreprise', 'Burger Shot')
+        mes_employes = {k: v for k, v in all_users_dict.items() if v.get('entreprise') == ent_name}
         liste_pour_select = [ent_name]
-    
-    # 3. On envoie TOUT au HTML (all_users ET entreprises)
+
+    # FORCE : On passe les variables avec des noms ultra-clairs
     return render_template('utilisateurs.html', 
                            all_users=mes_employes, 
                            entreprises=liste_pour_select)
