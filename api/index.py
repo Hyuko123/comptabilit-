@@ -1,12 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 
 app = Flask(__name__, template_folder='../templates')
-app.secret_key = 'ultraze_admin_v2_final'
+app.secret_key = 'ultraze_v2_core'
 
 # Liste des entreprises
 entreprises_liste = ["Restaurant Vinewood", "Burger Shot", "REX Diner + LTD", "Pop Chiken", "Unicorn", "Bahamas", "Benny's", "LS Custom", "Dynasty 8", "LTD Little Seoul", "Ammunation", "Taxi"]
 
-# Utilisateur Admin par défaut
+# Admin par défaut
 users_db = {
     "admin": {"password": "admin123", "name": "Admin", "role": "MASTER", "entreprise": "ADMINISTRATION"}
 }
@@ -29,17 +29,13 @@ def login_process():
 @app.route('/dashboard')
 def dashboard():
     if 'user' not in session: return redirect(url_for('login'))
-    stats = {'ca': "0", 'taxes': "0", 'benefice': "0"}
-    return render_template('dashboard.html', stats=stats)
+    return render_template('dashboard.html', stats={'ca': "4.650", 'taxes': "1.628", 'benefice': "465"})
 
 @app.route('/ventes')
 def ventes():
-    # Simulation de liste de ventes
-    historique_ventes = [
-        {"vendeur": "Admin", "item": "Menu Burger", "qty": 2, "total": 150, "net": 135},
-        {"vendeur": "Admin", "item": "Limonade", "qty": 1, "total": 45, "net": 40}
-    ]
-    return render_template('ventes.html', ventes=historique_ventes)
+    if 'user' not in session: return redirect(url_for('login'))
+    historique = [{"vendeur": "Admin", "item": "Menu Burger", "qty": 2, "total": 150, "net": 135}]
+    return render_template('ventes.html', ventes=historique)
 
 @app.route('/salaires')
 def salaires(): return render_template('salaires.html')
