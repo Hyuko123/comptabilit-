@@ -34,15 +34,13 @@ def login_process():
     u = request.form.get('username')
     p = request.form.get('password')
     
-    # On vérifie dans la table "utilisateurs" de Supabase
+    # Vérifie que "username" est bien le nom de ta colonne dans Supabase
     res = supabase.table("utilisateurs").select("*").eq("username", u).execute()
     
-    if res.data and res.data[0]['password'] == p:
+    if res.data and str(res.data[0]['password']) == str(p):
         session['user'] = res.data[0]
         return redirect(url_for('dashboard'))
     return redirect(url_for('login'))
-
-# --- ROUTES PRINCIPALES ---
 
 @app.route('/dashboard')
 def dashboard():
