@@ -1,38 +1,41 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <title>Dashboard | Ultraze V2</title>
+    <meta charset="UTF-8"><script src="https://cdn.tailwindcss.com"></script>
+    <title>Dashboard | Ultraze</title>
 </head>
-<body class="bg-[#fff9fa] flex min-h-screen text-[#880e4f] overflow-x-hidden">
+<body class="bg-[#fff9fa] flex min-h-screen">
+    <aside class="w-72 bg-white border-r border-pink-50 flex flex-col fixed h-full z-50">
+        <div class="p-10 mb-6"><h1 class="text-[#f06292] text-2xl font-black italic">ULTRAZE V2</h1></div>
+        <nav class="flex-1 px-4 space-y-1">
+            <a href="/dashboard" class="flex items-center gap-3 px-6 py-4 bg-pink-50 text-[#ad1457] font-bold rounded-2xl italic">Dashboard</a>
+            <a href="/ventes" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Ventes</a>
+            <a href="/salaires" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Salaires</a>
+            <a href="/utilisateurs" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Utilisateurs</a>
+            <a href="/types-ventes" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Stocks / Types</a>
+            <div class="h-px bg-pink-50 my-6 mx-6"></div>
+            <a href="/clotures" class="flex items-center gap-3 px-6 py-4 text-pink-400 font-bold hover:bg-pink-50 rounded-2xl transition">Clôtures</a>
+            <a href="/irs" class="flex items-center gap-3 px-6 py-4 text-red-400 font-bold hover:bg-red-50 rounded-2xl transition italic">Avertissement IRS</a>
+        </nav>
+        <div class="p-8 border-t border-pink-50"><a href="/logout" class="text-[10px] font-black text-gray-300 uppercase tracking-widest">Déconnexion</a></div>
+    </aside>
 
-    <main class="ml-[280px] flex-1 p-16">
-        <header class="mb-16 flex justify-between items-start">
-            <div>
-                <p class="text-[11px] font-black text-pink-300 uppercase tracking-[4px] mb-2 italic">Premium Management</p>
-                <h2 class="text-5xl font-light">Bienvenue, <span class="font-black italic text-[#f06292]">Admin</span></h2>
-            </div>
-            <div class="text-right">
-                <div class="bg-white border border-pink-50 px-6 py-3 rounded-2xl shadow-sm">
-                    <p class="text-[10px] font-bold text-pink-300 uppercase italic">Session Active</p>
-                    <p class="text-[#ad1457] font-black text-sm uppercase">{{ user.entreprise }}</p>
-                </div>
-            </div>
+    <main class="ml-72 flex-1 p-16">
+        <header class="mb-12">
+            <h2 class="text-5xl font-light text-[#880e4f]">Bienvenue, <span class="font-black italic text-[#f06292]">Admin</span></h2>
         </header>
-
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="bg-white p-10 rounded-[45px] shadow-xl shadow-pink-100/50 border border-pink-50">
-                <p class="text-[10px] font-bold text-pink-200 uppercase mb-4 tracking-widest">Chiffre d'Affaires</p>
-                <h3 class="text-5xl font-black text-[#ad1457] italic">{{ stats.ca }} <span class="text-xl">$</span></h3>
+            <div class="bg-white p-10 rounded-[45px] shadow-xl border border-pink-50">
+                <p class="text-[10px] font-bold text-pink-300 uppercase mb-4 tracking-widest italic">Chiffre d'Affaires</p>
+                <h3 class="text-5xl font-black text-[#ad1457] italic">{{ stats.ca }} $</h3>
             </div>
-            <div class="bg-white p-10 rounded-[45px] shadow-xl shadow-pink-100/50 border border-pink-50">
-                <p class="text-[10px] font-bold text-pink-200 uppercase mb-4 tracking-widest">Provision IRS</p>
-                <h3 class="text-5xl font-black text-red-400 italic">{{ stats.taxes }} <span class="text-xl">$</span></h3>
+            <div class="bg-white p-10 rounded-[45px] shadow-xl border border-pink-50">
+                <p class="text-[10px] font-bold text-pink-300 uppercase mb-4 tracking-widest italic">Taxes IRS</p>
+                <h3 class="text-5xl font-black text-red-400 italic">{{ stats.taxes }} $</h3>
             </div>
-            <div class="bg-gradient-to-br from-[#f06292] to-[#ec407a] p-10 rounded-[45px] text-white shadow-2xl shadow-pink-200 border-none">
-                <p class="text-[10px] font-bold opacity-60 uppercase mb-4 tracking-widest">Bénéfice Net</p>
-                <h3 class="text-5xl font-black italic">{{ stats.benefice }} <span class="text-xl opacity-40">$</span></h3>
+            <div class="bg-[#f06292] p-10 rounded-[45px] text-white shadow-2xl shadow-pink-200">
+                <p class="text-[10px] font-bold opacity-70 uppercase mb-4 tracking-widest italic">Bénéfice</p>
+                <h3 class="text-5xl font-black italic">{{ stats.benefice }} $</h3>
             </div>
         </div>
     </main>
