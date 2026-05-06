@@ -42,24 +42,22 @@ def dashboard():
     
     user = session['user']
     
-    # Sécurité : Si le rôle est admin, on redirige vers le panel master
+    # 1. Gestion Admin
     if user.get('role') == 'SYSTEM_ADMIN':
         return render_template('admin_master.html', entreprises=charger_config_entreprises())
     
-    # Récupération sécurisée des données
-    ventes_all = charger_ventes() or []
-    
-    # On utilise .get() partout pour éviter les erreurs "KeyError"
+    # 2. Sécurisation des données entreprise
     user_ent = user.get('entreprise', 'Inconnue')
+    ventes_all = charger_ventes() or []
+    config_all = charger_config_entreprises() or {}
     
-    # Filtrage des ventes pour l'entreprise
+    # Filtrage des ventes
     ventes = [v for v in ventes_all if v.get('entreprise') == user_ent]
-    
     ca = sum(v.get('net', 0) for v in ventes)
     
-    # On récupère la taxe configurée ou 15% par défaut
-    config_ent = charger_config_entreprises().get(user_ent, {})
-    taux_irs = config_ent.get('taxe_irs', 15)
+    # Récupération de la taxe IRS (Si l'entreprise n'existe pas dans le JSON, met 15% par défaut)
+    ent_data = config_all.get(user_ent, {})
+    taux_irs = ent_data.get('taxe_irs', 15)
     
     stats = {
         'ca': ca,
@@ -68,6 +66,7 @@ def dashboard():
     }
     
     return render_template('dashboard.html', stats=stats)
+    
 @app.route('/ventes')
 def ventes():
     if 'user' not in session: return redirect(url_for('login'))
