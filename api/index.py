@@ -1,24 +1,16 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import time
-import json
-import os
 from supabase import create_client, Client
 
-# URL de ton image précédente
+# --- CONFIGURATION ---
 SUPABASE_URL = "https://yiqpncfhfbltaalhgenp.supabase.co"
-# CLÉ de ta dernière image (Publishable key)
-SUPABASE_KEY = "sb_publishable_GR_DdAtHA7_DB55cLywtrw_0TlybFWx" 
+SUPABASE_KEY = "sb_publishable_GR_DdAtHA7_DB55cLywtrw_0TlybFWx" # Ta clé publishable
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 app = Flask(__name__, template_folder='../templates')
 app.secret_key = 'shinoza_ultraze_v2'
 
-# Dossiers temporaires pour Vercel
-TEMP_USERS = "/tmp/utilisateurs.json"
-TEMP_VENTES = "/tmp/ventes.json"
-
-# --- LISTE OFFICIELLE DES ENTREPRISES ---
 ENTREPRISES_LISTE = [
     "Restaurant Vinewood", "Burger Shot", "REX Diner + LTD", "Pop Chiken",
     "Unicorn", "Bahamas", "Fête Forraine", "Agence d'évènementiel", "Le Clown",
@@ -27,39 +19,11 @@ ENTREPRISES_LISTE = [
     "Taxi", "Psychologue", "Transport et livraison", "Salon de tatouage Aguja", "Salon de tatouage Vespucci"
 ]
 
-# --- UTILITAIRES ---
-
-def charger_utilisateurs():
-    if not os.path.exists(TEMP_USERS):
-        return {"admin": {"password": "admin123", "name": "Shinoza", "role": "MASTER", "entreprise": "ADMINISTRATION"}}
-    try:
-        with open(TEMP_USERS, 'r') as f:
-            return json.load(f)
-    except:
-        return {"admin": {"password": "admin123", "name": "Shinoza", "role": "MASTER", "entreprise": "ADMINISTRATION"}}
-
-def sauvegarder_utilisateurs(users):
-    with open(TEMP_USERS, 'w') as f:
-        json.dump(users, f, indent=4)
-
-def charger_ventes():
-    if not os.path.exists(TEMP_VENTES):
-        return []
-    try:
-        with open(TEMP_VENTES, 'r') as f:
-            return json.load(f)
-    except:
-        return []
-
-def sauvegarder_ventes(ventes):
-    with open(TEMP_VENTES, 'w') as f:
-        json.dump(ventes, f, indent=4)
-
 @app.context_processor
 def inject_globals():
     return dict(entreprises=ENTREPRISES_LISTE)
 
-# --- ROUTES ---
+# --- ROUTES AUTH ---
 
 @app.route('/')
 def login():
@@ -69,20 +33,25 @@ def login():
 def login_process():
     u = request.form.get('username')
     p = request.form.get('password')
-    users = charger_utilisateurs()
-    if u in users and users[u]['password'] == p:
-        session['user'] = users[u]
-        session['user']['uid'] = u
+    
+    # On vérifie dans la table "utilisateurs" de Supabase
+    res = supabase.table("utilisateurs").select("*").eq("username", u).execute()
+    
+    if res.data and res.data[0]['password'] == p:
+        session['user'] = res.data[0]
         return redirect(url_for('dashboard'))
     return redirect(url_for('login'))
+
+# --- ROUTES PRINCIPALES ---
 
 @app.route('/dashboard')
 def dashboard():
     if 'user' not in session: return redirect(url_for('login'))
-    user_ent = session['user'].get('entreprise', 'Restaurant Vinewood')
-    ventes_all = charger_ventes()
-    mes_ventes = [v for v in ventes_all if v.get('entreprise') == user_ent]
-    ca = sum(v.get('montant_net', 0) for v in mes_ventes)
+    user_ent = session['user'].get('entreprise')
+    
+    # Récupérer les ventes de l'entreprise sur Supabase
+    res = supabase.table("ventes").select("montant_net").eq("entreprise", user_ent).execute()
+    ca = sum(v.get('montant_net', 0) for v in res.data)
     
     stats = {
         'ca': ca,
@@ -96,140 +65,83 @@ def dashboard():
 @app.route('/utilisateurs')
 def utilisateurs():
     if 'user' not in session: return redirect(url_for('login'))
-    all_u = charger_utilisateurs()
-    user_logged = session['user']
+    ent = session['user'].get('entreprise')
     
-    if user_logged.get('role') == "MASTER":
-        mes_employes = all_u
-    else:
-        ent = user_logged.get('entreprise')
-        mes_employes = {k: v for k, v in all_u.items() if v.get('entreprise') == ent}
-        
-    return render_template('utilisateurs.html', all_users=mes_employes)
-
-@app.route('/add_user', methods=['POST'])
-def add_user():
-    if 'user' not in session: return redirect(url_for('login'))
-    users = charger_utilisateurs()
-    uid = request.form.get('new_username')
-    if uid:
-        users[uid] = {
-            "name": request.form.get('new_name'),
-            "password": request.form.get('new_password'),
-            "role": request.form.get('new_role'),
-            "entreprise": request.form.get('new_entreprise')
-        }
-        sauvegarder_utilisateurs(users)
-    return redirect(url_for('utilisateurs'))
-
-@app.route('/delete_user/<uid>')
-def delete_user(uid):
-    if 'user' not in session: return redirect(url_for('login'))
-    users = charger_utilisateurs()
-    if uid in users:
-        del users[uid]
-        sauvegarder_utilisateurs(users)
-    return redirect(url_for('utilisateurs'))
+    # On récupère les employés de l'entreprise sur Supabase
+    res = supabase.table("utilisateurs").select("*").eq("entreprise", ent).execute()
+    return render_template('utilisateurs.html', all_users_list=res.data)
 
 @app.route('/ventes')
 def ventes_page():
-    if 'user' not in session: 
-        return redirect(url_for('login'))
-    
-    # On récupère l'entreprise de l'utilisateur connecté
+    if 'user' not in session: return redirect(url_for('login'))
     user_ent = session['user'].get('entreprise')
     
-    # 1. Récupérer les ventes de l'entreprise, triées par les plus récentes (id descendant)
-    res_ventes = supabase.table("ventes")\
-        .select("*")\
-        .eq("entreprise", user_ent)\
-        .order("id", desc=True)\
-        .execute()
+    # Récupérer ventes + catalogue sur Supabase
+    ventes = supabase.table("ventes").select("*").eq("entreprise", user_ent).order("id", desc=True).execute()
+    cat = supabase.table("catalogue").select("*").order("nom").execute()
     
-    # 2. Récupérer le catalogue
-    # Si tu veux que le catalogue soit aussi séparé par entreprise, rajoute : .eq("entreprise", user_ent)
-    res_cat = supabase.table("catalogue")\
-        .select("*")\
-        .order("nom")\
-        .execute()
-    
-    return render_template('ventes.html', 
-                           ventes=res_ventes.data, 
-                           catalogue=res_cat.data,
-                           user=session['user'])
+    return render_template('ventes.html', ventes=ventes.data, catalogue=cat.data, user=session['user'])
+
+# --- ACTIONS (POST) ---
 
 @app.route('/add_vente', methods=['POST'])
 def add_vente():
     if 'user' not in session: return redirect(url_for('login'))
     
-    # On récupère les données du formulaire
     article = request.form.get('article')
-    quantite = int(request.form.get('quantite') or 0)
+    quantite = int(request.form.get('quantite') or 1)
     montant = float(request.form.get('montant') or 0)
     
-    # On envoie vers SUPABASE
-    try:
-        supabase.table("ventes").insert({
-            "vendeur": session['user']['name'],
-            "entreprise": session['user']['entreprise'],
-            "article": article,
-            "quantite": quantite,
-            "montant_net": montant,
-            "date": time.strftime("%d/%m %H:%M")
-        }).execute()
-        
-        # OPTIONNEL : Retirer 1 au stock automatiquement dans le catalogue
-        res = supabase.table("catalogue").select("stock").eq("nom", article).single().execute()
-        if res.data:
-            nouveau_stock = max(0, res.data['stock'] - quantite)
-            supabase.table("catalogue").update({"stock": nouveau_stock}).eq("nom", article).execute()
-
-    except Exception as e:
-        print(f"Erreur lors de la vente : {e}")
-
+    supabase.table("ventes").insert({
+        "vendeur": session['user']['name'],
+        "entreprise": session['user']['entreprise'],
+        "article": article,
+        "quantite": quantite,
+        "montant_net": montant,
+        "date": time.strftime("%d/%m %H:%M")
+    }).execute()
+    
     return redirect(url_for('ventes_page'))
+
+@app.route('/add_to_catalog', methods=['POST'])
+def add_to_catalog():
+    nom = request.form.get('item_name')
+    prix = request.form.get('item_price')
+    stock = request.form.get('item_stock')
+    
+    if nom and prix:
+        supabase.table("catalogue").insert({
+            "nom": nom, 
+            "prix": float(prix),
+            "stock": int(stock or 0)
+        }).execute()
+    return redirect('/types-ventes')
+
+@app.route('/types-ventes')
+def types_ventes_page():
+    if 'user' not in session: return redirect(url_for('login'))
+    res = supabase.table("catalogue").select("*").order("nom").execute()
+    return render_template('type-ventes.html', catalogue=res.data)
 
 @app.route('/salaires')
 def salaires_page():
-    if 'user' not in session:
-        return redirect(url_for('login'))
+    if 'user' not in session: return redirect(url_for('login'))
+    ent = session['user'].get('entreprise')
     
-    user_ent = session['user'].get('entreprise')
+    # Tout récupérer sur Supabase
+    users = supabase.table("utilisateurs").select("*").eq("entreprise", ent).execute()
+    ventes = supabase.table("ventes").select("*").eq("entreprise", ent).execute()
     
-    # 1. Grille salariale
-    grille = {
-        "Recrue": 0.50,
-        "Employé": 0.55,
-        "Manager": 0.60,
-        "Co patron": 0.63,
-        "Patron": 0.65
-    }
-
-    # 2. Récupérer tous les employés de l'entreprise
-    res_users = supabase.table("utilisateurs").select("*").eq("entreprise", user_ent).execute()
-    employes = res_users.data
+    grille = {"Recrue": 0.5, "Employé": 0.55, "Manager": 0.6, "Co patron": 0.63, "Patron": 0.65}
     
-    # 3. Récupérer toutes les ventes de l'entreprise
-    res_ventes = supabase.table("ventes").select("*").eq("entreprise", user_ent).execute()
-    toutes_ventes = res_ventes.data
-
-    # 4. Calculer le salaire pour chaque employé
     liste_salaires = []
-    for emp in employes:
-        total_ventes_emp = sum(v['montant_net'] for v in toutes_ventes if v['vendeur'] == emp['name'])
-        
-        grade = emp.get('role', 'Recrue')
-        pourcentage = grille.get(grade, 0.50) # 50% par défaut si grade inconnu
-        salaire_final = total_ventes_emp * pourcentage
-        
+    for u in users.data:
+        ca_emp = sum(v['montant_net'] for v in ventes.data if v['vendeur'] == u['name'])
+        taux = grille.get(u['role'], 0.5)
         liste_salaires.append({
-            "nom": emp['name'],
-            "grade": grade,
-            "pourcentage": int(pourcentage * 100),
-            "chiffre_affaire": total_ventes_emp,
-            "salaire_net": salaire_final
+            "nom": u['name'], "grade": u['role'], "pourcentage": int(taux*100),
+            "chiffre_affaire": ca_emp, "salaire_net": ca_emp * taux
         })
-
     return render_template('salaires.html', salaires=liste_salaires)
 
 @app.route('/logout')
@@ -237,42 +149,5 @@ def logout():
     session.clear()
     return redirect(url_for('login'))
 
-# Route pour afficher la page Stocks
-@app.route('/types-ventes')
-def types_ventes_page():
-    if 'user' not in session: return redirect(url_for('login'))
-    # On récupère tout le catalogue pour l'afficher
-    res = supabase.table("catalogue").select("*").order("nom").execute()
-    return render_template('type-ventes.html', catalogue=res.data)
-
-# Route pour ajouter un nouvel article au catalogue
-@app.route('/add_to_catalog', methods=['POST'])
-def add_to_catalog():
-    if 'user' not in session: return redirect(url_for('login'))
-    
-    nom = request.form.get('item_name')
-    prix = request.form.get('item_price')
-    stock = request.form.get('item_stock') # Ajout du stock initial
-    
-    if nom and prix:
-        try:
-            supabase.table("catalogue").insert({
-                "nom": nom, 
-                "prix": float(prix),
-                "stock": int(stock or 0)
-            }).execute()
-        except Exception as e:
-            print(f"Erreur catalogue: {e}")
-            
-    return redirect(url_for('types_ventes_page')) # On reste sur la page stocks
-    
-@app.route('/update_stock/<nom>/<action>')
-def update_stock(nom, action):
-    res = supabase.table("catalogue").select("stock").eq("nom", nom).single().execute()
-    current_stock = res.data['stock']
-    
-    new_stock = current_stock + 1 if action == 'add' else current_stock - 1
-    if new_stock < 0: new_stock = 0
-    
-    supabase.table("catalogue").update({"stock": new_stock}).eq("nom", nom).execute()
-    return redirect('/types-ventes')
+if __name__ == '__main__':
+    app.run(debug=True)
