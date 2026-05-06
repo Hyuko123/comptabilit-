@@ -97,18 +97,20 @@ def add_user():
     if 'user' not in session: return redirect(url_for('login'))
     
     users = charger_users()
+    # On récupère les infos du formulaire
     new_uid = request.form.get('new_username').lower().strip()
     
     users[new_uid] = {
         "password": request.form.get('new_password'),
         "name": request.form.get('new_name'),
         "role": request.form.get('new_role'),
-        "entreprise": request.form.get('new_entreprise'),
+        "entreprise": request.form.get('new_entreprise'), # Vérifie que ce nom correspond au <select>
         "telephone": "N/A", "iban": "N/A", "prime": 0, "avance": 0
     }
+    
     sauvegarder_users(users)
     return redirect(url_for('utilisateurs'))
-
+    
 @app.route('/delete_user/<uid>')
 def delete_user(uid):
     if 'user' not in session: return redirect(url_for('login'))
