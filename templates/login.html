@@ -2,33 +2,25 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>Connexion | Ultraze V2</title>
-    <style>
-        body { background: linear-gradient(135deg, #fff5f7 0%, #fce4ec 100%); }
-        .glass-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(15px); border: 1px solid #f8bbd0; }
-    </style>
+    <title>Ultraze V2 - Connexion</title>
 </head>
-<body class="flex flex-col items-center justify-center min-h-screen p-4">
-    <div class="glass-card p-10 rounded-[45px] shadow-2xl w-full max-w-md text-center">
-        <div class="mb-10">
-            <h1 class="text-4xl font-black text-[#ad1457] tracking-tighter mb-2 italic">ULTRAZE <span class="font-light">V2</span></h1>
-            <p class="text-pink-600 font-semibold text-sm uppercase tracking-widest">Système de gestion des entreprises</p>
-            <div class="h-[1px] w-12 bg-pink-300 mx-auto my-4"></div>
-            <p class="text-pink-400 text-xs italic font-medium">Fondée par <span class="text-pink-600 font-bold">Shinoza</span></p>
-        </div>
-        
-        <form action="/login_process" method="POST" class="space-y-5">
-            <input type="text" name="username" placeholder="Identifiant (admin)" required 
-                class="w-full p-4 rounded-2xl border border-pink-100 outline-none focus:border-pink-400 transition-all bg-white/60 text-pink-900 placeholder-pink-300">
-            <input type="password" name="password" placeholder="Mot de passe (admin123)" required 
-                class="w-full p-4 rounded-2xl border border-pink-100 outline-none focus:border-pink-400 transition-all bg-white/60 text-pink-900 placeholder-pink-300">
-            <button type="submit" class="w-full bg-[#f06292] hover:bg-[#ec407a] text-white font-bold py-4 rounded-2xl shadow-lg shadow-pink-200 transition-all transform hover:-translate-y-1 active:scale-95">
-                Accéder au Dashboard
+<body class="flex flex-col items-center justify-center min-h-screen bg-[#fff5f7]">
+    <div class="bg-white/80 backdrop-blur-md p-12 rounded-[50px] shadow-2xl w-full max-w-md border border-pink-100 text-center">
+        <h1 class="text-4xl font-black text-[#ad1457] italic mb-2">ULTRAZE <span class="font-light">V2</span></h1>
+        <p class="text-pink-600 text-[11px] uppercase tracking-[3px] font-bold">Système de gestion des entreprises</p>
+        <div class="h-[1px] w-16 bg-pink-200 mx-auto my-6"></div>
+        <p class="text-pink-400 text-xs italic mb-8">Fondée par <span class="font-bold text-pink-600">Shinoza</span></p>
+
+        <form action="/login_process" method="POST" class="space-y-6">
+            <input type="text" name="username" placeholder="Identifiant" required 
+                class="w-full p-4 rounded-2xl border border-pink-50 bg-white focus:border-pink-400 outline-none transition-all">
+            <input type="password" name="password" placeholder="Mot de passe" required 
+                class="w-full p-4 rounded-2xl border border-pink-50 bg-white focus:border-pink-400 outline-none transition-all">
+            <button type="submit" class="w-full bg-[#f06292] hover:bg-[#ec407a] text-white font-bold py-4 rounded-2xl shadow-lg transition-all transform hover:scale-[1.02]">
+                Accéder au Système
             </button>
         </form>
     </div>
-    <p class="mt-8 text-[10px] text-pink-300 uppercase tracking-[4px]">Luxury Management System</p>
 </body>
 </html>
