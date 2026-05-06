@@ -1,16 +1,20 @@
 from flask import Flask, render_template, request, redirect, url_for, session
-from .database import *
+import os
+# Import relatif pour Vercel
+from .database import charger_ventes, sauvegarder_ventes, charger_users, sauvegarder_users, charger_config_entreprises
 
 app = Flask(__name__, template_folder='../templates')
 app.secret_key = 'ultraze_v2_core_key'
 
-# Barème officiel des salaires
+# Barème des commissions (Ton barème demandé)
 COMMISSIONS = {
     "Patron": 0.65,
     "Co Patron": 0.63,
     "Manager": 0.60,
     "Employé": 0.55
 }
+
+# ... (le reste du code que je t'ai donné précédemment)
 
 @app.context_processor
 def inject_vars():
