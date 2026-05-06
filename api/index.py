@@ -2,9 +2,9 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import os
 
 app = Flask(__name__, template_folder='../templates')
-app.secret_key = 'shinoza_key_ultraze'
+app.secret_key = 'ultraze_admin_secret'
 
-# Liste complète des entreprises pour les menus déroulants
+# Liste des entreprises complète
 entreprises_liste = [
     "Restaurant Vinewood", "Burger Shot", "REX Diner + LTD", "Pop Chiken",
     "Unicorn", "Bahamas", "Fête Forraine", "Agence d'évènementiel", "Le Clown",
@@ -13,13 +13,13 @@ entreprises_liste = [
     "Taxi", "Psychologue", "Transport et livraison", "Salon de tatouage Aguja", "Salon de tatouage Vespucci"
 ]
 
+# Changement du nom par défaut en Admin
 users_db = {
-    "admin": {"password": "admin123", "name": "Shinoza", "role": "MASTER", "entreprise": "ADMINISTRATION"}
+    "admin": {"password": "admin123", "name": "Admin", "role": "MASTER", "entreprise": "ADMINISTRATION"}
 }
 
 @app.context_processor
 def inject_vars():
-    # Injection sécurisée : si l'utilisateur n'est pas connecté, user = None
     return dict(user=session.get('user'), entreprises=entreprises_liste)
 
 @app.route('/')
@@ -37,9 +37,27 @@ def login_process():
 @app.route('/dashboard')
 def dashboard():
     if 'user' not in session: return redirect(url_for('login'))
-    # Valeurs par défaut pour éviter le crash "Internal Server Error"
     stats = {'ca': "4.650", 'taxes': "1.628", 'benefice': "465"}
     return render_template('dashboard.html', stats=stats)
+
+# Routes pour toutes les catégories du menu
+@app.route('/ventes')
+def ventes(): return render_template('ventes.html')
+
+@app.route('/salaires')
+def salaires(): return render_template('salaires.html')
+
+@app.route('/utilisateurs')
+def utilisateurs(): return render_template('utilisateurs.html', all_users=users_db)
+
+@app.route('/types-ventes')
+def types_ventes(): return render_template('stocks.html')
+
+@app.route('/clotures')
+def clotures(): return render_template('clotures.html')
+
+@app.route('/irs')
+def irs(): return render_template('irs.html')
 
 @app.route('/logout')
 def logout():
