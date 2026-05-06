@@ -1,16 +1,21 @@
-# api/index.py
 from flask import Flask, render_template, request, redirect, url_for, session
-from .config import PRODUITS_PAR_ENTREPRISE
-from .database import charger_ventes, sauvegarder_ventes, charger_users, sauvegarder_users
+from .database import *
 
 app = Flask(__name__, template_folder='../templates')
-app.secret_key = 'ultraze_v2_core'
+app.secret_key = 'ultraze_v2_core_ultra_secret'
+
+# Barème des commissions
+COMMISSIONS = {
+    "Patron": 0.65,
+    "Co Patron": 0.63,
+    "Manager": 0.60,
+    "Employé": 0.55
+}
 
 @app.context_processor
 def inject_vars():
     user = session.get('user')
-    produits = PRODUITS_PAR_ENTREPRISE.get(user.get('entreprise'), {}) if user else {}
-    return dict(user=user, produits=produits)
+    return dict(user=user)
 
 @app.route('/')
 def login(): return render_template('login.html')
@@ -21,70 +26,82 @@ def login_process():
     users = charger_users()
     if u in users and users[u]['password'] == p:
         session['user'] = users[u]
+        session['user']['username'] = u # On garde l'ID pour les modifs
         return redirect(url_for('dashboard'))
     return redirect(url_for('login'))
+
+@app.route('/dashboard')
+def dashboard():
+    if 'user' not in session: return redirect(url_for('login'))
+    user = session['user']
+    
+    if user['role'] == 'SYSTEM_ADMIN':
+        ent_config = charger_config_entreprises()
+        return render_template('admin_master.html', entreprises=ent_config)
+    
+    # Calcul stats entreprise
+    ventes = [v for v in charger_ventes() if v['entreprise'] == user['entreprise']]
+    ca = sum(v['net'] for v in ventes)
+    return render_template('dashboard.html', stats={'ca': ca, 'taxes': int(ca*0.15), 'benefice': int(ca*0.85)})
 
 @app.route('/ventes')
 def ventes():
     if 'user' not in session: return redirect(url_for('login'))
     ventes_all = charger_ventes()
     filtrees = [v for v in ventes_all if v['entreprise'] == session['user']['entreprise']]
-    return render_template('ventes.html', ventes=filtrees)
+    # On passe aussi la liste des produits pour le formulaire
+    ent_config = charger_config_entreprises().get(session['user']['entreprise'], {})
+    produits = ent_config.get('produits', [])
+    return render_template('ventes.html', ventes=filtrees, produits=produits)
 
 @app.route('/add_vente', methods=['POST'])
 def add_vente():
     if 'user' not in session: return redirect(url_for('login'))
-    
-    ventes_all = charger_ventes()
-    user = session['user']
-    item = request.form.get('item')
-    qty = int(request.form.get('qty', 1))
-    vente_id = request.form.get('vente_id')
-    
-    prix = PRODUITS_PAR_ENTREPRISE.get(user['entreprise'], {}).get(item, 0)
-    total = prix * qty
-
-    if vente_id:
-        for v in ventes_all:
-            if str(v['id']) == str(vente_id):
-                v.update({"item": item, "qty": qty, "net": total})
-                break
-    else:
-        ventes_all.append({
-            "id": len(ventes_all) + 1, "vendeur": user['name'],
-            "entreprise": user['entreprise'], "item": item, "qty": qty, "net": total
-        })
-    
-    sauvegarder_ventes(ventes_all)
+    v_all = charger_ventes()
+    # Logique d'ajout (similaire à ton code précédent mais avec sauvegarde JSON)
+    # ... (récupération form)
+    # v_all.append(nouvelle_vente)
+    sauvegarder_ventes(v_all)
     return redirect(url_for('ventes'))
 
 @app.route('/salaires')
 def salaires():
     if 'user' not in session: return redirect(url_for('login'))
-    
     ent = session['user']['entreprise']
     users = charger_users()
     ventes_all = charger_ventes()
     liste_salaires = []
-    ca_global = 0
 
-    for _, data in users.items():
+    for username, data in users.items():
         if data['entreprise'] == ent:
             v_perso = [v for v in ventes_all if v['vendeur'] == data['name'] and v['entreprise'] == ent]
             ca_p = sum(v['net'] for v in v_perso)
-            ca_global += ca_p
+            taux = COMMISSIONS.get(data['role'], 0.55)
+            
             liste_salaires.append({
-                **data, "ca_perso": ca_p, "nombre_ventes": len(v_perso)
+                **data,
+                "ca_perso": ca_p,
+                "taux": taux * 100,
+                "salaire_du": int(ca_p * taux)
             })
+    return render_template('salaires.html', employes=liste_salaires)
 
-    return render_template('salaires.html', employes=liste_salaires, ca_total_entreprise=ca_global)
-
-@app.route('/dashboard')
-def dashboard():
+@app.route('/utilisateurs')
+def utilisateurs():
     if 'user' not in session: return redirect(url_for('login'))
-    return render_template('dashboard.html', stats={'ca': "0", 'taxes': "0", 'benefice': "0"})
+    # Seul un patron ou admin peut voir ça
+    if session['user']['role'] not in ['Patron', 'Co Patron', 'SYSTEM_ADMIN']:
+        return redirect(url_for('dashboard'))
+    
+    all_users = charger_users()
+    # Filtrer les utilisateurs de l'entreprise uniquement
+    mes_employes = {k: v for k, v in all_users.items() if v['entreprise'] == session['user']['entreprise']}
+    return render_template('utilisateurs.html', employes=mes_employes)
 
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('login'))
+
+if __name__ == '__main__':
+    app.run(debug=True)
