@@ -34,13 +34,24 @@ def login_process():
     u = request.form.get('username')
     p = request.form.get('password')
     
-    # Vérifie que "username" est bien le nom de ta colonne dans Supabase
-    res = supabase.table("utilisateurs").select("*").eq("username", u).execute()
-    
-    if res.data and str(res.data[0]['password']) == str(p):
-        session['user'] = res.data[0]
-        return redirect(url_for('dashboard'))
-    return redirect(url_for('login'))
+    try:
+        # On cherche l'utilisateur par son username
+        res = supabase.table("utilisateurs").select("*").eq("username", u).execute()
+        
+        # On vérifie si on a trouvé quelqu'un
+        if res.data and len(res.data) > 0:
+            user_data = res.data[0]
+            # Vérification du mot de passe (en texte brut ici selon ta capture)
+            if str(user_data.get('password')) == str(p):
+                session['user'] = user_data
+                return redirect(url_for('dashboard'))
+        
+        # Si ça échoue, on retourne au login
+        return redirect(url_for('login'))
+        
+    except Exception as e:
+        # Ceci évitera l'erreur 500 en affichant l'erreur au lieu de crash
+        return f"Erreur de connexion à la base de données : {e}", 500
 
 @app.route('/dashboard')
 def dashboard():
