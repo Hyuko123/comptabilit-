@@ -96,25 +96,15 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
-@app.route('/ventes', methods=['GET', 'POST'])
-@login_required
+@app.route('/ventes')
+@login_required # Si tu utilises Flask-Login
 def ventes():
-    produits = Product.query.all()
-    if request.method == 'POST':
-        p_id = request.form.get('produit_id')
-        produit = Product.query.get(p_id)
-        
-        if produit and produit.quantite_stock > 0:
-            produit.quantite_stock -= 1
-            taxe = produit.prix_vente * 0.20
-            nouvelle_vente = Sale(produit_id=p_id, vendeur_id=current_user.id, montant=produit.prix_vente, taxe_irs=taxe)
-            db.session.add(nouvelle_vente)
-            db.session.commit()
-            flash(f'Vente réussie !')
-        else:
-            flash('Erreur : Stock insuffisant !')
-            
-    return render_template('ventes.html', produits=produits)
+    # Ici tu récupères tes données
+    return render_template('ventes.html')
+
+@app.route('/salaires')
+def salaires():
+    return render_template('salaires.html')
 
 @app.route('/admin', methods=['GET', 'POST'])
 @login_required
