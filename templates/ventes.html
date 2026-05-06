@@ -18,6 +18,9 @@
             <a href="/clotures" class="flex items-center gap-3 px-6 py-4 text-pink-400 font-bold hover:bg-pink-50 rounded-2xl transition">Clôtures</a>
             <a href="/irs" class="flex items-center gap-3 px-6 py-4 text-red-400 font-bold hover:bg-red-50 rounded-2xl transition italic">Avertissement IRS</a>
         </nav>
+        <div class="p-8 border-t border-pink-50">
+            <a href="/logout" class="text-[10px] font-black text-gray-300 uppercase">Déconnexion</a>
+        </div>
     </aside>
 
     <main class="ml-72 flex-1 p-12">
@@ -28,12 +31,13 @@
 
         <div class="grid grid-cols-1 xl:grid-cols-3 gap-10">
             <div class="bg-white p-10 rounded-[45px] shadow-xl border border-pink-50 h-fit">
-                <h3 class="text-xl font-black mb-8 italic">Ajouter une vente</h3>
+                <h3 id="formTitle" class="text-xl font-black mb-8 italic">Ajouter une vente</h3>
                 <form action="/add_vente" method="POST" class="space-y-5" id="venteForm">
+                    <input type="hidden" name="vente_id" id="venteIdInput">
+                    
                     <div>
                         <label class="text-[9px] font-bold text-pink-300 uppercase px-2 italic">Identité du vendeur</label>
-                        <input type="text" name="vendeur_name" placeholder="Prénom Nom" required class="w-full p-4 rounded-2xl bg-pink-50 border-none outline-none mt-1 font-bold">
-                        <p class="text-[8px] text-pink-200 px-2 mt-1 uppercase font-bold">Compte : {{ user.name }}</p>
+                        <input type="text" name="vendeur_name" id="vendeurInput" placeholder="Prénom Nom" required class="w-full p-4 rounded-2xl bg-pink-50 border-none outline-none mt-1 font-bold">
                     </div>
 
                     <div>
@@ -58,7 +62,8 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="w-full bg-[#f06292] text-white font-black py-5 rounded-2xl shadow-lg hover:scale-[1.02] transition shadow-pink-200">VALIDER LA VENTE</button>
+                    <button type="submit" id="submitBtn" class="w-full bg-[#f06292] text-white font-black py-5 rounded-2xl shadow-lg hover:scale-[1.02] transition shadow-pink-200">VALIDER LA VENTE</button>
+                    <button type="button" id="cancelBtn" class="hidden w-full text-pink-300 font-bold py-2 text-xs uppercase">Annuler la modification</button>
                 </form>
             </div>
 
@@ -82,7 +87,9 @@
                             <td class="py-4 font-bold text-xs">{{ v.qty }}</td>
                             <td class="py-4 font-black text-[#ad1457]">{{ v.net }} $</td>
                             <td class="py-4 text-right space-x-3">
-                                <button class="text-pink-300 hover:text-[#f06292] text-[10px] font-black uppercase">Modifier</button>
+                                <button 
+                                    onclick="editVente('{{ v.id }}', '{{ v.vendeur }}', '{{ v.item }}', '{{ v.qty }}', '{{ v.net }}')"
+                                    class="text-pink-300 hover:text-[#f06292] text-[10px] font-black uppercase">Modifier</button>
                                 <a href="/delete_vente/{{ v.id }}" class="text-red-300 hover:text-red-500 text-[10px] font-black uppercase">Supprimer</a>
                             </td>
                         </tr>
@@ -99,29 +106,56 @@
         const qtyInput = document.getElementById('qtyInput');
         const netInput = document.getElementById('netInput');
         const errorMsg = document.getElementById('errorMsg');
+        const vendeurInput = document.getElementById('vendeurInput');
+        const venteIdInput = document.getElementById('venteIdInput');
+        const formTitle = document.getElementById('formTitle');
+        const submitBtn = document.getElementById('submitBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
 
         // Calcul automatique
         function calculateTotal() {
             const selectedOption = itemSelect.options[itemSelect.selectedIndex];
-            const price = selectedOption.getAttribute('data-price');
+            const price = selectedOption ? selectedOption.getAttribute('data-price') : 0;
             const qty = qtyInput.value;
-
             if (price && qty) {
                 netInput.value = price * qty;
-                errorMsg.classList.add('hidden'); // On cache l'erreur si un choix est fait
+                errorMsg.classList.add('hidden');
             }
         }
 
         itemSelect.addEventListener('change', calculateTotal);
         qtyInput.addEventListener('input', calculateTotal);
 
-        // Validation avant envoi
+        // Fonction pour passer en mode Edition
+        function editVente(id, vendeur, item, qty, net) {
+            formTitle.innerText = "Modifier la vente";
+            submitBtn.innerText = "METTRE À JOUR";
+            cancelBtn.classList.remove('hidden');
+            
+            venteIdInput.value = id;
+            vendeurInput.value = vendeur;
+            itemSelect.value = item;
+            qtyInput.value = qty;
+            netInput.value = net;
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Annuler la modification
+        cancelBtn.addEventListener('click', () => {
+            form.reset();
+            formTitle.innerText = "Ajouter une vente";
+            submitBtn.innerText = "VALIDER LA VENTE";
+            cancelBtn.classList.add('hidden');
+            venteIdInput.value = "";
+        });
+
+        // Validation & Erreur personnalisée
         form.addEventListener('submit', function(e) {
             if (itemSelect.value === "") {
-                e.preventDefault(); // Empêche l'envoi
+                e.preventDefault();
                 errorMsg.innerText = "Tu essaye de vendre quoi du coup ? :)";
                 errorMsg.classList.remove('hidden');
-                itemSelect.classList.add('ring-2', 'ring-red-300');
             }
         });
     </script>
