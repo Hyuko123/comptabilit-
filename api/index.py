@@ -133,16 +133,30 @@ def delete_user(uid):
 
 @app.route('/ventes')
 def ventes_page():
-    if 'user' not in session: return redirect(url_for('login'))
+    if 'user' not in session: 
+        return redirect(url_for('login'))
     
-    # Récupérer les ventes (code actuel)
+    # On récupère l'entreprise de l'utilisateur connecté
     user_ent = session['user'].get('entreprise')
-    res_ventes = supabase.table("ventes").select("*").eq("entreprise", user_ent).execute()
     
-    # RÉCUPÉRER LE CATALOGUE (NOUVEAU)
-    res_cat = supabase.table("catalogue").select("*").execute()
+    # 1. Récupérer les ventes de l'entreprise, triées par les plus récentes (id descendant)
+    res_ventes = supabase.table("ventes")\
+        .select("*")\
+        .eq("entreprise", user_ent)\
+        .order("id", desc=True)\
+        .execute()
     
-    return render_template('ventes.html', ventes=res_ventes.data, catalogue=res_cat.data)
+    # 2. Récupérer le catalogue
+    # Si tu veux que le catalogue soit aussi séparé par entreprise, rajoute : .eq("entreprise", user_ent)
+    res_cat = supabase.table("catalogue")\
+        .select("*")\
+        .order("nom")\
+        .execute()
+    
+    return render_template('ventes.html', 
+                           ventes=res_ventes.data, 
+                           catalogue=res_cat.data,
+                           user=session['user'])
 
 @app.route('/add_vente', methods=['POST'])
 def add_vente():
