@@ -2,7 +2,14 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import time
 import json
 import os
+from supabase import create_client, Client
 
+# URL de ton image précédente
+SUPABASE_URL = "https://yiqpncfhfbltaalhgenp.supabase.co"
+# CLÉ de ta dernière image (Publishable key)
+SUPABASE_KEY = "sb_publishable_GR_DdAtHA7_DB55cLywtrw_0TlybFWx" 
+
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 app = Flask(__name__, template_folder='../templates')
 app.secret_key = 'shinoza_ultraze_v2'
 
