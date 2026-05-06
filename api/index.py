@@ -5,8 +5,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 # Modifie cette ligne :
 app = Flask(__name__, template_folder="../templates")
-app.config['SECRET_KEY'] = 'ultraze_secret_key_v2'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///ultraze.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/ultraze.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 # --- MODELES DE DONNÉES ---
