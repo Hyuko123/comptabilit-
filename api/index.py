@@ -36,8 +36,37 @@ def login_process():
 
 @app.route('/dashboard')
 def dashboard():
-    if 'user' not in session: return redirect(url_for('login'))
-    stats = {'ca': "4.650", 'taxes': "1.628", 'benefice': "465"}
+    if 'user' not in session: 
+        return redirect(url_for('login'))
+    
+    user = session['user']
+    
+    # 1. Redirection si c'est l'Admin Global
+    if user.get('role') == 'SYSTEM_ADMIN':
+        return render_template('admin_master.html', entreprises=charger_config_entreprises())
+    
+    # 2. Récupération sécurisée des données (évite le crash si fichier vide)
+    user_ent = user.get('entreprise', 'Inconnue')
+    ventes_all = charger_ventes() or []
+    config_all = charger_config_entreprises() or {}
+    
+    # 3. Calcul du CA pour l'entreprise de l'utilisateur
+    mes_ventes = [v for v in ventes_all if v.get('entreprise') == user_ent]
+    ca = sum(v.get('net', 0) for v in mes_ventes)
+    
+    # 4. Récupération de la taxe (15% par défaut si non configuré)
+    ent_data = config_all.get(user_ent, {})
+    taux_irs = ent_data.get('taxe_irs', 15)
+    
+    # 5. Préparation des statistiques pour le HTML
+    stats = {
+        'ca': "{:,}".format(ca).replace(',', ' '),
+        'taxes': "{:,}".format(int(ca * (taux_irs / 100))).replace(',', ' '),
+        'benefice': "{:,}".format(int(ca * (1 - (taux_irs / 100)))).replace(',', ' '),
+        'nom_user': user.get('name', 'Utilisateur'),
+        'entreprise': user_ent
+    }
+    
     return render_template('dashboard.html', stats=stats)
 
 @app.route('/ventes')
