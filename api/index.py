@@ -97,18 +97,6 @@ def utilisateurs():
     return render_template('utilisateurs.html', 
                            all_users=mes_employes, 
                            entreprises=liste_pour_select)
-
-@app.route('/delete_user/<uid>')
-def delete_user(uid):
-    if 'user' not in session: return redirect(url_for('login'))
-    
-    users = charger_users()
-    if uid in users:
-        # Optionnel : vérifier ici que le gars qui supprime est bien le patron de la même entreprise
-        del users[uid]
-        sauvegarder_users(users)
-        
-    return redirect(url_for('utilisateurs'))
     
 @app.route('/add_user', methods=['POST'])
 def add_user():
@@ -133,9 +121,9 @@ def add_user():
 def delete_user(uid):
     if 'user' not in session: return redirect(url_for('login'))
     
-    # Sécurité : Un patron ne peut pas supprimer un admin ou quelqu'un d'une autre entreprise
     users = charger_users()
     if uid in users:
+        # Optionnel : vérifier ici que le gars qui supprime est bien le patron de la même entreprise
         del users[uid]
         sauvegarder_users(users)
         
