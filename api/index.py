@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session
+import time # Pour générer un ID unique
 
 app = Flask(__name__, template_folder='../templates')
 app.secret_key = 'shinoza_ultraze_v2'
@@ -139,3 +140,35 @@ def types_ventes(): return render_template('stocks.html')
 def logout():
     session.clear()
     return redirect(url_for('login'))
+    
+@app.route('/add_vente', methods=['POST'])
+def add_vente():
+    if 'user' not in session: return redirect(url_for('login'))
+    
+    ventes = charger_ventes()
+    
+    # Création de la nouvelle vente
+    nouvelle_vente = {
+        "id": str(int(time.time())), # ID unique basé sur l'heure
+        "vendeur": session['user']['name'], # Nom du vendeur connecté
+        "article": request.form.get('article'),
+        "quantite": int(request.form.get('quantite')),
+        "montant_net": float(request.form.get('montant')),
+        "date": time.strftime("%d/%m %H:%M")
+    }
+    
+    ventes.append(nouvelle_vente)
+    sauvegarder_ventes(ventes)
+    return redirect(url_for('ventes_page')) # Nom de ta route d'affichage
+
+@app.route('/delete_vente/<vente_id>')
+def delete_vente(vente_id):
+    if 'user' not in session: return redirect(url_for('login'))
+    
+    ventes = charger_ventes()
+    # On garde toutes les ventes SAUF celle à supprimer
+    ventes = [v for v in ventes if v['id'] != vente_id]
+    
+    sauvegarder_ventes(ventes)
+    return redirect(url_for('ventes_page'))
+
