@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>Ressources Humaines | Ultraze V2</title>
+</head>
+<body class="bg-[#fff9fa] p-12">
+    <div class="flex justify-between items-center mb-12">
+        <h1 class="text-3xl font-bold text-[#880e4f]"><i class="fa-solid fa-users-gear mr-2"></i> Gestion des Utilisateurs</h1>
+        <a href="/dashboard" class="bg-pink-100 text-pink-700 px-6 py-2 rounded-full font-bold text-sm">Retour Dashboard</a>
+    </div>
+
+    {% if session['role'] in ['Patron', 'Co-Patron', 'Admin Global'] %}
+    <div class="bg-white p-8 rounded-[35px] border border-pink-100 mb-8 shadow-sm">
+        <h3 class="font-bold text-[#ad1457] mb-4">Créer un profil employé</h3>
+        <form method="POST" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <input type="text" name="username" placeholder="Identifiant Connexion" required class="p-3 border border-pink-100 rounded-xl outline-none">
+            <input type="password" name="password" placeholder="Mot de passe" required class="p-3 border border-pink-100 rounded-xl outline-none">
+            <input type="text" name="nom_affiche" placeholder="Nom Complet / Prénom" required class="p-3 border border-pink-100 rounded-xl outline-none">
+            <select name="role" class="p-3 border border-pink-100 rounded-xl outline-none bg-white">
+                <option value="Employe">Employé</option>
+                <option value="Employe Expérimenté">Employé Expérimenté</option>
+                <option value="Manager">Manager</option>
+                <option value="Co-Patron">Co-Patron</option>
+                <option value="Patron">Patron</option>
+            </select>
+            <button type="submit" class="md:col-span-4 bg-[#f06292] hover:bg-[#ec407a] text-white font-bold p-3 rounded-xl transition-colors">Finaliser l'embauche</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for u in users %}
+        <div class="bg-white border border-pink-100 p-6 rounded-[30px] shadow-sm relative">
+            <span class="absolute top-4 right-4 bg-pink-100 text-[#ad1457] text-[10px] font-bold uppercase px-3 py-1 rounded-full">{{ u.role }}</span>
+            <h4 class="text-xl font-bold text-pink-950 mb-1">{{ u.nom_affiche }}</h4>
+            <p class="text-xs text-pink-400 mb-4">@{{ u.username }}</p>
+            
+            <div class="text-xs space-y-1 text-pink-900 border-t border-pink-50 pt-3">
+                <p><strong>Téléphone :</strong> {{ u.telephone or 'Non renseigné' }}</p>
+                <p><strong>IBAN :</strong> {{ u.iban or 'Non renseigné' }}</p>
+            </div>
+
+            {% if session['role'] in ['Patron', 'Co-Patron', 'Admin Global'] %}
+            <div class="mt-4 pt-3 border-t border-pink-50 text-right">
+                <a href="/utilisateurs/supprimer/{{ u.id }}" class="text-xs bg-red-50 text-red-500 font-bold px-3 py-2 rounded-xl hover:bg-red-100 transition-colors">Licencier</a>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
