@@ -74,7 +74,50 @@ def ventes():
 @app.route('/utilisateurs')
 def utilisateurs():
     if 'user' not in session: return redirect(url_for('login'))
-    return render_template('utilisateurs.html', all_users=users_db)
+    
+    user_logged = session['user']
+    all_u = charger_users()
+    
+    # FILTRAGE : On ne garde que les employés de la MÊME entreprise
+    # Sauf si c'est l'ADMINISTRATION
+    if user_logged.get('entreprise') == "ADMINISTRATION":
+        mes_employes = all_u
+    else:
+        mes_employes = {k: v for k, v in all_u.items() if v.get('entreprise') == user_logged.get('entreprise')}
+    
+    # Liste des entreprises pour le menu déroulant (restreint à la sienne pour les patrons)
+    ents = [user_logged.get('entreprise')] if user_logged.get('role') != "SYSTEM_ADMIN" else charger_config_entreprises().keys()
+    
+    return render_template('utilisateurs.html', all_users=mes_employes, entreprises=ents)
+
+@app.route('/add_user', methods=['POST'])
+def add_user():
+    if 'user' not in session: return redirect(url_for('login'))
+    
+    users = charger_users()
+    new_uid = request.form.get('new_username').lower().strip()
+    
+    users[new_uid] = {
+        "password": request.form.get('new_password'),
+        "name": request.form.get('new_name'),
+        "role": request.form.get('new_role'),
+        "entreprise": request.form.get('new_entreprise'),
+        "telephone": "N/A", "iban": "N/A", "prime": 0, "avance": 0
+    }
+    sauvegarder_users(users)
+    return redirect(url_for('utilisateurs'))
+
+@app.route('/delete_user/<uid>')
+def delete_user(uid):
+    if 'user' not in session: return redirect(url_for('login'))
+    
+    # Sécurité : Un patron ne peut pas supprimer un admin ou quelqu'un d'une autre entreprise
+    users = charger_users()
+    if uid in users:
+        del users[uid]
+        sauvegarder_users(users)
+        
+    return redirect(url_for('utilisateurs'))
 
 @app.route('/add_user', methods=['POST'])
 def add_user():
