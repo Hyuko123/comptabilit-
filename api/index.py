@@ -161,18 +161,32 @@ def ventes_page():
 @app.route('/add_vente', methods=['POST'])
 def add_vente():
     if 'user' not in session: return redirect(url_for('login'))
-    ventes = charger_ventes()
-    nouvelle_vente = {
-        "id": str(int(time.time())),
-        "vendeur": session['user']['name'],
-        "entreprise": session['user']['entreprise'],
-        "article": request.form.get('article'),
-        "quantite": int(request.form.get('quantite') or 0),
-        "montant_net": float(request.form.get('montant') or 0),
-        "date": time.strftime("%d/%m %H:%M")
-    }
-    ventes.append(nouvelle_vente)
-    sauvegarder_ventes(ventes)
+    
+    # On récupère les données du formulaire
+    article = request.form.get('article')
+    quantite = int(request.form.get('quantite') or 0)
+    montant = float(request.form.get('montant') or 0)
+    
+    # On envoie vers SUPABASE
+    try:
+        supabase.table("ventes").insert({
+            "vendeur": session['user']['name'],
+            "entreprise": session['user']['entreprise'],
+            "article": article,
+            "quantite": quantite,
+            "montant_net": montant,
+            "date": time.strftime("%d/%m %H:%M")
+        }).execute()
+        
+        # OPTIONNEL : Retirer 1 au stock automatiquement dans le catalogue
+        res = supabase.table("catalogue").select("stock").eq("nom", article).single().execute()
+        if res.data:
+            nouveau_stock = max(0, res.data['stock'] - quantite)
+            supabase.table("catalogue").update({"stock": nouveau_stock}).eq("nom", article).execute()
+
+    except Exception as e:
+        print(f"Erreur lors de la vente : {e}")
+
     return redirect(url_for('ventes_page'))
 
 @app.route('/salaires')
