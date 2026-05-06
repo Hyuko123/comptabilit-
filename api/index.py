@@ -110,13 +110,8 @@ def add_user_process():  # Changement de nom ici pour éviter le conflit
     
 @app.route('/delete_user/<uid>')
 def delete_user(uid):
-    if 'user' not in session: return redirect(url_for('login'))
-    
-    users = charger_users()
-    if uid in users:
-        del users[uid]
-        sauvegarder_users(users)
-        
+    # Logique pour supprimer l'utilisateur dans ton JSON
+    # ...
     return redirect(url_for('utilisateurs'))
 
 @app.route('/add_user', methods=['POST'])
