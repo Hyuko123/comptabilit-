@@ -1,0 +1,33 @@
+<!-- Dans templates/login.html -->
+<body class="bg-[#0f111a] flex items-center justify-center min-h-screen font-sans text-white">
+    <div class="bg-[#161b22] rounded-3xl overflow-hidden flex max-w-4xl w-full shadow-2xl border border-gray-800">
+        <!-- Gauche : Info -->
+        <div class="w-1/2 p-12 bg-gradient-to-br from-[#161b22] to-[#0d2137]">
+            <span class="text-[10px] border border-blue-400 text-blue-400 px-2 py-1 rounded-full uppercase">Suite Comptable</span>
+            <h1 class="text-5xl font-bold mt-6 leading-tight">Un poste de pilotage plus net.</h1>
+            <p class="text-gray-400 mt-6 leading-relaxed">Suis les ventes, les salaires et les clotures dans une interface plus claire, plus dense et plus agréable à lire au quotidien.</p>
+            <div class="flex mt-20 space-x-12">
+                <div><p class="text-[10px] text-gray-500 uppercase">Suivi</p><p class="font-bold">Temps réel</p></div>
+                <div><p class="text-[10px] text-gray-500 uppercase">Interface</p><p class="font-bold text-blue-300">Plus premium</p></div>
+            </div>
+        </div>
+        <!-- Droite : Formulaire -->
+        <div class="w-1/2 p-12 bg-[#0d1117]">
+            <span class="text-[10px] border border-blue-400 text-blue-400 px-2 py-1 rounded-full uppercase">Espace Sécurisé</span>
+            <h2 class="text-4xl font-bold mt-6">Connexion</h2>
+            <p class="text-gray-400 text-sm mt-2">Connecte-toi à ton tableau de bord pour suivre ventes, salaires et clotures d'entreprise.</p>
+            
+            <form class="mt-8 space-y-4" method="POST">
+                <input type="text" name="username" placeholder="Identifiant" class="w-full bg-[#1c2128] border border-gray-700 rounded-lg p-4 focus:border-blue-500 outline-none">
+                <input type="password" name="password" placeholder="••••••••••••" class="w-full bg-[#1c2128] border border-gray-700 rounded-lg p-4 focus:border-blue-500 outline-none">
+                <button class="w-full bg-gradient-to-r from-[#1eb1a6] to-[#2b7fff] py-4 rounded-xl font-bold shadow-lg hover:opacity-90 transition">Se connecter</button>
+            </form>
+            
+            <div class="mt-8 p-4 bg-[#161b22] rounded-lg border border-gray-800 text-xs text-gray-400">
+                <p class="font-bold text-white mb-1">Exemple de format :</p>
+                <p>Identifiant : votre_nom</p>
+                <p>Mot de passe : fourni par un admin ou un patron.</p>
+            </div>
+        </div>
+    </div>
+</body>
