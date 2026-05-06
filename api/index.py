@@ -178,5 +178,27 @@ def delete_vente(vente_id):
     ventes = [v for v in ventes if v['id'] != vente_id]
     
     sauvegarder_ventes(ventes)
+
+import json
+import os
+
+# Chemin vers le dossier temporaire de Vercel
+TEMP_USERS = "/tmp/utilisateurs.json"
+
+def charger_utilisateurs():
+    # Si le fichier n'existe pas dans /tmp, on lit le fichier par défaut du projet
+    if not os.path.exists(TEMP_USERS):
+        # Charge ton fichier de base (celui qui est dans ton dossier data)
+        with open('data/utilisateurs.json', 'r') as f:
+            data = json.load(f)
+        return data
+    
+    with open(TEMP_USERS, 'r') as f:
+        return json.load(f)
+
+def sauvegarder_utilisateurs(users):
+    # On écrit TOUJOURS dans /tmp
+    with open(TEMP_USERS, 'w') as f:
+        json.dump(users, f, indent=4)
     return redirect(url_for('ventes_page'))
 
