@@ -5,14 +5,40 @@
     <title>Ventes | Ultraze</title>
 </head>
 <body class="bg-[#fff9fa] flex min-h-screen">
-    <main class="ml-72 flex-1 p-16">
-        <h2 class="text-3xl font-light text-[#880e4f] mb-12 italic">Nouvelle <span class="text-pink-500 font-black">Facture</span></h2>
-        <div class="max-w-2xl bg-white p-12 rounded-[50px] shadow-2xl border border-pink-50">
-            <form class="space-y-6">
-                <select class="w-full p-5 rounded-2xl bg-pink-50 border-none"><option>Menu</option></select>
-                <input type="number" placeholder="Montant Brut ($)" class="w-full p-5 rounded-2xl bg-pink-50 border-none">
-                <button class="w-full bg-[#f06292] text-white font-black py-5 rounded-2xl">VALIDER</button>
-            </form>
+    <aside class="w-72 bg-white border-r border-pink-50 flex flex-col fixed h-full z-50">
+        <div class="p-10 mb-6"><h1 class="text-[#f06292] text-2xl font-black italic">ULTRAZE V2</h1></div>
+        <nav class="flex-1 px-4 space-y-1">
+            <a href="/dashboard" class="flex items-center gap-3 px-6 py-4 text-[#ad1457] font-bold hover:bg-pink-50 rounded-2xl">Dashboard</a>
+            <a href="/ventes" class="flex items-center gap-3 px-6 py-4 bg-pink-50 text-[#ad1457] font-bold rounded-2xl italic">Ventes</a>
+            <a href="/salaires" class="flex items-center gap-3 px-6 py-4 text-[#ad1457] font-bold hover:bg-pink-50 rounded-2xl">Salaires</a>
+            <a href="/utilisateurs" class="flex items-center gap-3 px-6 py-4 text-[#ad1457] font-bold hover:bg-pink-50 rounded-2xl">Utilisateurs</a>
+            <a href="/types-ventes" class="flex items-center gap-3 px-6 py-4 text-[#ad1457] font-bold hover:bg-pink-50 rounded-2xl">Stocks / Types</a>
+            <div class="h-px bg-pink-50 my-6 mx-6"></div>
+            <a href="/clotures" class="flex items-center gap-3 px-6 py-4 text-pink-400 font-bold hover:bg-pink-50 rounded-2xl transition">Clôtures</a>
+            <a href="/irs" class="flex items-center gap-3 px-6 py-4 text-red-400 font-bold hover:bg-red-50 rounded-2xl transition italic italic">IRS</a>
+        </nav>
+        <div class="p-8 border-t border-pink-50"><a href="/logout" class="text-[10px] font-black text-gray-300 uppercase tracking-widest">Déconnexion</a></div>
+    </aside>
+
+    <main class="ml-72 flex-1 p-12">
+        <header class="mb-12"><h2 class="text-4xl font-light text-[#880e4f]">Gestion des <span class="font-black italic text-[#f06292]">Ventes</span></h2></header>
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-10">
+            <div class="bg-white p-10 rounded-[45px] shadow-xl border border-pink-50 h-fit">
+                <h3 class="text-xl font-black mb-8 italic">Ajouter une vente</h3>
+                <form class="space-y-5">
+                    <select class="w-full p-4 rounded-2xl bg-pink-50 border-none outline-none"><option>Menu Classique</option></select>
+                    <input type="number" placeholder="Quantité" class="w-full p-4 rounded-2xl bg-pink-50 border-none outline-none">
+                    <input type="number" placeholder="Montant Net ($)" class="w-full p-4 rounded-2xl bg-pink-50 border-none outline-none">
+                    <button class="w-full bg-[#f06292] text-white font-black py-5 rounded-2xl shadow-lg">VALIDER</button>
+                </form>
+            </div>
+            <div class="xl:col-span-2 bg-white p-10 rounded-[45px] shadow-xl border border-pink-50">
+                <h3 class="text-xl font-black mb-8 italic">Historique</h3>
+                <table class="w-full text-left">
+                    <tr class="text-[10px] text-pink-300 uppercase border-b border-pink-50"><th class="pb-4">Vendeur</th><th class="pb-4">Item</th><th class="pb-4">Qté</th><th class="pb-4 text-right">Net</th></tr>
+                    {% for v in ventes %}<tr class="border-b border-pink-50/50"><td class="py-4 font-bold">{{ v.vendeur }}</td><td class="py-4">{{ v.item }}</td><td class="py-4 text-xs">{{ v.qty }}</td><td class="py-4 text-right font-black text-[#ad1457]">{{ v.net }} $</td></tr>{% endfor %}
+                </table>
+            </div>
         </div>
     </main>
 </body>
