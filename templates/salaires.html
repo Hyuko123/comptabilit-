@@ -1,49 +1,104 @@
-<main class="ml-72 flex-1 p-12">
-    <header class="mb-12">
-        <h2 class="text-4xl font-light">Grille des <span class="font-black italic text-[#f06292]">Salaires</span></h2>
-        <p class="text-pink-300 mt-2 italic">Calcul automatique basé sur le Chiffre d'Affaire (CA) individuel.</p>
-    </header>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Salaires | Ultraze</title>
+</head>
+<body class="bg-[#fff9fa] flex min-h-screen text-[#880e4f]">
+    <aside class="w-72 bg-white border-r border-pink-50 flex flex-col fixed h-full z-50">
+        <div class="p-10 mb-6"><h1 class="text-[#f06292] text-2xl font-black italic">ULTRAZE V2</h1></div>
+        <nav class="flex-1 px-4 space-y-1">
+            <a href="/dashboard" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Dashboard</a>
+            <a href="/ventes" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Ventes</a>
+            <a href="/salaires" class="flex items-center gap-3 px-6 py-4 bg-pink-50 text-[#ad1457] font-bold rounded-2xl italic">Salaires</a>
+            <a href="/utilisateurs" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Utilisateurs</a>
+            <a href="/types-ventes" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Stocks / Types</a>
+        </nav>
+    </aside>
 
-    <div class="grid grid-cols-1 gap-6">
-        <div class="bg-white p-8 rounded-[45px] shadow-xl border border-pink-50">
-            <table class="w-full text-left">
-                <thead>
-                    <tr class="text-[10px] uppercase font-bold text-pink-300 tracking-widest border-b border-pink-50">
-                        <th class="pb-4 px-4">Employé</th>
-                        <th class="pb-4">Grade</th>
-                        <th class="pb-4">Taux</th>
-                        <th class="pb-4">Ventes totales</th>
-                        <th class="pb-4 text-right">Salaire Net</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-pink-50">
-                    {% for s in salaires %}
-                    <tr class="group hover:bg-pink-50/30 transition-all">
-                        <td class="py-6 px-4">
-                            <span class="font-bold text-[#ad1457]">{{ s.nom }}</span>
-                        </td>
-                        <td>
-                            <span class="px-3 py-1 bg-pink-100 text-[#f06292] rounded-full text-xs font-black italic">
-                                {{ s.grade }}
-                            </span>
-                        </td>
-                        <td class="font-bold text-gray-400">{{ s.pourcentage }}%</td>
-                        <td class="font-bold text-[#ad1457]">{{ s.chiffre_affaire }}$</td>
-                        <td class="text-right">
-                            <span class="text-2xl font-black italic text-[#f06292]">
-                                {{ "%.2f"|format(s.salaire_net) }}$
-                            </span>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <main class="ml-72 flex-1 p-12">
+        <header class="mb-12">
+            <h2 class="text-4xl font-light">Gestion des <span class="font-black italic text-[#f06292]">Rémunérations</span></h2>
+        </header>
+
+        <div class="grid grid-cols-1 gap-10">
             
-            {% if not salaires %}
-                <div class="text-center py-10">
-                    <p class="text-pink-300 italic">Aucune donnée disponible.</p>
+            <div class="bg-white p-8 rounded-[40px] shadow-sm border border-pink-50">
+                <h3 class="text-lg font-black mb-6 italic text-[#ad1457] flex items-center gap-2">
+                    <span class="w-2 h-6 bg-[#f06292] rounded-full"></span>
+                    Grille Salariale (Taux de commission)
+                </h3>
+                <div class="grid grid-cols-5 gap-4">
+                    <div class="bg-pink-50/50 p-4 rounded-3xl text-center">
+                        <p class="text-[10px] font-bold text-pink-300 uppercase">Recrue</p>
+                        <p class="text-2xl font-black text-[#f06292]">50%</p>
+                    </div>
+                    <div class="bg-pink-50/50 p-4 rounded-3xl text-center">
+                        <p class="text-[10px] font-bold text-pink-300 uppercase">Employé</p>
+                        <p class="text-2xl font-black text-[#f06292]">55%</p>
+                    </div>
+                    <div class="bg-pink-50/50 p-4 rounded-3xl text-center">
+                        <p class="text-[10px] font-bold text-pink-300 uppercase">Manager</p>
+                        <p class="text-2xl font-black text-[#f06292]">60%</p>
+                    </div>
+                    <div class="bg-pink-50/50 p-4 rounded-3xl text-center border-2 border-pink-100">
+                        <p class="text-[10px] font-bold text-pink-300 uppercase">Co Patron</p>
+                        <p class="text-2xl font-black text-[#f06292]">63%</p>
+                    </div>
+                    <div class="bg-[#f06292] p-4 rounded-3xl text-center shadow-lg shadow-pink-100">
+                        <p class="text-[10px] font-bold text-pink-100 uppercase">Patron</p>
+                        <p class="text-2xl font-black text-white">65%</p>
+                    </div>
                 </div>
-            {% endif %}
+            </div>
+
+            <div class="bg-white p-10 rounded-[45px] shadow-xl border border-pink-50">
+                <h3 class="text-xl font-black mb-8 italic text-[#ad1457]">États des salaires</h3>
+                
+                <div class="overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="text-[10px] uppercase font-bold text-pink-300 tracking-widest border-b border-pink-50">
+                                <th class="pb-4 px-4">Nom de l'employé</th>
+                                <th class="pb-4">Grade</th>
+                                <th class="pb-4">Chiffre d'Affaire</th>
+                                <th class="pb-4">Taux</th>
+                                <th class="pb-4 text-right px-4">Salaire Net</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-pink-50">
+                            {% if salaires %}
+                                {% for s in salaires %}
+                                <tr class="group hover:bg-pink-50/20 transition-all">
+                                    <td class="py-6 px-4 font-bold text-[#ad1457] text-lg">{{ s.nom }}</td>
+                                    <td>
+                                        <span class="px-3 py-1 bg-pink-50 text-[#f06292] rounded-full text-[10px] font-black uppercase italic">
+                                            {{ s.grade }}
+                                        </span>
+                                    </td>
+                                    <td class="font-bold text-gray-400">{{ s.chiffre_affaire }}$</td>
+                                    <td class="font-bold text-pink-300">{{ s.pourcentage }}%</td>
+                                    <td class="text-right px-4">
+                                        <span class="text-2xl font-black italic text-[#f06292]">
+                                            {{ "%.0f"|format(s.salaire_net) }}$
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="py-20 text-center">
+                                        <p class="text-pink-200 italic">En attente de données (Veuillez enregistrer des ventes)...</p>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
-    </div>
-</main>
+    </main>
+</body>
+</html>
