@@ -2,22 +2,42 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8"><script src="https://cdn.tailwindcss.com"></script>
-    <title>Utilisateurs | Ultraze</title>
+    <title>Utilisateurs | Ultraze V2</title>
 </head>
 <body class="bg-[#fff9fa] flex min-h-screen">
-    <main class="ml-72 flex-1 p-16">
-        <h2 class="text-4xl font-light text-[#880e4f] mb-12 italic">Gestion <span class="font-black text-[#f06292]">Admin</span></h2>
+    <main class="ml-80 flex-1 p-16">
+        <h2 class="text-3xl font-light text-[#880e4f] mb-12">Gestion des <span class="font-black italic">Effectifs</span></h2>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-            <div class="bg-white p-10 rounded-[40px] shadow-xl border border-pink-50">
-                <h3 class="font-black mb-6 italic">Créer un membre</h3>
+            <div class="bg-white p-10 rounded-[40px] shadow-xl shadow-pink-100/50 border border-pink-50">
                 <form action="/add_user" method="POST" class="space-y-4">
-                    <input type="text" name="new_name" placeholder="Nom Complet" class="w-full p-4 rounded-2xl bg-pink-50 border-none outline-none">
-                    <select name="new_entreprise" class="w-full p-4 rounded-2xl bg-pink-50 border-none">{% for ent in entreprises %}<option>{{ ent }}</option>{% endfor %}</select>
-                    <button class="w-full bg-[#f06292] text-white font-bold py-4 rounded-2xl shadow-lg">CRÉER LE COMPTE</button>
+                    <input type="text" name="new_name" placeholder="Nom Complet" class="w-full p-4 rounded-2xl bg-pink-50/30 border-none outline-none" required>
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="text" name="new_username" placeholder="Identifiant" class="w-full p-4 rounded-2xl bg-pink-50/30 border-none outline-none" required>
+                        <input type="password" name="new_password" placeholder="Mot de passe" class="w-full p-4 rounded-2xl bg-pink-50/30 border-none outline-none" required>
+                    </div>
+                    <select name="new_entreprise" class="w-full p-4 rounded-2xl bg-pink-50 border-none outline-none">
+                        {% for ent in entreprises %}<option value="{{ ent }}">{{ ent }}</option>{% endfor %}
+                    </select>
+                    <div class="grid grid-cols-2 gap-2">
+                        {% for role in ['Patron', 'Co patron', 'Manager', 'Employé'] %}
+                        <label class="p-3 border border-pink-100 rounded-xl flex items-center gap-2 cursor-pointer hover:bg-pink-50 transition-all">
+                            <input type="radio" name="new_role" value="{{ role }}" class="accent-pink-500" required>
+                            <span class="text-xs font-bold text-[#ad1457]">{{ role }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <button class="w-full bg-[#f06292] text-white font-bold py-4 rounded-2xl shadow-lg mt-4">Créer le compte</button>
                 </form>
             </div>
             <div class="space-y-4">
-                {% for u, d in all_users.items() %}<div class="bg-white p-6 rounded-3xl border border-pink-50 font-bold text-[#ad1457] italic shadow-sm">{{ d.name }} — {{ d.role }}</div>{% endfor %}
+                {% for username, data in all_users.items() %}
+                <div class="bg-white p-6 rounded-3xl border border-pink-50 flex justify-between items-center">
+                    <div>
+                        <p class="font-bold text-[#ad1457]">{{ data.name }}</p>
+                        <p class="text-[10px] uppercase font-bold text-pink-300">{{ data.entreprise }} • {{ data.role }}</p>
+                    </div>
+                </div>
+                {% endfor %}
             </div>
         </div>
     </main>
