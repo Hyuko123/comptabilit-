@@ -1,202 +1,29 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <title>Ventes | Ultraze</title>
+    <meta charset="UTF-8"><script src="https://cdn.tailwindcss.com"></script>
+    <title>Ventes | Ultraze V2</title>
 </head>
-<body class="bg-[#fff9fa] flex min-h-screen text-[#880e4f]">
-    <aside class="w-72 bg-white border-r border-pink-50 flex flex-col fixed h-full z-50">
-        <div class="p-10 mb-6"><h1 class="text-[#f06292] text-2xl font-black italic">ULTRAZE V2</h1></div>
-        <nav class="flex-1 px-4 space-y-1">
-            <a href="/dashboard" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Dashboard</a>
-            <a href="/ventes" class="flex items-center gap-3 px-6 py-4 bg-pink-50 text-[#ad1457] font-bold rounded-2xl italic">Ventes</a>
-            <a href="/salaires" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Salaires</a>
-            <a href="/utilisateurs" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Utilisateurs</a>
-            <a href="/types-ventes" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Stocks / Types</a>
-            <div class="h-px bg-pink-50 my-6 mx-6"></div>
-            <a href="/clotures" class="flex items-center gap-3 px-6 py-4 text-pink-400 font-bold hover:bg-pink-50 rounded-2xl transition">Clôtures</a>
-            <a href="/irs" class="flex items-center gap-3 px-6 py-4 text-red-400 font-bold hover:bg-red-50 rounded-2xl transition italic">Avertissement IRS</a>
-        </nav>
-        <div class="p-8 border-t border-pink-50">
-            <a href="/logout" class="text-[10px] font-black text-gray-300 uppercase">Déconnexion</a>
-        </div>
-    </aside>
-
-    <main class="ml-72 flex-1 p-12">
-        <header class="mb-12">
-            <h2 class="text-4xl font-light text-[#880e4f]">Gestion des <span class="font-black italic text-[#f06292]">Ventes</span></h2>
-            <p class="text-pink-300 text-xs font-bold uppercase mt-2 italic border-l-2 border-pink-200 pl-3">{{ user.entreprise }}</p>
-        </header>
-
-        <div class="grid grid-cols-1 xl:grid-cols-3 gap-10">
-            <div class="bg-white p-10 rounded-[45px] shadow-xl border border-pink-50 h-fit sticky top-12">
-                <h3 id="formTitle" class="text-xl font-black mb-8 italic text-[#f06292]">Ajouter une vente</h3>
-                
-                <form action="/add_vente" method="POST" class="space-y-5" id="venteForm">
-                    <input type="hidden" name="vente_id" id="venteIdInput">
-                    
+<body class="bg-[#fff9fa] flex min-h-screen">
+    <main class="ml-80 flex-1 p-16">
+        <h2 class="text-3xl font-light text-[#880e4f] mb-12">Nouvelle <span class="font-black italic text-pink-500">Vente</span></h2>
+        <div class="max-w-2xl bg-white p-12 rounded-[50px] shadow-2xl shadow-pink-100 border border-pink-50">
+            <form class="space-y-6">
+                <div class="grid grid-cols-2 gap-6">
                     <div>
-                        <label class="text-[9px] font-bold text-pink-300 uppercase px-2 italic">Identité du vendeur</label>
-                        <input type="text" name="vendeur_name" id="vendeurInput" placeholder="Prénom Nom" required 
-                               class="w-full p-4 rounded-2xl bg-pink-50 border-2 border-transparent focus:border-pink-200 outline-none mt-1 font-bold transition">
-                    </div>
-
-                    <div>
-                        <label class="text-[9px] font-bold text-pink-300 uppercase px-2 italic">Article</label>
-                        <select name="item" id="itemSelect" 
-                                class="w-full p-4 rounded-2xl bg-pink-50 border-2 border-transparent focus:border-pink-200 outline-none mt-1 font-bold text-[#ad1457] transition">
-                            <option value="" disabled selected>Choisir un article...</option>
-                            {% for nom, prix in produits.items() %}
-                                <option value="{{ nom }}" data-price="{{ prix }}">{{ nom }} ({{ prix }}$)</option>
-                            {% endfor %}
+                        <label class="text-[10px] font-bold text-pink-300 uppercase px-2">Article</label>
+                        <select class="w-full p-4 rounded-2xl bg-pink-50/50 border-none outline-none mt-2">
+                            <option>Menu Burger</option><option>Boisson</option>
                         </select>
-                        <p id="errorMsg" class="hidden text-red-500 text-[10px] font-black italic mt-2 px-2 bg-red-50 py-1 rounded-lg">
-                            ⚠️ Tu essaye de vendre quoi du coup ? :)
-                        </p>
                     </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="text-[9px] font-bold text-pink-300 uppercase px-2">Quantité</label>
-                            <input type="number" name="qty" id="qtyInput" value="1" min="1" 
-                                   class="w-full p-4 rounded-2xl bg-pink-50 border-2 border-transparent focus:border-pink-200 outline-none mt-1 font-bold">
-                        </div>
-                        <div>
-                            <label class="text-[9px] font-bold text-pink-300 uppercase px-2">Total Net ($)</label>
-                            <input type="number" name="net" id="netInput" readonly 
-                                   class="w-full p-4 rounded-2xl bg-pink-100/30 border-none outline-none mt-1 font-black text-[#ad1457]">
-                        </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-pink-300 uppercase px-2">Montant ($)</label>
+                        <input type="number" placeholder="0" class="w-full p-4 rounded-2xl bg-pink-50/50 border-none outline-none mt-2">
                     </div>
-
-                    <button type="submit" id="submitBtn" 
-                            class="w-full bg-[#f06292] text-white font-black py-5 rounded-2xl shadow-lg hover:scale-[1.02] active:scale-95 transition shadow-pink-200 uppercase tracking-widest">
-                        VALIDER LA VENTE
-                    </button>
-                    
-                    <button type="button" id="cancelBtn" 
-                            class="hidden w-full text-pink-400 font-bold py-2 text-[10px] uppercase hover:text-[#f06292] transition">
-                        ✖ Annuler la modification
-                    </button>
-                </form>
-            </div>
-
-            <div class="xl:col-span-2 bg-white p-10 rounded-[45px] shadow-xl border border-pink-50">
-                <h3 class="text-xl font-black mb-8 italic">Historique des ventes</h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead>
-                            <tr class="text-[10px] text-pink-300 uppercase border-b border-pink-50">
-                                <th class="pb-4 font-black">Vendeur</th>
-                                <th class="pb-4 font-black">Article</th>
-                                <th class="pb-4 font-black">Qté</th>
-                                <th class="pb-4 font-black">Total Net</th>
-                                <th class="pb-4 text-right font-black">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-sm">
-                            {% for v in ventes %}
-                            <tr class="border-b border-pink-50/50 hover:bg-pink-50/20 transition group">
-                                <td class="py-4 font-bold">{{ v.vendeur }}</td>
-                                <td class="py-4 italic text-gray-500">{{ v.item }}</td>
-                                <td class="py-4">
-                                    <span class="bg-pink-50 text-[#f06292] px-3 py-1 rounded-full font-black text-xs">
-                                        {{ v.qty }}
-                                    </span>
-                                </td>
-                                <td class="py-4 font-black text-[#ad1457] text-base">{{ v.net }} $</td>
-                                <td class="py-4 text-right">
-                                    <div class="flex justify-end gap-3">
-                                        <button onclick="editVente('{{ v.id }}', '{{ v.vendeur }}', '{{ v.item }}', '{{ v.qty }}', '{{ v.net }}')"
-                                                class="text-pink-300 hover:text-[#f06292] text-[10px] font-black uppercase transition">
-                                            Modifier
-                                        </button>
-                                        <a href="/delete_vente/{{ v.id }}" 
-                                           class="text-red-200 hover:text-red-500 text-[10px] font-black uppercase transition"
-                                           onclick="return confirm('Supprimer cette vente ?')">
-                                            Supprimer
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% else %}
-                            <tr>
-                                <td colspan="5" class="py-12 text-center text-pink-200 italic font-bold">Aucune vente enregistrée pour le moment.</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
                 </div>
-            </div>
+                <button class="w-full bg-[#f06292] hover:bg-[#ec407a] text-white font-bold py-5 rounded-[25px] shadow-lg shadow-pink-100 transition-all">Valider la transaction</button>
+            </form>
         </div>
     </main>
-
-    <script>
-        const form = document.getElementById('venteForm');
-        const itemSelect = document.getElementById('itemSelect');
-        const qtyInput = document.getElementById('qtyInput');
-        const netInput = document.getElementById('netInput');
-        const errorMsg = document.getElementById('errorMsg');
-        const vendeurInput = document.getElementById('vendeurInput');
-        const venteIdInput = document.getElementById('venteIdInput');
-        const formTitle = document.getElementById('formTitle');
-        const submitBtn = document.getElementById('submitBtn');
-        const cancelBtn = document.getElementById('cancelBtn');
-
-        // CALCUL DU TOTAL EN DIRECT
-        function calculateTotal() {
-            const selectedOption = itemSelect.options[itemSelect.selectedIndex];
-            const price = selectedOption ? selectedOption.getAttribute('data-price') : 0;
-            const qty = qtyInput.value;
-            
-            if (price && qty) {
-                netInput.value = (parseFloat(price) * parseInt(qty)).toFixed(0);
-                errorMsg.classList.add('hidden');
-                itemSelect.classList.remove('border-red-300');
-            }
-        }
-
-        itemSelect.addEventListener('change', calculateTotal);
-        qtyInput.addEventListener('input', calculateTotal);
-
-        // MODE EDITION : Remplir le formulaire
-        function editVente(id, vendeur, item, qty, net) {
-            formTitle.innerText = "Modifier la vente";
-            formTitle.classList.replace('text-[#f06292]', 'text-[#ad1457]');
-            submitBtn.innerText = "METTRE À JOUR";
-            cancelBtn.classList.remove('hidden');
-            
-            venteIdInput.value = id;
-            vendeurInput.value = vendeur;
-            itemSelect.value = item;
-            qtyInput.value = qty;
-            netInput.value = net;
-
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // RESET DU FORMULAIRE
-        cancelBtn.addEventListener('click', () => {
-            form.reset();
-            formTitle.innerText = "Ajouter une vente";
-            formTitle.classList.replace('text-[#ad1457]', 'text-[#f06292]');
-            submitBtn.innerText = "VALIDER LA VENTE";
-            cancelBtn.classList.add('hidden');
-            venteIdInput.value = "";
-            netInput.value = "";
-            errorMsg.classList.add('hidden');
-            itemSelect.classList.remove('border-red-300');
-        });
-
-        // VALIDATION FINALE AVANT ENVOI
-        form.addEventListener('submit', function(e) {
-            if (itemSelect.value === "") {
-                e.preventDefault();
-                errorMsg.classList.remove('hidden');
-                itemSelect.classList.add('border-red-300');
-                itemSelect.focus();
-            }
-        });
-    </script>
 </body>
 </html>
