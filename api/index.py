@@ -149,5 +149,16 @@ def logout():
     session.clear()
     return redirect(url_for('login'))
 
+@app.route('/delete_vente/<int:vente_id>')
+def delete_vente(vente_id):
+    if 'user' not in session: return redirect(url_for('login'))
+    
+    try:
+        supabase.table("ventes").delete().eq("id", vente_id).execute()
+    except Exception as e:
+        print(f"Erreur suppression : {e}")
+        
+    return redirect(url_for('ventes_page'))
+
 if __name__ == '__main__':
     app.run(debug=True)
