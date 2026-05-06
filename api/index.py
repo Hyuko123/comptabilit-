@@ -1,9 +1,10 @@
 from flask import Flask, render_template, request, redirect, url_for, session
+import os
 
 app = Flask(__name__, template_folder='../templates')
-app.secret_key = 'shinoza_ultraze_v2_secret'
+app.secret_key = 'shinoza_key_ultraze'
 
-# Base de données simulée (Liste complète de tes images)
+# Liste complète des entreprises pour les menus déroulants
 entreprises_liste = [
     "Restaurant Vinewood", "Burger Shot", "REX Diner + LTD", "Pop Chiken",
     "Unicorn", "Bahamas", "Fête Forraine", "Agence d'évènementiel", "Le Clown",
@@ -16,9 +17,9 @@ users_db = {
     "admin": {"password": "admin123", "name": "Shinoza", "role": "MASTER", "entreprise": "ADMINISTRATION"}
 }
 
-# --- INJECTION DE VARIABLE (Fixe le bug 'user' undefined) ---
 @app.context_processor
 def inject_vars():
+    # Injection sécurisée : si l'utilisateur n'est pas connecté, user = None
     return dict(user=session.get('user'), entreprises=entreprises_liste)
 
 @app.route('/')
@@ -27,8 +28,7 @@ def login():
 
 @app.route('/login_process', methods=['POST'])
 def login_process():
-    u = request.form.get('username')
-    p = request.form.get('password')
+    u, p = request.form.get('username'), request.form.get('password')
     if u in users_db and users_db[u]['password'] == p:
         session['user'] = users_db[u]
         return redirect(url_for('dashboard'))
@@ -37,39 +37,9 @@ def login_process():
 @app.route('/dashboard')
 def dashboard():
     if 'user' not in session: return redirect(url_for('login'))
-    stats = {'ca': "4.650", 'taxes': "1,628", 'benefice': "465"}
+    # Valeurs par défaut pour éviter le crash "Internal Server Error"
+    stats = {'ca': "4.650", 'taxes': "1.628", 'benefice': "465"}
     return render_template('dashboard.html', stats=stats)
-
-@app.route('/utilisateurs')
-def utilisateurs():
-    if 'user' not in session: return redirect(url_for('login'))
-    return render_template('utilisateurs.html', all_users=users_db)
-
-@app.route('/add_user', methods=['POST'])
-def add_user():
-    new_u = request.form.get('new_username')
-    users_db[new_u] = {
-        "password": request.form.get('new_password'),
-        "name": request.form.get('new_name'),
-        "role": request.form.get('new_role'),
-        "entreprise": request.form.get('new_entreprise')
-    }
-    return redirect(url_for('utilisateurs'))
-
-@app.route('/ventes')
-def ventes():
-    if 'user' not in session: return redirect(url_for('login'))
-    return render_template('ventes.html')
-
-@app.route('/salaires')
-def salaires():
-    if 'user' not in session: return redirect(url_for('login'))
-    return render_template('salaires.html')
-
-@app.route('/types-ventes')
-def types_ventes():
-    if 'user' not in session: return redirect(url_for('login'))
-    return render_template('stocks.html')
 
 @app.route('/logout')
 def logout():
