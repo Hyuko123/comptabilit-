@@ -33,9 +33,17 @@ def login_process():
 
 @app.route('/dashboard')
 def dashboard():
-    if 'user' not in session: return redirect(url_for('login'))
-    # On initialise des valeurs à 0 pour éviter l'erreur 500 sur le dashboard
-    stats = {'ca_net': 0, 'taxes': 0, 'salaires': 0, 'benefice': 0}
+    if 'user' not in session: 
+        return redirect(url_for('login'))
+    
+    # On prépare des stats par défaut pour l'affichage
+    stats = {
+        'ca_net': "0",
+        'taxes': "40%",
+        'salaires': "0",
+        'benefice': "0"
+    }
+    
     return render_template('dashboard.html', user=session['user'], stats=stats)
 
 @app.route('/utilisateurs')
