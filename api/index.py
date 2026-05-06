@@ -75,40 +75,35 @@ def ventes():
 def utilisateurs():
     if 'user' not in session: return redirect(url_for('login'))
     
-    # On force des dictionnaires vides si le chargement échoue
+    user_logged = session['user']
     all_u = charger_users() or {}
     config_ent = charger_config_entreprises() or {}
     
-    user_logged = session['user']
-    ent_name = user_logged.get('entreprise', 'Inconnue')
-    
+    # Filtrage par entreprise
     if user_logged.get('role') == "SYSTEM_ADMIN":
         mes_employes = all_u
-        liste_entreprises = list(config_ent.keys()) or ["Burger Shot", "LTD"]
+        liste_entreprises = list(config_ent.keys())
     else:
+        ent_name = user_logged.get('entreprise')
         mes_employes = {k: v for k, v in all_u.items() if v.get('entreprise') == ent_name}
         liste_entreprises = [ent_name]
-
-    return render_template('utilisateurs.html', 
-                           all_users=mes_employes, 
-                           entreprises=liste_entreprises)
+    
+    return render_template('utilisateurs.html', all_users=mes_employes, entreprises=liste_entreprises)
     
 @app.route('/add_user', methods=['POST'])
-def add_user():
+def add_user_process():  # Changement de nom ici pour éviter le conflit
     if 'user' not in session: return redirect(url_for('login'))
     
     users = charger_users()
-    # On récupère les infos du formulaire
     new_uid = request.form.get('new_username').lower().strip()
     
     users[new_uid] = {
         "password": request.form.get('new_password'),
         "name": request.form.get('new_name'),
         "role": request.form.get('new_role'),
-        "entreprise": request.form.get('new_entreprise'), # Vérifie que ce nom correspond au <select>
+        "entreprise": request.form.get('new_entreprise'),
         "telephone": "N/A", "iban": "N/A", "prime": 0, "avance": 0
     }
-    
     sauvegarder_users(users)
     return redirect(url_for('utilisateurs'))
     
@@ -118,7 +113,6 @@ def delete_user(uid):
     
     users = charger_users()
     if uid in users:
-        # Optionnel : vérifier ici que le gars qui supprime est bien le patron de la même entreprise
         del users[uid]
         sauvegarder_users(users)
         
