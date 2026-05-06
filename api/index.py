@@ -1,25 +1,10 @@
 from flask import Flask, render_template, request, redirect, url_for, session
-from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import generate_password_hash, check_password_hash
+import os
 
 app = Flask(__name__, template_folder='../templates')
-app.secret_key = 'shinoza_ultraze_secret'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///ultraze.db'
-db = SQLAlchemy(app)
+app.secret_key = 'shinoza_ultraze_v2_key'
 
-# --- MODÈLES DE DONNÉES ---
-class Entreprise(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    nom = db.Column(db.String(100), unique=True)
-
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True)
-    password = db.Column(db.String(200))
-    role = db.Column(db.String(20)) # Patron, Co-Patron, Manager, Employé
-    entreprise_id = db.Column(db.Integer, db.ForeignKey('entreprise.id'))
-
-# --- ROUTES DE CONNEXION ---
+# --- LOGIQUE DE CONNEXION ---
 @app.route('/')
 def login():
     return render_template('login.html')
@@ -29,45 +14,57 @@ def login_process():
     u = request.form.get('username')
     p = request.form.get('password')
     
-    # Sécurité : admin/admin123 n'est pas écrit dans le HTML mais géré ici
+    # Ton accès admin secret (Invisible dans le HTML)
     if u == "admin" and p == "admin123":
-        session['user'] = {'username': 'Shinoza', 'role': 'Admin Global'}
+        session['user'] = {'name': 'Shinoza', 'role': 'Patron Global', 'entreprise': 'Ultraze Corp'}
         return redirect(url_for('dashboard'))
     
-    # Logique pour les autres utilisateurs en base de données ici...
+    # Simuler une connexion entreprise pour le test (Ex: Rex Diner)
+    if u == "rex" and p == "rex123":
+        session['user'] = {'name': 'Amare', 'role': 'Patron', 'entreprise': 'Rex Diner + LTD'}
+        return redirect(url_for('dashboard'))
+
     return redirect(url_for('login'))
 
-# --- NAVIGATION DASHBOARD ---
+# --- ROUTES DASHBOARD & CATÉGORIES ---
 @app.route('/dashboard')
 def dashboard():
     if 'user' not in session: return redirect(url_for('login'))
-    return render_template('dashboard.html')
+    # Les stats sont calculées ici (Simulation selon tes images)
+    stats = {'ca': 4650, 'salaires': 2558, 'taxes': 1628, 'benefice': 465}
+    return render_template('dashboard.html', user=session['user'], stats=stats)
 
 @app.route('/ventes')
 def ventes():
-    return render_template('ventes.html') # Tu devras créer ce fichier
+    if 'user' not in session: return redirect(url_for('login'))
+    return render_template('ventes.html', user=session['user'])
 
 @app.route('/salaires')
 def salaires():
-    return render_template('salaires.html') # Basé sur ton image
+    if 'user' not in session: return redirect(url_for('login'))
+    return render_template('salaires.html', user=session['user'])
 
 @app.route('/utilisateurs')
 def utilisateurs():
-    return render_template('utilisateurs.html') # Basé sur ton image
+    if 'user' not in session: return redirect(url_for('login'))
+    return render_template('utilisateurs.html', user=session['user'])
 
 @app.route('/stocks')
 def stocks():
-    return render_template('stocks.html')
+    if 'user' not in session: return redirect(url_for('login'))
+    return render_template('stocks.html', user=session['user'])
 
 @app.route('/clotures')
 def clotures():
-    return render_template('clotures.html')
+    if 'user' not in session: return redirect(url_for('login'))
+    return render_template('clotures.html', user=session['user'])
 
 @app.route('/irs')
 def irs():
-    return render_template('irs.html')
+    if 'user' not in session: return redirect(url_for('login'))
+    return render_template('irs.html', user=session['user'])
 
-if __name__ == '__main__':
-    with app.app_context():
-        db.create_all() # Crée la base de données
-    app.run(debug=True)
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
