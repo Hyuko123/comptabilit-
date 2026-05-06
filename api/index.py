@@ -1,7 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 
-# On précise le dossier des templates car il est en dehors du dossier api/
 app = Flask(__name__, template_folder='../templates')
+app.secret_key = 'ultraze_secret_key' # Nécessaire pour les sessions
 
 @app.route('/')
 def login_page():
@@ -9,40 +9,43 @@ def login_page():
 
 @app.route('/login_process', methods=['POST'])
 def login_process():
-    # Simulation de connexion simple
     username = request.form.get('username')
     password = request.form.get('password')
-    if username == "admin" and password == "admin":
+    
+    # Correction : On vérifie admin / admin123
+    if username == "admin" and password == "admin123":
+        session['logged_in'] = True
         return redirect(url_for('dashboard'))
-    return redirect(url_for('login_page'))
+    else:
+        # Si ça rate, on revient au login (tu peux ajouter un message d'erreur ici)
+        return redirect(url_for('login_page'))
 
 @app.route('/dashboard')
 def dashboard():
+    if not session.get('logged_in'):
+        return redirect(url_for('login_page'))
     return render_template('dashboard.html')
 
+# Routes pour éviter les erreurs 404 au clic sur les catégories
 @app.route('/ventes')
-def ventes():
-    return "<h1>Page Ventes</h1><p>En construction...</p>"
+def ventes(): return "<h1>Page Ventes</h1>"
 
 @app.route('/salaires')
-def salaires():
-    return "<h1>Page Salaires</h1><p>En construction...</p>"
+def salaires(): return "<h1>Page Salaires</h1>"
 
 @app.route('/utilisateurs')
-def utilisateurs():
-    return "<h1>Page Utilisateurs</h1><p>En construction...</p>"
+def utilisateurs(): return "<h1>Page Utilisateurs</h1>"
 
 @app.route('/types-ventes')
-def types_ventes():
-    return "<h1>Types de ventes</h1>"
+def types_ventes(): return "<h1>Types de ventes</h1>"
 
 @app.route('/clotures')
-def clotures():
-    return "<h1>Taxes & Clôtures</h1>"
+def clotures(): return "<h1>Taxes & Clôtures</h1>"
 
 @app.route('/irs')
-def irs():
-    return "<h1>Avertissement IRS</h1>"
+def irs(): return "<h1>Avertissement IRS</h1>"
 
-# Pour Vercel
-app.debug = True
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)
+    return redirect(url_for('login_page'))
