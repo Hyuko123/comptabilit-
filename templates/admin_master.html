@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Master Admin | Ultraze V2</title>
+</head>
+<body class="bg-[#0f172a] text-white p-10">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex justify-between items-center mb-10 border-b border-slate-800 pb-5">
+            <h1 class="text-3xl font-black italic text-sky-400">MASTER PANEL <span class="text-white">ULTRAZE V2</span></h1>
+            <a href="/logout" class="text-rose-500 font-bold">Quitter la session</a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-slate-900 p-8 rounded-[30px] border border-slate-800">
+                <h2 class="text-xl font-bold mb-6 italic text-sky-400">Ajouter une Entreprise</h2>
+                <form class="space-y-4">
+                    <input type="text" placeholder="Nom de l'entreprise (ex: Rex Diner)" class="w-full bg-slate-800 p-4 rounded-xl border-none outline-none">
+                    <input type="number" placeholder="Taux IRS Global (%)" class="w-full bg-slate-800 p-4 rounded-xl border-none outline-none">
+                    <button class="w-full bg-sky-600 p-4 rounded-xl font-bold">Créer l'entité</button>
+                </form>
+            </div>
+
+            <div class="bg-slate-900 p-8 rounded-[30px] border border-slate-800">
+                <h2 class="text-xl font-bold mb-6 italic text-emerald-400">Configuration des Taxes</h2>
+                {% for nom, data in entreprises.items() %}
+                <div class="mb-6 p-4 bg-slate-800/50 rounded-2xl border border-slate-700">
+                    <div class="flex justify-between font-bold text-white mb-2">
+                        <span>{{ nom }}</span>
+                        <span class="text-rose-400">IRS: {{ data.taxes_irs }}%</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        {% for grade, taxe in data.grades.items() %}
+                        <div class="text-[10px] bg-slate-900 p-2 rounded-lg flex justify-between">
+                            <span class="text-slate-400">{{ grade }}</span>
+                            <span class="text-emerald-400 font-bold">{{ taxe }}%</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
