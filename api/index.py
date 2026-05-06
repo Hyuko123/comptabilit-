@@ -73,31 +73,25 @@ def ventes():
 
 @app.route('/utilisateurs')
 def utilisateurs():
-    if 'user' not in session:
-        return redirect(url_for('login'))
+    if 'user' not in session: return redirect(url_for('login'))
     
-    user_logged = session['user']
-    all_users_dict = charger_users() or {}
+    # On force des dictionnaires vides si le chargement échoue
+    all_u = charger_users() or {}
     config_ent = charger_config_entreprises() or {}
     
-    # Sécurité : on définit des listes vides par défaut
-    mes_employes = {}
-    liste_pour_select = []
+    user_logged = session['user']
+    ent_name = user_logged.get('entreprise', 'Inconnue')
     
     if user_logged.get('role') == "SYSTEM_ADMIN":
-        mes_employes = all_users_dict
-        liste_pour_select = list(config_ent.keys())
-        if not liste_pour_select: # Si config vide
-            liste_pour_select = ["Burger Shot", "LTD", "Unicorn"]
+        mes_employes = all_u
+        liste_entreprises = list(config_ent.keys()) or ["Burger Shot", "LTD"]
     else:
-        ent_name = user_logged.get('entreprise', 'Burger Shot')
-        mes_employes = {k: v for k, v in all_users_dict.items() if v.get('entreprise') == ent_name}
-        liste_pour_select = [ent_name]
+        mes_employes = {k: v for k, v in all_u.items() if v.get('entreprise') == ent_name}
+        liste_entreprises = [ent_name]
 
-    # FORCE : On passe les variables avec des noms ultra-clairs
     return render_template('utilisateurs.html', 
                            all_users=mes_employes, 
-                           entreprises=liste_pour_select)
+                           entreprises=liste_entreprises)
     
 @app.route('/add_user', methods=['POST'])
 def add_user():
