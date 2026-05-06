@@ -10,6 +10,7 @@ SUPABASE_URL = "https://yiqpncfhfbltaalhgenp.supabase.co"
 SUPABASE_KEY = "sb_publishable_GR_DdAtHA7_DB55cLywtrw_0TlybFWx" 
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
 app = Flask(__name__, template_folder='../templates')
 app.secret_key = 'shinoza_ultraze_v2'
 
