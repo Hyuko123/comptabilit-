@@ -1,9 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 
 app = Flask(__name__, template_folder='../templates')
-app.secret_key = 'shinoza_ultraze_v2'
+app.secret_key = 'shinoza_ultraze_v2_secret'
 
-# Liste complète des entreprises de tes images
+# Base de données simulée (Liste complète de tes images)
 entreprises_liste = [
     "Restaurant Vinewood", "Burger Shot", "REX Diner + LTD", "Pop Chiken",
     "Unicorn", "Bahamas", "Fête Forraine", "Agence d'évènementiel", "Le Clown",
@@ -12,13 +12,13 @@ entreprises_liste = [
     "Taxi", "Psychologue", "Transport et livraison", "Salon de tatouage Aguja", "Salon de tatouage Vespucci"
 ]
 
-# Base de données temporaire (se vide au redémarrage Vercel)
 users_db = {
     "admin": {"password": "admin123", "name": "Shinoza", "role": "MASTER", "entreprise": "ADMINISTRATION"}
 }
 
+# --- INJECTION DE VARIABLE (Fixe le bug 'user' undefined) ---
 @app.context_processor
-def inject_user():
+def inject_vars():
     return dict(user=session.get('user'), entreprises=entreprises_liste)
 
 @app.route('/')
@@ -37,13 +37,8 @@ def login_process():
 @app.route('/dashboard')
 def dashboard():
     if 'user' not in session: return redirect(url_for('login'))
-    stats = {'ca': "4.650", 'taxes': "1.628", 'benefice': "465"}
+    stats = {'ca': "4.650", 'taxes': "1,628", 'benefice': "465"}
     return render_template('dashboard.html', stats=stats)
-
-@app.route('/ventes')
-def ventes():
-    if 'user' not in session: return redirect(url_for('login'))
-    return render_template('ventes.html')
 
 @app.route('/utilisateurs')
 def utilisateurs():
@@ -61,11 +56,20 @@ def add_user():
     }
     return redirect(url_for('utilisateurs'))
 
+@app.route('/ventes')
+def ventes():
+    if 'user' not in session: return redirect(url_for('login'))
+    return render_template('ventes.html')
+
 @app.route('/salaires')
-def salaires(): return render_template('salaires.html')
+def salaires():
+    if 'user' not in session: return redirect(url_for('login'))
+    return render_template('salaires.html')
 
 @app.route('/types-ventes')
-def types_ventes(): return render_template('stocks.html')
+def types_ventes():
+    if 'user' not in session: return redirect(url_for('login'))
+    return render_template('stocks.html')
 
 @app.route('/logout')
 def logout():
