@@ -1,14 +1,18 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 
 app = Flask(__name__, template_folder='../templates')
-app.secret_key = 'ultraze_master_key'
+app.secret_key = 'shinoza_ultraze_v2_key'
 
-# Simulation de base de données des entreprises et taxes
-# Dans un vrai projet, ceci serait dans ta base de données
-entreprises_db = {
-    "Rex Diner + LTD": {"taxes_irs": 35, "grades": {"Patron": 65, "Co Patron": 63, "Manager": 60, "Employé": 55}},
-    "Ultraze Corp": {"taxes_irs": 20, "grades": {"Patron": 100}}
+# Simulation de base de données (se réinitialise au redémarrage sur Vercel)
+# Pour une vraie persistance, il faudra lier une DB externe (ex: Supabase)
+users_db = {
+    "admin": {"password": "admin123", "name": "Shinoza", "role": "MASTER", "entreprise": "ADMINISTRATION"}
 }
+
+entreprises = [
+    "Rex Diner + LTD", "Pops Diner", "Up-n-Atom", "Burgershot", 
+    "Wigwam", "Bean Machine", "Yellow Jack", "Vanilla Unicorn", "Bahama Mamas"
+]
 
 @app.route('/')
 def login():
@@ -19,44 +23,40 @@ def login_process():
     u = request.form.get('username')
     p = request.form.get('password')
     
-    # ACCÈS MASTER ADMIN (Shinoza)
-    if u == "admin" and p == "admin123":
-        session['user'] = {'name': 'Shinoza', 'role': 'MASTER', 'entreprise': 'ADMINISTRATION'}
-        return redirect(url_for('admin_panel'))
-    
-    # ACCÈS ENTREPRISE (Exemple)
-    if u == "rex" and p == "rex123":
-        session['user'] = {'name': 'Amare', 'role': 'Patron', 'entreprise': 'Rex Diner + LTD'}
+    if u in users_db and users_db[u]['password'] == p:
+        session['user'] = users_db[u]
+        session['user']['username'] = u
+        if users_db[u]['role'] == 'MASTER':
+            return redirect(url_for('dashboard')) # Ou admin_master
         return redirect(url_for('dashboard'))
-
     return redirect(url_for('login'))
 
-# --- PANEL ADMIN UNIQUE (ADMIN ONLY) ---
-@app.route('/admin-master')
-def admin_panel():
-    if session.get('user', {}).get('role') != 'MASTER':
-        return "Accès interdit", 403
-    return render_template('admin_master.html', entreprises=entreprises_db)
-
-# --- ROUTES CLASSIQUES ---
-@app.route('/dashboard')
-def dashboard():
+@app.route('/utilisateurs')
+def utilisateurs():
     if 'user' not in session: return redirect(url_for('login'))
-    # On récupère les taxes spécifiques à l'entreprise de l'utilisateur
-    ent = session['user']['entreprise']
-    config = entreprises_db.get(ent, {"taxes_irs": 0, "grades": {}})
-    return render_template('dashboard.html', user=session['user'], config=config)
+    return render_template('utilisateurs.html', user=session['user'], entreprises=entreprises, all_users=users_db)
+
+@app.route('/add_user', methods=['POST'])
+def add_user():
+    # Seul l'admin ou un Patron peut créer
+    new_u = request.form.get('new_username')
+    users_db[new_u] = {
+        "password": request.form.get('new_password'),
+        "name": request.form.get('new_name'),
+        "role": request.form.get('new_role'),
+        "entreprise": request.form.get('new_entreprise')
+    }
+    return redirect(url_for('utilisateurs'))
 
 @app.route('/ventes')
 def ventes():
     if 'user' not in session: return redirect(url_for('login'))
     return render_template('ventes.html', user=session['user'])
 
-@app.route('/utilisateurs')
-def utilisateurs():
+@app.route('/dashboard')
+def dashboard():
     if 'user' not in session: return redirect(url_for('login'))
-    # Si c'est l'admin, il voit tout. Si c'est un patron, il ne voit que ses employés.
-    return render_template('utilisateurs.html', user=session['user'])
+    return render_template('dashboard.html', user=session['user'])
 
 @app.route('/logout')
 def logout():
