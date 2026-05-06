@@ -6,18 +6,29 @@ import os
 app = Flask(__name__, template_folder='../templates')
 app.secret_key = 'shinoza_ultraze_v2'
 
-# Dossiers temporaires obligatoires pour Vercel
+# Dossiers temporaires pour Vercel
 TEMP_USERS = "/tmp/utilisateurs.json"
 TEMP_VENTES = "/tmp/ventes.json"
 
-# --- FONCTIONS DE GESTION DES DONNÉES ---
+# --- LISTE OFFICIELLE DES ENTREPRISES ---
+ENTREPRISES_LISTE = [
+    "Restaurant Vinewood", "Burger Shot", "REX Diner + LTD", "Pop Chiken",
+    "Unicorn", "Bahamas", "Fête Forraine", "Agence d'évènementiel", "Le Clown",
+    "Benny's", "LS Custom", "Garage Paleto", "REX Garage", "Custom Mirror", "Auto Repair 68",
+    "Dynasty 8", "LTD Little Seoul", "LTD Groove Street", "Ammunation", "Car Dealer",
+    "Taxi", "Psychologue", "Transport et livraison", "Salon de tatouage Aguja", "Salon de tatouage Vespucci"
+]
+
+# --- UTILITAIRES ---
 
 def charger_utilisateurs():
     if not os.path.exists(TEMP_USERS):
-        # Admin par défaut si le fichier n'existe pas encore
         return {"admin": {"password": "admin123", "name": "Shinoza", "role": "MASTER", "entreprise": "ADMINISTRATION"}}
-    with open(TEMP_USERS, 'r') as f:
-        return json.load(f)
+    try:
+        with open(TEMP_USERS, 'r') as f:
+            return json.load(f)
+    except:
+        return {"admin": {"password": "admin123", "name": "Shinoza", "role": "MASTER", "entreprise": "ADMINISTRATION"}}
 
 def sauvegarder_utilisateurs(users):
     with open(TEMP_USERS, 'w') as f:
@@ -26,14 +37,21 @@ def sauvegarder_utilisateurs(users):
 def charger_ventes():
     if not os.path.exists(TEMP_VENTES):
         return []
-    with open(TEMP_VENTES, 'r') as f:
-        return json.load(f)
+    try:
+        with open(TEMP_VENTES, 'r') as f:
+            return json.load(f)
+    except:
+        return []
 
 def sauvegarder_ventes(ventes):
     with open(TEMP_VENTES, 'w') as f:
         json.dump(ventes, f, indent=4)
 
-# --- ROUTES DE NAVIGATION ---
+@app.context_processor
+def inject_globals():
+    return dict(entreprises=ENTREPRISES_LISTE)
+
+# --- ROUTES ---
 
 @app.route('/')
 def login():
@@ -53,40 +71,47 @@ def login_process():
 @app.route('/dashboard')
 def dashboard():
     if 'user' not in session: return redirect(url_for('login'))
-    user_ent = session['user'].get('entreprise')
+    user_ent = session['user'].get('entreprise', 'Restaurant Vinewood')
     ventes_all = charger_ventes()
     mes_ventes = [v for v in ventes_all if v.get('entreprise') == user_ent]
     ca = sum(v.get('montant_net', 0) for v in mes_ventes)
     
-    stats = {'ca': ca, 'taxes': int(ca * 0.15), 'benefice': int(ca * 0.85),
-             'nom_user': session['user'].get('name'), 'entreprise': user_ent}
+    stats = {
+        'ca': ca,
+        'taxes': int(ca * 0.15),
+        'benefice': int(ca * 0.85),
+        'nom_user': session['user'].get('name'),
+        'entreprise': user_ent
+    }
     return render_template('dashboard.html', stats=stats)
-
-# --- GESTION DES UTILISATEURS ---
 
 @app.route('/utilisateurs')
 def utilisateurs():
     if 'user' not in session: return redirect(url_for('login'))
     all_u = charger_utilisateurs()
-    # On affiche tout pour le MASTER, sinon uniquement son entreprise
-    if session['user'].get('role') == "MASTER":
+    user_logged = session['user']
+    
+    if user_logged.get('role') == "MASTER":
         mes_employes = all_u
     else:
-        ent = session['user'].get('entreprise')
+        ent = user_logged.get('entreprise')
         mes_employes = {k: v for k, v in all_u.items() if v.get('entreprise') == ent}
+        
     return render_template('utilisateurs.html', all_users=mes_employes)
 
 @app.route('/add_user', methods=['POST'])
 def add_user():
+    if 'user' not in session: return redirect(url_for('login'))
     users = charger_utilisateurs()
     uid = request.form.get('new_username')
-    users[uid] = {
-        "name": request.form.get('new_name'),
-        "password": request.form.get('new_password'),
-        "role": request.form.get('new_role'),
-        "entreprise": request.form.get('new_entreprise')
-    }
-    sauvegarder_utilisateurs(users)
+    if uid:
+        users[uid] = {
+            "name": request.form.get('new_name'),
+            "password": request.form.get('new_password'),
+            "role": request.form.get('new_role'),
+            "entreprise": request.form.get('new_entreprise')
+        }
+        sauvegarder_utilisateurs(users)
     return redirect(url_for('utilisateurs'))
 
 @app.route('/delete_user/<uid>')
@@ -98,13 +123,30 @@ def delete_user(uid):
         sauvegarder_utilisateurs(users)
     return redirect(url_for('utilisateurs'))
 
-# --- AUTRES PAGES (Éviter le "Not Found") ---
-
 @app.route('/ventes')
-def ventes():
+def ventes_page():
     if 'user' not in session: return redirect(url_for('login'))
-    mes_ventes = [v for v in charger_ventes() if v.get('entreprise') == session['user'].get('entreprise')]
+    user_ent = session['user'].get('entreprise')
+    ventes_all = charger_ventes()
+    mes_ventes = [v for v in ventes_all if v.get('entreprise') == user_ent]
     return render_template('ventes.html', ventes=mes_ventes)
+
+@app.route('/add_vente', methods=['POST'])
+def add_vente():
+    if 'user' not in session: return redirect(url_for('login'))
+    ventes = charger_ventes()
+    nouvelle_vente = {
+        "id": str(int(time.time())),
+        "vendeur": session['user']['name'],
+        "entreprise": session['user']['entreprise'],
+        "article": request.form.get('article'),
+        "quantite": int(request.form.get('quantite') or 0),
+        "montant_net": float(request.form.get('montant') or 0),
+        "date": time.strftime("%d/%m %H:%M")
+    }
+    ventes.append(nouvelle_vente)
+    sauvegarder_ventes(ventes)
+    return redirect(url_for('ventes_page'))
 
 @app.route('/salaires')
 def salaires():
