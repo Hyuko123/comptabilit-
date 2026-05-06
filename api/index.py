@@ -1,26 +1,15 @@
 from flask import Flask, render_template, request, redirect, url_for, session
-import os
 
 app = Flask(__name__, template_folder='../templates')
-app.secret_key = 'ultraze_admin_v2_key'
+app.secret_key = 'ultraze_secret_key'
 
-# Liste des entreprises (extraite de tes screens)
-entreprises_liste = [
-    "Restaurant Vinewood", "Burger Shot", "REX Diner + LTD", "Pop Chiken",
-    "Unicorn", "Bahamas", "Fête Forraine", "Agence d'évènementiel", "Le Clown",
-    "Benny's", "LS Custom", "Garage Paleto", "REX Garage", "Custom Mirror", "Auto Repair 68",
-    "Dynasty 8", "LTD Little Seoul", "LTD Groove Street", "Ammunation", "Car Dealer",
-    "Taxi", "Psychologue", "Transport et livraison", "Salon de tatouage Aguja", "Salon de tatouage Vespucci"
-]
-
-# Utilisateur Admin par défaut
+# Base de données simulée avec Admin par défaut
 users_db = {
     "admin": {"password": "admin123", "name": "Admin", "role": "MASTER", "entreprise": "ADMINISTRATION"}
 }
 
-@app.context_processor
-def inject_vars():
-    return dict(user=session.get('user'), entreprises=entreprises_liste)
+# Données de démonstration pour le Dashboard
+stats_demo = {'ca': "4.650", 'taxes': "1.628", 'benefice': "465"}
 
 @app.route('/')
 def login():
@@ -37,28 +26,38 @@ def login_process():
 @app.route('/dashboard')
 def dashboard():
     if 'user' not in session: return redirect(url_for('login'))
-    stats = {'ca': "4.650", 'taxes': "1.628", 'benefice': "465"}
-    return render_template('dashboard.html', stats=stats)
+    return render_template('dashboard.html', stats=stats_demo, user=session['user'])
+
+# --- ROUTES DES CATÉGORIES (Évite les erreurs 500) ---
 
 @app.route('/ventes')
-def ventes(): return render_template('ventes.html')
+def ventes():
+    return render_template('ventes.html', user=session.get('user'))
 
 @app.route('/salaires')
-def salaires(): return render_template('salaires.html')
+def salaires():
+    return render_template('salaires.html', user=session.get('user'))
 
 @app.route('/utilisateurs')
-def utilisateurs(): return render_template('utilisateurs.html', all_users=users_db)
+def utilisateurs():
+    return render_template('utilisateurs.html', all_users=users_db, user=session.get('user'))
 
 @app.route('/types-ventes')
-def types_ventes(): return render_template('stocks.html')
+def types_ventes():
+    return render_template('types_ventes.html', user=session.get('user'))
 
 @app.route('/clotures')
-def clotures(): return render_template('clotures.html')
+def clotures():
+    return render_template('clotures.html', user=session.get('user'))
 
 @app.route('/irs')
-def irs(): return render_template('irs.html')
+def irs():
+    return render_template('irs.html', user=session.get('user'))
 
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('login'))
+
+if __name__ == '__main__':
+    app.run(debug=True)
