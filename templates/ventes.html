@@ -1,57 +1,28 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <meta charset="UTF-8"><script src="https://cdn.tailwindcss.com"></script>
     <title>Ventes | Ultraze V2</title>
 </head>
-<body class="bg-[#0a0f18] text-slate-300 flex min-h-screen">
-    
-    <main class="flex-1 p-12">
-        <div class="flex justify-between items-center mb-12">
-            <h1 class="text-3xl font-light italic text-white">Enregistrement <span class="text-sky-500 font-bold">Ventes</span></h1>
-            <div class="text-right">
-                <p class="text-xs text-slate-500 font-bold uppercase tracking-widest">Opérateur</p>
-                <p class="text-sky-400 font-bold italic">{{ user.name }}</p>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div class="lg:col-span-2 bg-slate-900/50 border border-slate-800 p-10 rounded-[40px]">
-                <form class="space-y-6">
-                    <div class="grid grid-cols-2 gap-6">
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-500 uppercase ml-2">Produit / Service</label>
-                            <select class="w-full bg-slate-800 p-4 rounded-2xl border-none outline-none mt-2 focus:ring-2 ring-sky-500/20">
-                                <option>Menu Burger Royal</option>
-                                <option>Service Traiteur</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-500 uppercase ml-2">Prix Unitaire ($)</label>
-                            <input type="number" placeholder="150" class="w-full bg-slate-800 p-4 rounded-2xl border-none outline-none mt-2">
-                        </div>
+<body class="bg-[#fff9fa] flex min-h-screen">
+    <main class="ml-80 flex-1 p-16">
+        <h2 class="text-3xl font-light text-[#880e4f] mb-12">Nouvelle <span class="font-black italic text-pink-500">Vente</span></h2>
+        <div class="max-w-2xl bg-white p-12 rounded-[50px] shadow-2xl shadow-pink-100 border border-pink-50">
+            <form class="space-y-6">
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <label class="text-[10px] font-bold text-pink-300 uppercase px-2">Article</label>
+                        <select class="w-full p-4 rounded-2xl bg-pink-50/50 border-none outline-none mt-2">
+                            <option>Menu Burger</option><option>Boisson</option>
+                        </select>
                     </div>
-                    
-                    <div class="bg-slate-800/30 p-6 rounded-3xl border border-dashed border-slate-700">
-                        <p class="text-xs text-center text-slate-500">Ici s'affichera le calcul automatique des taxes (IRS + Grade)</p>
-                    </div>
-
-                    <button class="w-full bg-sky-500 hover:bg-sky-400 text-slate-900 font-black py-5 rounded-2xl transition-all shadow-lg shadow-sky-500/10">VALIDER LE CONTRAT DE VENTE</button>
-                </form>
-            </div>
-
-            <div class="bg-slate-900/50 border border-slate-800 p-8 rounded-[40px]">
-                <h3 class="text-white font-bold mb-6">Derniers Contrats</h3>
-                <div class="space-y-4">
-                    <div class="p-4 bg-slate-800 rounded-2xl flex justify-between items-center">
-                        <span class="text-xs font-bold italic">#8892 - Rossi</span>
-                        <span class="text-emerald-400 font-bold">1,200$</span>
+                    <div>
+                        <label class="text-[10px] font-bold text-pink-300 uppercase px-2">Montant ($)</label>
+                        <input type="number" placeholder="0" class="w-full p-4 rounded-2xl bg-pink-50/50 border-none outline-none mt-2">
                     </div>
                 </div>
-            </div>
+                <button class="w-full bg-[#f06292] hover:bg-[#ec407a] text-white font-bold py-5 rounded-[25px] shadow-lg shadow-pink-100 transition-all">Valider la transaction</button>
+            </form>
         </div>
     </main>
 </body>
