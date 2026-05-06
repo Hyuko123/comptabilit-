@@ -1,51 +1,73 @@
 from flask import Flask, render_template, request, redirect, url_for, session
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__, template_folder='../templates')
-app.secret_key = 'ultraze_secret_key' # Nécessaire pour les sessions
+app.secret_key = 'shinoza_ultraze_secret'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///ultraze.db'
+db = SQLAlchemy(app)
 
+# --- MODÈLES DE DONNÉES ---
+class Entreprise(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nom = db.Column(db.String(100), unique=True)
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True)
+    password = db.Column(db.String(200))
+    role = db.Column(db.String(20)) # Patron, Co-Patron, Manager, Employé
+    entreprise_id = db.Column(db.Integer, db.ForeignKey('entreprise.id'))
+
+# --- ROUTES DE CONNEXION ---
 @app.route('/')
-def login_page():
+def login():
     return render_template('login.html')
 
 @app.route('/login_process', methods=['POST'])
 def login_process():
-    username = request.form.get('username')
-    password = request.form.get('password')
+    u = request.form.get('username')
+    p = request.form.get('password')
     
-    # Correction : On vérifie admin / admin123
-    if username == "admin" and password == "admin123":
-        session['logged_in'] = True
+    # Sécurité : admin/admin123 n'est pas écrit dans le HTML mais géré ici
+    if u == "admin" and p == "admin123":
+        session['user'] = {'username': 'Shinoza', 'role': 'Admin Global'}
         return redirect(url_for('dashboard'))
-    else:
-        # Si ça rate, on revient au login (tu peux ajouter un message d'erreur ici)
-        return redirect(url_for('login_page'))
+    
+    # Logique pour les autres utilisateurs en base de données ici...
+    return redirect(url_for('login'))
 
+# --- NAVIGATION DASHBOARD ---
 @app.route('/dashboard')
 def dashboard():
-    if not session.get('logged_in'):
-        return redirect(url_for('login_page'))
+    if 'user' not in session: return redirect(url_for('login'))
     return render_template('dashboard.html')
 
-# Routes pour éviter les erreurs 404 au clic sur les catégories
 @app.route('/ventes')
-def ventes(): return "<h1>Page Ventes</h1>"
+def ventes():
+    return render_template('ventes.html') # Tu devras créer ce fichier
 
 @app.route('/salaires')
-def salaires(): return "<h1>Page Salaires</h1>"
+def salaires():
+    return render_template('salaires.html') # Basé sur ton image
 
 @app.route('/utilisateurs')
-def utilisateurs(): return "<h1>Page Utilisateurs</h1>"
+def utilisateurs():
+    return render_template('utilisateurs.html') # Basé sur ton image
 
-@app.route('/types-ventes')
-def types_ventes(): return "<h1>Types de ventes</h1>"
+@app.route('/stocks')
+def stocks():
+    return render_template('stocks.html')
 
 @app.route('/clotures')
-def clotures(): return "<h1>Taxes & Clôtures</h1>"
+def clotures():
+    return render_template('clotures.html')
 
 @app.route('/irs')
-def irs(): return "<h1>Avertissement IRS</h1>"
+def irs():
+    return render_template('irs.html')
 
-@app.route('/logout')
-def logout():
-    session.pop('logged_in', None)
-    return redirect(url_for('login_page'))
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all() # Crée la base de données
+    app.run(debug=True)
