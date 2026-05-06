@@ -4,88 +4,46 @@
     <meta charset="UTF-8">
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Dashboard | Ultraze V2</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,800;1,800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-    </style>
 </head>
-<body class="bg-[#fff9fa] flex min-h-screen overflow-x-hidden">
+<body class="bg-[#fff9fa] flex min-h-screen text-[#880e4f] overflow-x-hidden">
 
-    <aside class="w-72 bg-white border-r border-pink-50 flex flex-col fixed h-full z-50">
-        <div class="p-8 mb-10">
-            <h1 class="text-[#f06292] text-2xl font-black italic tracking-tighter">ULTRAZE <span class="text-pink-300">V2</span></h1>
-            <p class="text-[10px] text-pink-300 font-bold uppercase tracking-[3px]">Management</p>
+    <aside class="w-[280px] bg-white border-r border-pink-50 flex flex-col fixed h-full z-50">
+        <div class="p-10 mb-8">
+            <h1 class="text-[#f06292] text-2xl font-black italic">ULTRAZE V2</h1>
         </div>
-        
-        <nav class="flex-1 space-y-2 px-4">
-            <a href="/dashboard" class="flex items-center gap-4 px-6 py-4 bg-pink-50 text-[#ad1457] font-bold rounded-2xl transition-all">Dashboard</a>
-            <a href="/ventes" class="flex items-center gap-4 px-6 py-4 text-[#ad1457] font-bold hover:bg-pink-50 rounded-2xl transition-all">Ventes</a>
-            <a href="/salaires" class="flex items-center gap-4 px-6 py-4 text-[#ad1457] font-bold hover:bg-pink-50 rounded-2xl transition-all">Salaires</a>
-            <a href="/utilisateurs" class="flex items-center gap-4 px-6 py-4 text-[#ad1457] font-bold hover:bg-pink-50 rounded-2xl transition-all">Utilisateurs</a>
-            <a href="/types-ventes" class="flex items-center gap-4 px-6 py-4 text-[#ad1457] font-bold hover:bg-pink-50 rounded-2xl transition-all">Types de ventes</a>
+        <nav class="flex-1 px-4 space-y-2">
+            <a href="/dashboard" class="block p-4 bg-pink-50 text-[#ad1457] font-bold rounded-2xl">Dashboard</a>
+            <a href="#" class="block p-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Ventes</a>
+            <a href="#" class="block p-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Utilisateurs</a>
         </nav>
-
         <div class="p-8 border-t border-pink-50">
-            <a href="/logout" class="text-xs font-bold text-gray-400 hover:text-red-400 flex items-center gap-2 uppercase tracking-widest">
-                <span class="text-lg">⏻</span> Déconnexion
-            </a>
+            <a href="/logout" class="text-xs font-bold text-gray-300 uppercase">Déconnexion</a>
         </div>
     </aside>
 
-    <main class="ml-72 flex-1 p-12">
-        
-        <header class="flex justify-between items-start mb-16">
+    <main class="ml-[280px] flex-1 p-16">
+        <header class="mb-12 flex justify-between items-end">
             <div>
-                <p class="text-[11px] font-black text-pink-300 uppercase tracking-[4px] mb-2">Interface Premium</p>
-                <h2 class="text-5xl font-light text-[#880e4f]">Bienvenue, <span class="font-black italic text-[#f06292]">{{ user.name }}</span></h2>
+                <h2 class="text-4xl font-light">Bienvenue, <span class="font-black italic text-[#ad1457]">{{ user.name }}</span></h2>
+                <p class="text-pink-300 text-[10px] font-bold uppercase tracking-widest mt-2">{{ user.entreprise }}</p>
             </div>
-            <div class="text-right">
-                <p class="text-[10px] font-bold text-pink-300 uppercase tracking-widest">Entreprise</p>
-                <p class="text-[#ad1457] font-black italic uppercase text-xl">{{ user.entreprise }}</p>
-            </div>
+            <div class="bg-pink-500 text-white p-3 rounded-2xl shadow-lg">👑</div>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-            <div class="bg-white p-8 rounded-[40px] shadow-sm border border-pink-50 relative overflow-hidden">
-                <div class="absolute top-4 right-6 text-[10px] font-bold text-green-400 bg-green-50 px-2 py-1 rounded-full">+12.5%</div>
-                <p class="text-[10px] font-black text-pink-200 uppercase tracking-widest mb-6">Chiffre d'affaires net</p>
-                <div class="flex items-baseline gap-1">
-                    <span class="text-5xl font-black text-[#ad1457] italic">{{ stats.ca }}</span>
-                    <span class="text-2xl font-bold text-pink-200">$</span>
-                </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white p-10 rounded-[45px] shadow-xl shadow-pink-100/50 border border-pink-50">
+                <p class="text-[10px] font-bold text-pink-300 uppercase mb-4 tracking-widest">Chiffre d'Affaires</p>
+                <h3 class="text-5xl font-black text-[#ad1457] italic">{{ stats.ca }} $</h3>
             </div>
-
-            <div class="bg-white p-8 rounded-[40px] shadow-sm border border-pink-50 relative">
-                <div class="absolute top-4 right-6 text-[10px] font-bold text-red-400 bg-red-50 px-2 py-1 rounded-full italic">IRS DUE</div>
-                <p class="text-[10px] font-black text-pink-200 uppercase tracking-widest mb-6">Taxes provisionnées</p>
-                <div class="flex items-baseline gap-1">
-                    <span class="text-5xl font-black text-[#ad1457] italic">{{ stats.taxes }}</span>
-                    <span class="text-2xl font-bold text-pink-200">$</span>
-                </div>
+            <div class="bg-white p-10 rounded-[45px] shadow-xl shadow-pink-100/50 border border-pink-50">
+                <p class="text-[10px] font-bold text-pink-300 uppercase mb-4 tracking-widest">Taxes IRS</p>
+                <h3 class="text-5xl font-black text-red-400 italic">{{ stats.taxes }} $</h3>
             </div>
-
-            <div class="bg-gradient-to-br from-[#f06292] to-[#ec407a] p-8 rounded-[40px] shadow-xl shadow-pink-200 text-white">
-                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest mb-6 text-white">Bénéfice Réel</p>
-                <div class="flex items-baseline gap-1">
-                    <span class="text-5xl font-black italic">{{ stats.benefice }}</span>
-                    <span class="text-2xl font-bold opacity-40">$</span>
-                </div>
+            <div class="bg-gradient-to-br from-[#f06292] to-[#ec407a] p-10 rounded-[45px] text-white shadow-xl shadow-pink-200">
+                <p class="text-[10px] font-bold opacity-70 uppercase mb-4 tracking-widest">Bénéfice Réel</p>
+                <h3 class="text-5xl font-black italic">{{ stats.benefice }} $</h3>
             </div>
         </div>
-
-        <div class="bg-white border border-pink-50 rounded-[40px] p-10 flex items-center justify-between shadow-sm">
-            <div class="flex items-center gap-8">
-                <div class="w-16 h-16 bg-pink-50 rounded-3xl flex items-center justify-center text-3xl">🛡️</div>
-                <div>
-                    <h4 class="text-xl font-bold text-[#ad1457]">Statut de Clôture Hebdomadaire</h4>
-                    <p class="text-pink-300 text-sm">Votre entreprise est à jour. Prochaine déclaration dans <span class="font-bold">4 jours</span>.</p>
-                </div>
-            </div>
-            <button class="bg-[#f06292] hover:bg-[#ad1457] text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-pink-100">
-                Détails Taxes
-            </button>
-        </div>
-
     </main>
 </body>
 </html>
