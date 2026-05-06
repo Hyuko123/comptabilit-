@@ -1,113 +1,120 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>Salaires | Ultraze</title>
+    <title>Utilisateurs | Ultraze</title>
 </head>
-<body class="bg-[#0f111a] text-white flex min-h-screen font-sans">
-
-    <aside class="w-72 bg-[#161925] border-r border-gray-800 flex flex-col fixed h-full z-50">
+<body class="bg-[#fff9fa] flex min-h-screen text-[#880e4f]">
+    <aside class="w-72 bg-white border-r border-pink-50 flex flex-col fixed h-full z-50">
         <div class="p-10 mb-6"><h1 class="text-[#f06292] text-2xl font-black italic">ULTRAZE V2</h1></div>
         <nav class="flex-1 px-4 space-y-1">
-            <a href="/dashboard" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-[#1f2335] rounded-2xl transition">Dashboard</a>
-            <a href="/ventes" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-[#1f2335] rounded-2xl transition">Ventes</a>
-            <a href="/salaires" class="flex items-center gap-3 px-6 py-4 bg-[#1f2335] text-[#f06292] font-bold rounded-2xl italic">Salaires</a>
-            <a href="/utilisateurs" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-[#1f2335] rounded-2xl transition">Utilisateurs</a>
-            <div class="h-px bg-gray-800 my-6 mx-6"></div>
-            <a href="/logout" class="px-6 py-4 text-red-400 font-bold text-xs uppercase tracking-widest">Déconnexion</a>
+            <a href="/dashboard" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Dashboard</a>
+            <a href="/ventes" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Ventes</a>
+            <a href="/salaires" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Salaires</a>
+            <a href="/utilisateurs" class="flex items-center gap-3 px-6 py-4 bg-pink-50 text-[#ad1457] font-bold rounded-2xl italic">Utilisateurs</a>
+            <a href="/types-ventes" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Stocks / Types</a>
+            <div class="h-px bg-pink-50 my-6 mx-6"></div>
+            <a href="/clotures" class="flex items-center gap-3 px-6 py-4 text-pink-400 font-bold hover:bg-pink-50 rounded-2xl transition">Clôtures</a>
+            <a href="/irs" class="flex items-center gap-3 px-6 py-4 text-red-400 font-bold hover:bg-red-50 rounded-2xl transition italic">IRS</a>
         </nav>
     </aside>
 
     <main class="ml-72 flex-1 p-12">
-        <header class="mb-12 flex justify-between items-center">
-            <div>
-                <h2 class="text-4xl font-light">Gestion des <span class="font-black italic text-[#f06292]">Salaires</span></h2>
-                <p class="text-gray-500 text-xs font-bold uppercase mt-2 italic tracking-widest">{{ user.entreprise }} — Session active</p>
-            </div>
-            <div class="bg-[#161925] p-4 rounded-2xl border border-gray-800 text-right">
-                <p class="text-[10px] text-gray-500 uppercase font-black">CA Global Entreprise</p>
-                <p class="text-xl font-black text-white">{{ ca_total_entreprise }} $</p>
-            </div>
+        <header class="mb-12">
+            <h2 class="text-4xl font-light">Gestion des <span class="font-black italic text-[#f06292]">Effectifs</span></h2>
         </header>
 
-        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
-            {% for emp in employes %}
-            <div class="bg-[#161925] p-8 rounded-[35px] border border-gray-800 shadow-2xl relative overflow-hidden group">
-                <div class="flex justify-between items-start mb-8">
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-10">
+            
+            <div class="bg-white p-10 rounded-[45px] shadow-xl border border-pink-50 h-fit">
+                <h3 class="text-xl font-black mb-8 italic text-[#ad1457]">Recruter un employé</h3>
+                
+                <form action="/add_user" method="POST" class="space-y-5">
                     <div>
-                        <h3 class="text-2xl font-black text-white">{{ emp.nom }}</h3>
-                        <p class="text-[10px] text-gray-500 uppercase font-bold tracking-tighter">{{ user.entreprise }} — {{ emp.role }} — actif</p>
+                        <label class="text-[10px] font-bold text-pink-300 uppercase px-2 italic">Identifiant (UID)</label>
+                        <input type="text" name="new_username" placeholder="ex: shinoza" required class="w-full p-4 rounded-2xl bg-pink-50/50 border-none outline-none mt-1 font-bold text-[#ad1457]">
                     </div>
-                    <span class="bg-[#0f111a] px-4 py-2 rounded-xl text-xs font-black border border-gray-800 text-pink-400 italic">
-                        {{ emp.role }}
-                    </span>
-                </div>
 
-                <div class="grid grid-cols-5 gap-3 mb-8">
-                    <div class="bg-[#0f111a] p-4 rounded-2xl border border-gray-800 text-center">
-                        <p class="text-[8px] text-gray-500 uppercase font-black mb-1">Ventes</p>
-                        <p class="text-lg font-black">{{ emp.nombre_ventes }}</p>
-                    </div>
-                    <div class="bg-[#0f111a] p-4 rounded-2xl border border-gray-800 text-center">
-                        <p class="text-[8px] text-gray-500 uppercase font-black mb-1">CA Perso</p>
-                        <p class="text-lg font-black text-white">{{ emp.ca_perso }} $</p>
-                    </div>
-                    <div class="bg-[#0f111a] p-4 rounded-2xl border border-gray-800 text-center">
-                        <p class="text-[8px] text-gray-500 uppercase font-black mb-1">Taux</p>
-                        <p class="text-lg font-black text-gray-300">{{ emp.taux }}%</p>
-                    </div>
-                    <div class="bg-[#0f111a] p-4 rounded-2xl border border-gray-800 text-center">
-                        <p class="text-[8px] text-gray-500 uppercase font-black mb-1">Prime</p>
-                        <p class="text-lg font-black text-emerald-400">{{ emp.prime }} $</p>
-                    </div>
-                    <div class="bg-[#0f111a] p-4 rounded-2xl border border-emerald-500/20 text-center ring-2 ring-emerald-500/10">
-                        <p class="text-[8px] text-emerald-500 uppercase font-black mb-1">Salaire</p>
-                        <p class="text-lg font-black text-emerald-400 italic">
-                            {{ ((emp.ca_perso * emp.taux / 100) + emp.prime) | round(0) }} $
-                        </p>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4 mb-6">
                     <div>
-                        <label class="text-[9px] font-black text-gray-500 uppercase ml-2">Téléphone</label>
-                        <input type="text" readonly value="{{ emp.telephone }}" class="w-full bg-[#0f111a] border border-gray-800 rounded-xl p-3 text-sm mt-1 outline-none text-gray-400">
+                        <label class="text-[10px] font-bold text-pink-300 uppercase px-2 italic">Nom complet RP</label>
+                        <input type="text" name="new_name" placeholder="ex: Shinoza S" required class="w-full p-4 rounded-2xl bg-pink-50/50 border-none outline-none mt-1 font-bold">
                     </div>
-                    <div>
-                        <label class="text-[9px] font-black text-gray-500 uppercase ml-2">IBAN / Coordonnées</label>
-                        <input type="text" readonly value="{{ emp.iban }}" class="w-full bg-[#0f111a] border border-gray-800 rounded-xl p-3 text-sm mt-1 outline-none text-gray-400">
-                    </div>
-                </div>
 
-                <div class="grid grid-cols-3 gap-4 items-end">
-                    <div class="col-span-1">
-                        <label class="text-[9px] font-black text-gray-500 uppercase ml-2">Avance versée</label>
-                        <input type="text" readonly value="{{ emp.avance }} $" class="w-full bg-[#0f111a] border border-gray-800 rounded-xl p-3 text-sm mt-1 font-bold text-red-400">
-                    </div>
-                    <div class="bg-[#0f111a] border border-gray-800 rounded-2xl p-4 flex justify-between items-center">
+                    <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <p class="text-[8px] text-gray-500 uppercase font-black">Reste à payer</p>
-                            <p class="text-xl font-black text-white">
-                                {{ (((emp.ca_perso * emp.taux / 100) + emp.prime) - emp.avance) | round(0) }} $
-                            </p>
+                            <label class="text-[10px] font-bold text-pink-300 uppercase px-2 italic">Mot de passe</label>
+                            <input type="password" name="new_password" placeholder="****" required class="w-full p-4 rounded-2xl bg-pink-50/50 border-none outline-none mt-1">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-pink-300 uppercase px-2 italic">Grade</label>
+                            <select name="new_role" class="w-full p-4 rounded-2xl bg-pink-50/50 border-none outline-none mt-1 font-bold">
+                                <option value="Employé">Employé</option>
+                                <option value="Manager">Manager</option>
+                                <option value="Co patron">Co patron</option>
+                                <option value="Patron">Patron</option>
+                            </select>
                         </div>
                     </div>
-                    <div class="flex items-center justify-center gap-3 bg-[#0f111a] border border-gray-800 rounded-2xl p-4">
-                        <p class="text-[9px] font-black text-gray-500 uppercase">Payé :</p>
-                        <input type="checkbox" {% if emp.paye %}checked{% endif %} class="w-5 h-5 rounded border-gray-700 bg-gray-800 text-pink-500 focus:ring-0">
-                    </div>
-                </div>
 
-                <div class="mt-8 flex gap-3">
-                    <button class="flex-1 bg-gray-800 hover:bg-gray-700 text-white font-black py-4 rounded-2xl text-[10px] uppercase tracking-widest transition">Copier ligne paie</button>
-                    <button class="bg-red-500/10 hover:bg-red-500/20 text-red-500 font-black py-4 px-8 rounded-2xl text-[10px] uppercase tracking-widest border border-red-500/20 transition">Licencier</button>
+                    <div>
+                        <label class="text-[10px] font-bold text-pink-400 uppercase px-2 italic">Entreprise</label>
+                        <select name="new_entreprise" class="w-full p-4 rounded-2xl bg-pink-50 border-none outline-none text-[#ad1457] font-bold mt-1">
+                            {% if entreprises %}
+                                {% for ent in entreprises %}
+                                    <option value="{{ ent }}">{{ ent }}</option>
+                                {% endfor %}
+                            {% else %}
+                                <option>Aucune entreprise configurée</option>
+                            {% endif %}
+                        </select>
+                    </div>
+
+                    <button type="submit" class="w-full bg-[#f06292] text-white font-black py-5 rounded-2xl shadow-lg shadow-pink-100 hover:scale-[1.02] transition uppercase tracking-widest">
+                        VALIDER LE RECRUTEMENT
+                    </button>
+                </form>
+            </div>
+
+            <div class="xl:col-span-2 bg-white p-10 rounded-[45px] shadow-xl border border-pink-50">
+                <h3 class="text-xl font-black mb-8 italic text-[#ad1457]">Liste des employés</h3>
+                
+                <div class="space-y-4">
+                    {% if all_users %}
+                        {% for uid, data in all_users.items() %}
+                        <div class="group bg-white p-6 rounded-3xl border border-pink-50 flex justify-between items-center hover:bg-pink-50/30 transition-all duration-300">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-pink-100 rounded-2xl flex items-center justify-center text-[#f06292] font-black">
+                                    {{ data.name[0] | upper }}
+                                </div>
+                                <div>
+                                    <p class="font-bold text-[#ad1457] text-lg">{{ data.name }}</p>
+                                    <p class="text-[10px] uppercase font-bold text-pink-300 tracking-widest">
+                                        {{ data.entreprise }} • <span class="text-[#f06292]">{{ data.role }}</span>
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center gap-2">
+                                <a href="/delete_user/{{ uid }}" 
+                                   onclick="return confirm('Voulez-vous vraiment licencier {{ data.name }} ?')"
+                                   class="opacity-0 group-hover:opacity-100 bg-red-50 text-red-400 hover:bg-red-500 hover:text-white p-3 rounded-2xl transition-all duration-300">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center p-20 bg-pink-50/30 rounded-[35px] border-2 border-dashed border-pink-100">
+                            <p class="text-pink-300 italic font-medium">Aucun employé dans cette entreprise pour le moment.</p>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
-            {% endfor %}
+
         </div>
     </main>
-
 </body>
 </html>
