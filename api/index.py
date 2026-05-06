@@ -82,16 +82,25 @@ def utilisateurs():
 
 @app.route('/ventes')
 def ventes_page():
-    if 'user' not in session: return redirect(url_for('login'))
+    if 'user' not in session: 
+        return redirect(url_for('login'))
+    
     user_ent = session['user'].get('entreprise')
     
-    # Récupérer ventes + catalogue sur Supabase
-    ventes = supabase.table("ventes").select("*").eq("entreprise", user_ent).order("id", desc=True).execute()
-    cat = supabase.table("catalogue").select("*").order("nom").execute()
-    
-    return render_template('ventes.html', ventes=ventes.data, catalogue=cat.data, user=session['user'])
-
-# --- ACTIONS (POST) ---
+    try:
+        # 1. On récupère les ventes de l'entreprise
+        ventes = supabase.table("ventes").select("*").eq("entreprise", user_ent).order("id", desc=True).execute()
+        
+        # 2. On récupère TOUT le catalogue pour le menu déroulant
+        cat = supabase.table("catalogue").select("*").order("nom").execute()
+        
+        # On passe les .data au template
+        return render_template('ventes.html', 
+                               ventes=ventes.data, 
+                               catalogue=cat.data, 
+                               user=session['user'])
+    except Exception as e:
+        return f"Erreur Supabase : {e}", 500
 
 @app.route('/add_vente', methods=['POST'])
 def add_vente():
