@@ -134,10 +134,15 @@ def delete_user(uid):
 @app.route('/ventes')
 def ventes_page():
     if 'user' not in session: return redirect(url_for('login'))
+    
+    # Récupérer les ventes (code actuel)
     user_ent = session['user'].get('entreprise')
-    ventes_all = charger_ventes()
-    mes_ventes = [v for v in ventes_all if v.get('entreprise') == user_ent]
-    return render_template('ventes.html', ventes=mes_ventes)
+    res_ventes = supabase.table("ventes").select("*").eq("entreprise", user_ent).execute()
+    
+    # RÉCUPÉRER LE CATALOGUE (NOUVEAU)
+    res_cat = supabase.table("catalogue").select("*").execute()
+    
+    return render_template('ventes.html', ventes=res_ventes.data, catalogue=res_cat.data)
 
 @app.route('/add_vente', methods=['POST'])
 def add_vente():
