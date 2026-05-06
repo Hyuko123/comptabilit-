@@ -1,22 +1,40 @@
-<select name="new_entreprise" class="w-full p-4 rounded-2xl bg-pink-50 border-none outline-none text-[#ad1457] font-bold">
-    {% for ent in entreprises %}
-        <option value="{{ ent }}">{{ ent }}</option>
-    {% endfor %}
-</select>
-
-{% for uid, data in all_users.items() %}
-<div class="bg-white p-6 rounded-3xl border border-pink-50 flex justify-between items-center mb-4">
-    <div>
-        <p class="font-bold text-[#ad1457]">{{ data.name }}</p>
-        <p class="text-[10px] uppercase font-bold text-pink-300">{{ data.entreprise }} • {{ data.role }}</p>
-    </div>
-    
-    <a href="/delete_user/{{ uid }}" 
-       onclick="return confirm('Licencier cet employé ?')"
-       class="text-red-400 hover:text-red-600 p-2">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-        </svg>
-    </a>
+<div class="mb-8">
+    <label class="block text-pink-400 font-bold text-[10px] uppercase mb-2">Choisir l'entreprise</label>
+    <select name="new_entreprise" class="w-full p-4 rounded-2xl bg-pink-50 border-none outline-none text-[#ad1457] font-bold">
+        {% if entreprises %}
+            {% for ent in entreprises %}
+                <option value="{{ ent }}">{{ ent }}</option>
+            {% endfor %}
+        {% else %}
+            <option>Aucune entreprise configurée</option>
+        {% endif %}
+    </select>
 </div>
-{% endfor %}
+
+<h3 class="text-[#ad1457] font-bold mb-6 italic text-xl">Effectifs actuels</h3>
+<div class="space-y-4">
+    {% if all_users %}
+        {% for uid, data in all_users.items() %}
+        <div class="bg-white p-6 rounded-3xl border border-pink-50 flex justify-between items-center hover:shadow-md transition-all">
+            <div>
+                <p class="font-bold text-[#ad1457] text-lg">{{ data.name }}</p>
+                <p class="text-[10px] uppercase font-bold text-pink-300 tracking-widest">
+                    {{ data.entreprise }} • <span class="text-[#f06292]">{{ data.role }}</span>
+                </p>
+            </div>
+            
+            <a href="/delete_user/{{ uid }}" 
+               onclick="return confirm('Voulez-vous vraiment licencier {{ data.name }} ?')"
+               class="text-red-400 hover:bg-red-50 p-3 rounded-2xl transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+            </a>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="text-center p-10 bg-white rounded-3xl border border-dashed border-pink-200">
+            <p class="text-gray-400 italic">Aucun employé dans cette entreprise.</p>
+        </div>
+    {% endif %}
+</div>
