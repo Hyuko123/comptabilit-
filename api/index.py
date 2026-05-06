@@ -1,4 +1,19 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import request # N'oublie pas l'import !
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        # Flask récupère ce qui a été tapé dans les champs 'name'
+        user_tape = request.form.get('username')
+        pass_tape = request.form.get('password')
+
+        # Ici tu fais tes vérifications
+        if user_tape == "admin" and pass_tape == "admin123":
+            return redirect(url_for('index')) # Direction le Dashboard !
+        else:
+            return "Identifiants invalides"
+
+    return render_template('login.html')
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
