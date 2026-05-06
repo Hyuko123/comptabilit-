@@ -1,9 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 
 app = Flask(__name__, template_folder='../templates')
-app.secret_key = 'ultraze_secret_v2'
+app.secret_key = 'shinoza_ultraze_v2'
 
-# Base de données simulée avec toutes tes entreprises
+# Liste complète des entreprises de tes images
 entreprises_liste = [
     "Restaurant Vinewood", "Burger Shot", "REX Diner + LTD", "Pop Chiken",
     "Unicorn", "Bahamas", "Fête Forraine", "Agence d'évènementiel", "Le Clown",
@@ -12,10 +12,14 @@ entreprises_liste = [
     "Taxi", "Psychologue", "Transport et livraison", "Salon de tatouage Aguja", "Salon de tatouage Vespucci"
 ]
 
-# Utilisateur admin par défaut
+# Base de données temporaire (se vide au redémarrage Vercel)
 users_db = {
     "admin": {"password": "admin123", "name": "Shinoza", "role": "MASTER", "entreprise": "ADMINISTRATION"}
 }
+
+@app.context_processor
+def inject_user():
+    return dict(user=session.get('user'), entreprises=entreprises_liste)
 
 @app.route('/')
 def login():
@@ -27,21 +31,24 @@ def login_process():
     p = request.form.get('password')
     if u in users_db and users_db[u]['password'] == p:
         session['user'] = users_db[u]
-        session['user']['username'] = u
         return redirect(url_for('dashboard'))
     return redirect(url_for('login'))
 
 @app.route('/dashboard')
 def dashboard():
     if 'user' not in session: return redirect(url_for('login'))
-    # On initialise des valeurs à 0 pour éviter l'erreur 500 sur le dashboard
-    stats = {'ca_net': 0, 'taxes': 0, 'salaires': 0, 'benefice': 0}
-    return render_template('dashboard.html', user=session['user'], stats=stats)
+    stats = {'ca': "4.650", 'taxes': "1.628", 'benefice': "465"}
+    return render_template('dashboard.html', stats=stats)
+
+@app.route('/ventes')
+def ventes():
+    if 'user' not in session: return redirect(url_for('login'))
+    return render_template('ventes.html')
 
 @app.route('/utilisateurs')
 def utilisateurs():
     if 'user' not in session: return redirect(url_for('login'))
-    return render_template('utilisateurs.html', user=session['user'], entreprises=entreprises_liste, all_users=users_db)
+    return render_template('utilisateurs.html', all_users=users_db)
 
 @app.route('/add_user', methods=['POST'])
 def add_user():
@@ -54,10 +61,11 @@ def add_user():
     }
     return redirect(url_for('utilisateurs'))
 
-@app.route('/ventes')
-def ventes():
-    if 'user' not in session: return redirect(url_for('login'))
-    return render_template('ventes.html', user=session['user'])
+@app.route('/salaires')
+def salaires(): return render_template('salaires.html')
+
+@app.route('/types-ventes')
+def types_ventes(): return render_template('stocks.html')
 
 @app.route('/logout')
 def logout():
