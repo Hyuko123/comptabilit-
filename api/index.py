@@ -176,9 +176,47 @@ def add_vente():
     return redirect(url_for('ventes_page'))
 
 @app.route('/salaires')
-def salaires():
-    if 'user' not in session: return redirect(url_for('login'))
-    return render_template('salaires.html')
+def salaires_page():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    user_ent = session['user'].get('entreprise')
+    
+    # 1. Grille salariale
+    grille = {
+        "Recrue": 0.50,
+        "Employé": 0.55,
+        "Manager": 0.60,
+        "Co patron": 0.63,
+        "Patron": 0.65
+    }
+
+    # 2. Récupérer tous les employés de l'entreprise
+    res_users = supabase.table("utilisateurs").select("*").eq("entreprise", user_ent).execute()
+    employes = res_users.data
+    
+    # 3. Récupérer toutes les ventes de l'entreprise
+    res_ventes = supabase.table("ventes").select("*").eq("entreprise", user_ent).execute()
+    toutes_ventes = res_ventes.data
+
+    # 4. Calculer le salaire pour chaque employé
+    liste_salaires = []
+    for emp in employes:
+        total_ventes_emp = sum(v['montant_net'] for v in toutes_ventes if v['vendeur'] == emp['name'])
+        
+        grade = emp.get('role', 'Recrue')
+        pourcentage = grille.get(grade, 0.50) # 50% par défaut si grade inconnu
+        salaire_final = total_ventes_emp * pourcentage
+        
+        liste_salaires.append({
+            "nom": emp['name'],
+            "grade": grade,
+            "pourcentage": int(pourcentage * 100),
+            "chiffre_affaire": total_ventes_emp,
+            "salaire_net": salaire_final
+        })
+
+    return render_template('salaires.html', salaires=liste_salaires)
 
 @app.route('/logout')
 def logout():
