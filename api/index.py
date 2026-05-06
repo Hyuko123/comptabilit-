@@ -244,5 +244,30 @@ def add_to_catalog():
             
     return redirect(url_for('ventes_page'))
 
+# Route pour AJOUTER un nouvel article
+@app.route('/add_to_catalog', methods=['POST'])
+def add_to_catalog():
+    nom = request.form.get('item_name')
+    prix = request.form.get('item_price')
+    stock = request.form.get('item_stock')
+    
+    supabase.table("catalogue").insert({
+        "nom": nom, 
+        "prix": float(prix), 
+        "stock": int(stock)
+    }).execute()
+    return redirect('/types-ventes')
+
+# Route pour AJUSTER le stock (+1 ou -1)
+@app.route('/update_stock/<name>/<action>', methods=['POST'])
+def update_stock(name, action):
+    # On récupère le stock actuel
+    res = supabase.table("catalogue").select("stock").eq("nom", name).single().execute()
+    current_stock = res.data['stock']
+    
+    new_stock = current_stock + 1 if action == "add" else current_stock - 1
+    
+    supabase.table("catalogue").update({"stock": max(0, new_stock)}).eq("nom", name).execute()
+    return redirect('/types-ventes')
 if __name__ == '__main__':
     app.run(debug=True)
