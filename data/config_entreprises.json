@@ -1,1 +1,18 @@
 
+{
+    "Burger Shot": {
+        "taxe_irs": 15,
+        "produits": [
+            {"nom": "Menu Burger", "prix": 75},
+            {"nom": "Frites", "prix": 20},
+            {"nom": "Soda", "prix": 15}
+        ]
+    },
+    "LTD Little Seoul": {
+        "taxe_irs": 10,
+        "produits": [
+            {"nom": "Sachet de chips", "prix": 10},
+            {"nom": "Eau", "prix": 5}
+        ]
+    }
+}
