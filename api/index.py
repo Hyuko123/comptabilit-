@@ -88,19 +88,20 @@ def ventes_page():
     user_ent = session['user'].get('entreprise')
     
     try:
-        # 1. On récupère les ventes de l'entreprise
-        ventes = supabase.table("ventes").select("*").eq("entreprise", user_ent).order("id", desc=True).execute()
+        # On récupère les données
+        res_ventes = supabase.table("ventes").select("*").eq("entreprise", user_ent).order("id", desc=True).execute()
+        res_cat = supabase.table("catalogue").select("*").order("nom").execute()
         
-        # 2. On récupère TOUT le catalogue pour le menu déroulant
-        cat = supabase.table("catalogue").select("*").order("nom").execute()
-        
-        # On passe les .data au template
+        # On vérifie si Supabase a renvoyé une erreur de permission
+        if hasattr(res_ventes, 'error') and res_ventes.error:
+            return f"Erreur Supabase (Ventes): {res_ventes.error}", 500
+            
         return render_template('ventes.html', 
-                               ventes=ventes.data, 
-                               catalogue=cat.data, 
+                               ventes=res_ventes.data or [], 
+                               catalogue=res_cat.data or [],
                                user=session['user'])
     except Exception as e:
-        return f"Erreur Supabase : {e}", 500
+        return f"Erreur de connexion : {e}", 500
 
 @app.route('/add_vente', methods=['POST'])
 def add_vente():
