@@ -171,5 +171,26 @@ def logout():
     session.clear()
     return redirect(url_for('login'))
 
+@app.route('/add_to_catalog', methods=['POST'])
+def add_to_catalog():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    # Récupération des données du formulaire
+    nom = request.form.get('item_name')
+    prix = request.form.get('item_price')
+    
+    if nom and prix:
+        try:
+            # Enregistrement dans la table "catalogue" de Supabase
+            supabase.table("catalogue").insert({
+                "nom": nom, 
+                "prix": float(prix)
+            }).execute()
+        except Exception as e:
+            print(f"Erreur catalogue: {e}")
+            
+    return redirect(url_for('ventes_page'))
+
 if __name__ == '__main__':
     app.run(debug=True)
