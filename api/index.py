@@ -40,35 +40,32 @@ def dashboard():
         return redirect(url_for('login'))
     
     user = session['user']
+    user_ent = user.get('entreprise', 'Burger Shot') # Valeur par défaut pour éviter le crash
     
-    # 1. Redirection si c'est l'Admin Global
-    if user.get('role') == 'SYSTEM_ADMIN':
-        return render_template('admin_master.html', entreprises=charger_config_entreprises())
-    
-    # 2. Récupération sécurisée des données (évite le crash si fichier vide)
-    user_ent = user.get('entreprise', 'Inconnue')
-    ventes_all = charger_ventes() or []
-    config_all = charger_config_entreprises() or {}
-    
-    # 3. Calcul du CA pour l'entreprise de l'utilisateur
+    # On charge les données ou on met des listes vides si ça échoue
+    try:
+        ventes_all = charger_ventes() or []
+        config_all = charger_config_entreprises() or {}
+    except:
+        ventes_all, config_all = [], {}
+
+    # Filtrage
     mes_ventes = [v for v in ventes_all if v.get('entreprise') == user_ent]
     ca = sum(v.get('net', 0) for v in mes_ventes)
     
-    # 4. Récupération de la taxe (15% par défaut si non configuré)
+    # IRS
     ent_data = config_all.get(user_ent, {})
     taux_irs = ent_data.get('taxe_irs', 15)
     
-    # 5. Préparation des statistiques pour le HTML
     stats = {
-        'ca': "{:,}".format(ca).replace(',', ' '),
-        'taxes': "{:,}".format(int(ca * (taux_irs / 100))).replace(',', ' '),
-        'benefice': "{:,}".format(int(ca * (1 - (taux_irs / 100)))).replace(',', ' '),
+        'ca': ca,
+        'taxes': int(ca * (taux_irs / 100)),
+        'benefice': int(ca * (1 - (taux_irs / 100))),
         'nom_user': user.get('name', 'Utilisateur'),
         'entreprise': user_ent
     }
     
     return render_template('dashboard.html', stats=stats)
-
 @app.route('/ventes')
 def ventes():
     if 'user' not in session: return redirect(url_for('login'))
