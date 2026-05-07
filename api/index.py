@@ -286,5 +286,29 @@ def delete_catalogue(item_id):
     supabase.table('catalogue').delete().eq('id', item_id).execute()
     return redirect(url_for('types_ventes'))
 
+@app.route('/delete_catalogue/<id>')
+def delete_catalogue(id):
+    if 'user' not in session: return redirect(url_for('login'))
+    try:
+        supabase.table("catalogue").delete().eq("id", id).execute()
+    except Exception as e:
+        print(f"Erreur suppression : {e}")
+    return redirect(url_for('types_ventes_page'))
+
+@app.route('/update_stock/<id>', methods=['POST'])
+def update_stock(id):
+    if 'user' not in session: return redirect(url_for('login'))
+    
+    nouveau_stock = request.form.get('nouveau_stock')
+    if nouveau_stock is not None:
+        try:
+            supabase.table("catalogue").update({
+                "stock": int(nouveau_stock)
+            }).eq("id", id).execute()
+        except Exception as e:
+            print(f"Erreur mise à jour stock : {e}")
+            
+    return redirect(url_for('types_ventes_page'))
+
 if __name__ == '__main__':
     app.run(debug=True)
