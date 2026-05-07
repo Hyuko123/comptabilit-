@@ -38,10 +38,10 @@
 
             <div class="mt-8 pt-8 border-t border-pink-50 space-y-1">
                 <p class="px-6 mb-2 text-[10px] font-black text-pink-200 uppercase tracking-[0.2em]">Comptabilité</p>
-                <a href="{{ url_for('clotures') }}" class="flex items-center gap-3 px-6 py-4 font-bold rounded-2xl transition hover:bg-pink-50 {{ 'bg-pink-50 text-[#ad1457] italic' if request.endpoint == 'clotures' else 'text-gray-400' }}">
+                <a href="{{ url_for('clotures_page') }}" class="flex items-center gap-3 px-6 py-4 font-bold rounded-2xl transition hover:bg-pink-50 {{ 'bg-pink-50 text-[#ad1457] italic' if request.endpoint == 'clotures_page' else 'text-gray-400' }}">
                     Clôtures
                 </a>
-                <a href="{{ url_for('irs') }}" class="flex items-center gap-3 px-6 py-4 font-bold rounded-2xl transition hover:bg-orange-50 {{ 'bg-orange-50 text-orange-600 italic' if request.endpoint == 'irs' else 'text-orange-400' }}">
+                <a href="{{ url_for('irs_page') }}" class="flex items-center gap-3 px-6 py-4 font-bold rounded-2xl transition hover:bg-orange-50 {{ 'bg-orange-50 text-orange-600 italic' if request.endpoint == 'irs_page' else 'text-orange-400' }}">
                     Avertissement IRS
                 </a>
             </div>
@@ -56,7 +56,6 @@
     </aside>
 
     <main class="ml-72 flex-1 p-12">
-        
         <header class="mb-12 flex justify-between items-center">
             <div>
                 <p class="text-pink-400 font-bold uppercase tracking-widest text-[10px] mb-2">{{ stats.entreprise | default('Entreprise inconnue') }}</p>
@@ -139,7 +138,6 @@
                         <p class="text-xl font-black">50% - 55%</p>
                     </div>
                 </div>
-                
                 <div class="mt-8">
                     <a href="{{ url_for('ventes_page') }}" class="block w-full text-center bg-[#f06292] text-white py-5 rounded-3xl font-black uppercase tracking-widest shadow-lg hover:bg-[#ad1457] hover:scale-[1.02] transition-all">
                         Enregistrer une vente
@@ -147,7 +145,6 @@
                 </div>
             </div>
         </div>
-
     </main>
 </body>
 </html>
