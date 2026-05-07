@@ -176,6 +176,29 @@ def delete_vente(vente_id):
         supabase.table("ventes").delete().eq("id", vente_id).execute()
     except Exception as e:
         print(f"Erreur suppression : {e}")
+
+@app.route('/executer_cloture', methods=['POST'])
+def executer_cloture():
+    if 'user' not in session: return redirect(url_for('login'))
+    user_ent = session['user']['entreprise']
+
+    # 1. Calculer les totaux actuels avant de supprimer
+    res = supabase.table("ventes").select("montant_net").eq("entreprise", user_ent).execute()
+    ca_total = sum(float(v['montant_net']) for v in res.data)
+    taxes = ca_total * 0.35 # Ton taux de 35% sur le screen
+
+    # 2. Archiver dans la table clotures
+    supabase.table("clotures").insert({
+        "semaine_nom": "Semaine " + datetime.now().strftime("%U"),
+        "ca_total": ca_total,
+        "taxes_totales": taxes,
+        "entreprise": user_ent
+    }).execute()
+
+    # 3. REMISE À ZÉRO : On supprime les ventes de cette entreprise
+    supabase.table("ventes").delete().eq("entreprise", user_ent).execute()
+
+    return redirect(url_for('dashboard'))
         
     return redirect(url_for('ventes_page'))
 
