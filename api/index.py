@@ -132,12 +132,15 @@ def add_to_catalog():
             return f"Erreur ajout catalogue : {e}", 500
     return redirect(url_for('types_ventes_page'))
 
+# ... (tes imports et configurations restent identiques)
+
 @app.route('/update_stock/<id>', methods=['POST'])
 def update_stock(id):
     if 'user' not in session: return redirect(url_for('login'))
     nouveau_stock = request.form.get('nouveau_stock')
     if nouveau_stock is not None:
         try:
+            # On s'assure que l'ID est bien passé à la requête Supabase
             supabase.table("catalogue").update({"stock": int(nouveau_stock)}).eq("id", id).execute()
         except Exception as e:
             return f"Erreur stock : {e}", 500
@@ -147,10 +150,14 @@ def update_stock(id):
 def delete_catalogue(id):
     if 'user' not in session: return redirect(url_for('login'))
     try:
+        # On supprime l'article correspondant à l'ID
         supabase.table("catalogue").delete().eq("id", id).execute()
     except Exception as e:
         print(f"Erreur suppression catalogue : {e}")
+        return f"Erreur suppression : {e}", 500
     return redirect(url_for('types_ventes_page'))
+
+# ... (le reste de tes routes)
 
 @app.route('/ventes')
 def ventes_page():
