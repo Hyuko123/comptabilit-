@@ -270,24 +270,43 @@ def irs_page():
 def utilisateurs():
     if 'user' not in session: return redirect(url_for('login'))
     
+    current_user = session['user']
+    user_role = current_user.get('role')
+    user_entreprise = current_user.get('entreprise')
+    
     try:
-        # On récupère tous les utilisateurs
-        response = supabase.table("utilisateurs").select("*").execute()
+        # 1. On récupère les utilisateurs
+        query = supabase.table("utilisateurs").select("*")
+        
+        # Si ce n'est pas l'ADMIN (MASTER), on filtre par son entreprise uniquement
+        if user_role != "MASTER":
+            query = query.eq("entreprise", user_entreprise)
+        
+        response = query.execute()
         users_list = response.data if response.data else []
         
-        # Tri par Grade (Ordre logique : MASTER -> Patron -> Co patron -> Manager -> Employé)
-        ordre_grades = {"MASTER": 1, "Patron": 2, "Co patron": 3, "Manager": 4, "Employé": 5}
+        # 2. On masque l'ADMIN (MASTER) de la liste pour tout le monde
+        users_list = [u for u in users_list if u.get('role') != "MASTER"]
+        
+        # 3. Tri par grade
+        ordre_grades = {"Patron": 1, "Co patron": 2, "Manager": 3, "Employé": 4}
         users_list.sort(key=lambda x: ordre_grades.get(x.get('role'), 99))
         
-        # On utilise la liste globale ENTREPRISES_LISTE définie en haut de ton fichier
+        # 4. Gestion de la liste des entreprises pour le menu déroulant
+        # Seul l'admin voit tout. Le Patron/Co-Patron ne voit que la sienne.
+        if user_role == "MASTER":
+            liste_affichage_entreprises = ENTREPRISES_LISTE
+        else:
+            liste_affichage_entreprises = [user_entreprise]
+
         return render_template('utilisateurs.html', 
                                all_users=users_list, 
-                               entreprises=ENTREPRISES_LISTE)
+                               entreprises=liste_affichage_entreprises,
+                               current_user_role=user_role) # On envoie le rôle pour le HTML
                                
     except Exception as e:
-        print(f"Erreur Page Utilisateurs : {e}")
-        return f"Erreur : {e}", 500
-
+        print(f"Erreur : {e}")
+        return f"Erreur serveur", 500
 @app.route('/admin/select_entreprise', methods=['POST'])
 def admin_select_entreprise():
     if 'user' not in session or session['user'].get('role') != 'MASTER':
