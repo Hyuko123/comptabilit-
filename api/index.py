@@ -81,16 +81,22 @@ def add_user():
 
 @app.route('/dashboard')
 def dashboard():
-    # ... tes calculs (total_ca, etc.) ...
+    # 1. Tes calculs (exemple)
+    total_ca = 150000 
+    total_taxes = 52500
+    total_salaires = 45000
 
+    # 2. LA DÉFINITION DU DICTIONNAIRE (C'est ici que ça foire !)
     stats = {
-        'ca_total': total_ca,      # <--- VERIFIE CETTE CLÉ (pas 'ca' ou 'ca_brut')
-        'taxes': total_taxes,
+        'ca_total': total_ca,       # <--- EST-CE QUE TU AS BIEN ÉCRIT 'ca_total' ICI ?
+        'taxes': total_taxes,       # Pas 'ca', pas 'total_ca_brut', vraiment 'ca_total'
         'total_salaires': total_salaires,
         'nom_user': session['user']['name'],
         'entreprise': session['user']['entreprise']
     }
-    
+
+    # 3. L'ENVOI AU TEMPLATE
+    # Est-ce que tu envoies bien le dictionnaire 'stats' ?
     return render_template('dashboard.html', stats=stats, ventes=ventes)
 
 @app.route('/types-ventes')
