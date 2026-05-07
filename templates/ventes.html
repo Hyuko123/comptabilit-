@@ -8,7 +8,7 @@
 </head>
 <body class="bg-[#fff9fa] flex min-h-screen text-[#880e4f]">
 
-    <aside class="w-72 bg-white border-r border-pink-50 flex flex-col fixed h-full z-50">
+    <aside class="w-72 bg-white border-r border-pink-50 flex flex-col fixed h-full z-50 shadow-sm">
         <div class="p-10 mb-6">
             <h1 class="text-[#f06292] text-2xl font-black italic">ULTRAZE V2</h1>
         </div>
@@ -43,7 +43,10 @@
 
                         <div>
                             <label class="text-[10px] font-bold text-pink-300 uppercase px-2 italic">Article / Service</label>
-                            <select id="article_select" name="article" required class="w-full p-4 rounded-2xl bg-pink-50/50 border-none outline-none mt-1 font-bold text-[#ad1457] focus:ring-2 focus:ring-pink-200 transition">
+                            <select id="article_select" name="article" required 
+                                    oninvalid="this.setCustomValidity('Tu essaye de vendre quoi finalement ? :)')" 
+                                    oninput="this.setCustomValidity('')"
+                                    class="w-full p-4 rounded-2xl bg-pink-50/50 border-none outline-none mt-1 font-bold text-[#ad1457] focus:ring-2 focus:ring-pink-200 transition">
                                 <option value="" data-prix="0">-- Choisir un item --</option>
                                 {% if catalogue %}
                                     {% for item in catalogue %}
@@ -115,7 +118,7 @@
                                         <a href="/delete_vente/{{ v.id }}" 
                                            onclick="return confirm('Annuler cette vente ?')" 
                                            class="opacity-0 group-hover:opacity-100 bg-red-50 text-red-400 hover:bg-red-500 hover:text-white px-4 py-2 rounded-xl text-xs font-bold transition-all duration-300">
-                                             Supprimer
+                                              Supprimer
                                         </a>
                                     </td>
                                 </tr>
@@ -140,25 +143,15 @@
         const totalInput = document.getElementById('vente_total');
 
         function updatePrice() {
-            // On récupère l'option sélectionnée
             const selectedOption = select.options[select.selectedIndex];
-            
-            // On récupère le prix via l'attribut data-prix
             const prixUnitaire = parseFloat(selectedOption.getAttribute('data-prix')) || 0;
             const quantite = parseInt(qtyInput.value) || 0;
-            
-            // Calcul du total
             const total = prixUnitaire * quantite;
-            
-            // Affichage (arrondi pour éviter les virgules infinies)
             totalInput.value = total.toFixed(0);
         }
 
-        // Écouteurs d'événements pour le calcul en temps réel
         select.addEventListener('change', updatePrice);
         qtyInput.addEventListener('input', updatePrice);
-
-        // Lancer au chargement pour initialiser à 0
         window.addEventListener('DOMContentLoaded', updatePrice);
     </script>
 
