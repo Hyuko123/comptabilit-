@@ -1,0 +1,8 @@
+<div class="p-10 bg-red-50 rounded-[45px] border-2 border-red-100">
+    <h3 class="text-red-600 font-black italic text-2xl mb-4">AVERTISSEMENT IRS</h3>
+    {% if stats.taxes > 50000 %}
+        <p class="text-red-400 font-bold italic anim-pulse">⚠️ Vos taxes impayées dépassent 50,000$. Risque de saisie imminent.</p>
+    {% else %}
+        <p class="text-green-500 font-bold italic">✅ Votre dossier est en règle pour le moment.</p>
+    {% endif %}
+</div>
