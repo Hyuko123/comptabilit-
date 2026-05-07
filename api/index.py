@@ -247,13 +247,19 @@ def irs_page():
     return render_template('irs.html', stats=stats)
 
 @app.route('/admin/select_entreprise', methods=['POST'])
-def select_entreprise():
-    if session.get('user', {}).get('role') != 'MASTER': 
-        return "Accès refusé", 403
+def admin_select_entreprise():
+    # Sécurité : on vérifie que tu es bien MASTER
+    if 'user' not in session or session['user'].get('role') != 'MASTER':
+        return redirect(url_for('login'))
+
+    entreprise_choisie = request.form.get('entreprise_choisie')
     
-    nouvelle_ent = request.form.get('entreprise_choisie')
-    # L'admin change virtuellement d'entreprise pour voir ses stats
-    session['user']['entreprise'] = nouvelle_ent
+    if entreprise_choisie:
+        # On remplace l'entreprise actuelle par celle choisie
+        session['user']['entreprise'] = entreprise_choisie
+        session.modified = True 
+        print(f"Switch réussi vers : {entreprise_choisie}")
+        
     return redirect(url_for('dashboard'))
 
 if __name__ == '__main__':
