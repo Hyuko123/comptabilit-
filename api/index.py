@@ -244,5 +244,15 @@ def irs_page():
     
     return render_template('irs.html', stats=stats)
 
+@app.route('/admin/select_entreprise', methods=['POST'])
+def select_entreprise():
+    if session.get('user', {}).get('role') != 'MASTER': 
+        return "Accès refusé", 403
+    
+    nouvelle_ent = request.form.get('entreprise_choisie')
+    # L'admin change virtuellement d'entreprise pour voir ses stats
+    session['user']['entreprise'] = nouvelle_ent
+    return redirect(url_for('dashboard'))
+
 if __name__ == '__main__':
     app.run(debug=True)
