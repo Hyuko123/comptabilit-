@@ -58,8 +58,8 @@
     <main class="ml-72 flex-1 p-12">
         <header class="mb-12 flex justify-between items-center">
             <div>
-                <p class="text-pink-400 font-bold uppercase tracking-widest text-[10px] mb-2">{{ stats.entreprise | default('Entreprise inconnue') }}</p>
-                <h2 class="text-5xl font-light">Bienvenue, <span class="font-black italic text-[#f06292]">{{ stats.nom_user | default('Utilisateur') }}</span></h2>
+                <p class="text-pink-400 font-bold uppercase tracking-widest text-[10px] mb-2">{{ stats.get('entreprise', 'Entreprise inconnue') }}</p>
+                <h2 class="text-5xl font-light">Bienvenue, <span class="font-black italic text-[#f06292]">{{ stats.get('nom_user', 'Utilisateur') }}</span></h2>
             </div>
             
             {% if session['user']['role'] == 'MASTER' %}
@@ -67,8 +67,8 @@
                 <p class="text-[9px] font-black text-[#ad1457] uppercase tracking-tighter italic mb-2">Changer d'entreprise (Master)</p>
                 <form action="/admin/select_entreprise" method="POST" class="flex gap-2">
                     <select name="entreprise_choisie" class="bg-pink-50 border-none rounded-xl px-4 py-2 text-xs font-bold text-[#ad1457] focus:ring-2 focus:ring-pink-200 outline-none">
-                        {% for ent in ["Restaurant Vinewood", "Burger Shot", "REX Diner + LTD", "Pop Chiken", "Unicorn", "Bahamas", "Benny's", "LS Custom", "Dynasty 8", "Ammunation", "Taxi"] %}
-                            <option value="{{ ent }}" {% if stats.entreprise == ent %}selected{% endif %}>{{ ent }}</option>
+                        {% for ent in entreprises %}
+                            <option value="{{ ent }}" {% if stats.get('entreprise') == ent %}selected{% endif %}>{{ ent }}</option>
                         {% endfor %}
                     </select>
                     <button type="submit" class="bg-[#ad1457] text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase hover:bg-[#880e4f] transition shadow-md">Switcher</button>
@@ -77,7 +77,7 @@
             {% else %}
             <div class="bg-white px-6 py-4 rounded-3xl border border-pink-50 shadow-sm text-right">
                 <p class="text-[10px] font-black text-pink-300 uppercase">Période en cours</p>
-                <p class="font-black text-sm italic text-[#ad1457]">Semaine 19 — 07/05/26 au 13/05/26</p>
+                <p class="font-black text-sm italic text-[#ad1457]">Session actuelle</p>
             </div>
             {% endif %}
         </header>
@@ -85,18 +85,18 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
             <div class="bg-[#ad1457] p-8 rounded-[40px] text-white shadow-xl shadow-pink-100">
                 <p class="text-xs font-bold uppercase opacity-60">Chiffre d'Affaires Brut</p>
-                <p class="text-5xl font-black italic mt-2">{{ stats.ca_total | default(0) }}$</p>
+                <p class="text-5xl font-black italic mt-2">{{ stats.get('ca_total', 0) }}$</p>
             </div>
             
             <div class="bg-white p-8 rounded-[40px] border border-pink-50 shadow-sm">
                 <p class="text-xs font-bold text-pink-300 uppercase">Taxes à reverser (35%)</p>
-                <p class="text-5xl font-black italic text-red-400 mt-2">{{ stats.taxes | default(0) }}$</p>
+                <p class="text-5xl font-black italic text-red-400 mt-2">{{ stats.get('taxes', 0) }}$</p>
             </div>
             
             <div class="bg-white p-8 rounded-[40px] border border-pink-50 shadow-sm">
                 <p class="text-xs font-bold text-pink-300 uppercase">Bénéfice Réel (Net)</p>
                 <p class="text-5xl font-black italic text-green-500 mt-2">
-                    {{ (stats.ca_total | default(0)) - (stats.taxes | default(0)) - (stats.total_salaires | default(0)) }}$
+                    {{ (stats.get('ca_total', 0) - stats.get('taxes', 0) - stats.get('total_salaires', 0)) }}$
                 </p>
             </div>
         </div>
@@ -125,16 +125,16 @@
                     <span class="bg-red-50 text-red-400 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-tighter">Taxe IRS 35% fixe</span>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-pink-50/50 p-6 rounded-3xl border border-pink-50 group hover:bg-pink-100 transition text-center">
+                    <div class="bg-pink-50/50 p-6 rounded-3xl border border-pink-50 text-center">
                         <p class="text-[9px] font-bold text-pink-300 uppercase mb-1">Patron</p>
                         <p class="text-xl font-black">65%</p>
                     </div>
-                    <div class="bg-pink-50/50 p-6 rounded-3xl border border-pink-50 group hover:bg-pink-100 transition text-center">
+                    <div class="bg-pink-50/50 p-6 rounded-3xl border border-pink-50 text-center">
                         <p class="text-[9px] font-bold text-pink-300 uppercase mb-1">Manager</p>
                         <p class="text-xl font-black">60%</p>
                     </div>
-                    <div class="bg-pink-50/50 p-6 rounded-3xl border border-pink-50 group hover:bg-pink-100 transition text-center col-span-2">
-                        <p class="text-[9px] font-bold text-pink-300 uppercase mb-1 text-center">Recrue / Employé</p>
+                    <div class="bg-pink-50/50 p-6 rounded-3xl border border-pink-50 text-center col-span-2">
+                        <p class="text-[9px] font-bold text-pink-300 uppercase mb-1">Recrue / Employé</p>
                         <p class="text-xl font-black">50% - 55%</p>
                     </div>
                 </div>
