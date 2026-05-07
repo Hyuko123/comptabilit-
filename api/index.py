@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import time
 from supabase import create_client, Client
+from datetime import datetime
 
 # --- CONFIGURATION ---
 SUPABASE_URL = "https://yiqpncfhfbltaalhgenp.supabase.co"
