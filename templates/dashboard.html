@@ -17,6 +17,7 @@
             <a href="/utilisateurs" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Utilisateurs</a>
             <div class="h-px bg-pink-50 my-6 mx-6"></div>
             <a href="/clotures" class="flex items-center gap-3 px-6 py-4 text-pink-400 font-bold hover:bg-pink-50 rounded-2xl transition">Clôtures</a>
+            <a href="/irs" class="flex items-center gap-3 px-6 py-4 text-red-400 font-bold hover:bg-red-50 rounded-2xl transition">Alertes IRS</a>
         </nav>
         <div class="p-8 border-t border-pink-50"><a href="/logout" class="text-[10px] font-black text-gray-300 uppercase tracking-widest">Déconnexion</a></div>
     </aside>
@@ -28,10 +29,34 @@
                 <p class="text-pink-400 font-bold uppercase tracking-widest text-[10px] mb-2">{{ stats.entreprise }}</p>
                 <h2 class="text-5xl font-light">Bienvenue, <span class="font-black italic text-[#f06292]">{{ stats.nom_user }}</span></h2>
             </div>
+            
+            {% if session['user']['role'] == 'MASTER' %}
+            <div class="bg-white px-6 py-4 rounded-3xl border-2 border-[#ad1457] shadow-lg flex flex-col gap-2">
+                <p class="text-[9px] font-black text-[#ad1457] uppercase tracking-tighter italic">Mode Administrateur : Changer d'entreprise</p>
+                <form action="/admin/select_entreprise" method="POST" class="flex gap-2">
+                    <select name="entreprise_choisie" class="bg-pink-50 border-none rounded-xl px-4 py-2 text-xs font-bold text-[#ad1457] focus:ring-2 focus:ring-pink-200 outline-none">
+                        {% for ent in [
+                            "Restaurant Vinewood", "Burger Shot", "REX Diner + LTD", "Pop Chiken",
+                            "Unicorn", "Bahamas", "Fête Forraine", "Agence d'évènementiel", "Le Clown",
+                            "Benny's", "LS Custom", "Garage Paleto", "REX Garage", "Custom Mirror", 
+                            "Auto Repair 68", "Dynasty 8", "LTD Little Seoul", "LTD Groove Street", 
+                            "Ammunation", "Car Dealer", "Taxi", "Psychologue", "Transport et livraison", 
+                            "Salon de tatouage Aguja", "Salon de tatouage Vespucci"
+                        ] %}
+                            <option value="{{ ent }}" {% if stats.entreprise == ent %}selected{% endif %}>{{ ent }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="bg-[#ad1457] text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase hover:bg-[#880e4f] transition">
+                        Switcher
+                    </button>
+                </form>
+            </div>
+            {% else %}
             <div class="bg-white px-6 py-4 rounded-2xl border border-pink-50 shadow-sm text-right">
                 <p class="text-[10px] font-bold text-pink-300 uppercase italic">Période en cours</p>
                 <p class="font-black text-sm">Semaine 19 — 07/05/26 au 13/05/26</p>
             </div>
+            {% endif %}
         </header>
 
         <div class="grid grid-cols-1 md:grid-cols-6 gap-4 mb-8">
