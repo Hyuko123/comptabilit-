@@ -132,30 +132,27 @@ def add_to_catalog():
             return f"Erreur ajout catalogue : {e}", 500
     return redirect(url_for('types_ventes_page'))
 
-@app.route('/update_stock/<string:id>', methods=['POST'])
-def update_stock(id):
+@app.route('/update_stock/<name>', methods=['POST'])
+def update_stock(name):
     if 'user' not in session: return redirect(url_for('login'))
     nouveau_stock = request.form.get('nouveau_stock')
     try:
-        # On s'assure que nouveau_stock est un entier
         valeur_stock = int(nouveau_stock) if nouveau_stock else 0
-        supabase.table("catalogue").update({"stock": valeur_stock}).eq("id", id).execute()
+        # On filtre par "nom" au lieu de "id"
+        supabase.table("catalogue").update({"stock": valeur_stock}).eq("nom", name).execute()
         return redirect(url_for('types_ventes_page'))
     except Exception as e:
-        print(f"Erreur stock : {e}")
-        return f"Erreur lors de la mise à jour : {e}", 500
+        return f"Erreur stock : {e}", 500
 
-@app.route('/delete_catalogue/<string:id>')
-def delete_catalogue(id):
+@app.route('/delete_catalogue/<name>')
+def delete_catalogue(name):
     if 'user' not in session: return redirect(url_for('login'))
     try:
-        # On vérifie que l'ID n'est pas vide
-        if id:
-            supabase.table("catalogue").delete().eq("id", id).execute()
+        # On filtre par "nom" au lieu de "id"
+        supabase.table("catalogue").delete().eq("nom", name).execute()
         return redirect(url_for('types_ventes_page'))
     except Exception as e:
-        print(f"Erreur suppression : {e}")
-        return f"Erreur lors de la suppression : {e}", 500
+        return f"Erreur suppression : {e}", 500
 
 @app.route('/ventes')
 def ventes_page():
