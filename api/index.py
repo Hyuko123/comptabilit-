@@ -125,13 +125,11 @@ def add_vente():
     except Exception as e:
         return f"Erreur lors de l'ajout de la vente : {e}", 500
 
+# --- ROUTE AJOUT CATALOGUE ---
 @app.route('/add_to_catalog', methods=['POST'])
 def add_to_catalog():
-    if 'user' not in session: 
-        return redirect(url_for('login'))
+    if 'user' not in session: return redirect(url_for('login'))
     
-    # On récupère les données du formulaire
-    # Note : Vérifie que dans type-ventes.html tes <input> ont bien ces 'name'
     nom = request.form.get('item_name')
     prix = request.form.get('item_price')
     stock = request.form.get('item_stock')
@@ -139,26 +137,30 @@ def add_to_catalog():
 
     if nom and prix:
         try:
-            # Insertion avec l'entreprise pour l'unicité du catalogue
             supabase.table("catalogue").insert({
                 "nom": nom, 
                 "prix": float(prix),
                 "stock": int(stock or 0),
-                "entreprise": user_ent 
+                "entreprise": user_ent
             }).execute()
         except Exception as e:
-            # Affiche l'erreur si la colonne 'entreprise' manque encore dans Supabase
-            return f"Erreur lors de l'ajout au catalogue : {e}", 500
-
-    # Redirection vers la page du catalogue (ton @app.route('/types-ventes'))
+            return f"Erreur lors de l'insertion Supabase : {e}", 500
+            
     return redirect(url_for('types_ventes_page'))
-
+# --- ROUTE AFFICHAGE CATALOGUE ---
 @app.route('/types-ventes')
 def types_ventes_page():
     if 'user' not in session: return redirect(url_for('login'))
-    res = supabase.table("catalogue").select("*").order("nom").execute()
-    return render_template('type-ventes.html', catalogue=res.data)
+    user_ent = session['user'].get('entreprise')
+    
+    try:
+        # On filtre par entreprise pour ne pas voir le catalogue des autres
+        res = supabase.table("catalogue").select("*").eq("entreprise", user_ent).order("nom").execute()
+        return render_template('types-ventes.html', catalogue=res.data, user=session['user'])
+    except Exception as e:
+        return f"Erreur chargement catalogue : {e}", 500
 
+# --- ROUTE AJOUT CATALOGUE ---
 @app.route('/salaires')
 def salaires_page():
     if 'user' not in session: return redirect(url_for('login'))
