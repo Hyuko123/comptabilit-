@@ -96,7 +96,7 @@
             <div class="bg-white p-8 rounded-[40px] border border-pink-50 shadow-sm">
                 <p class="text-xs font-bold text-pink-300 uppercase">Bénéfice Réel (Net)</p>
                 <p class="text-5xl font-black italic text-green-500 mt-2">
-                    {{ (stats.get('ca_total', 0) - stats.get('taxes', 0) - stats.get('total_salaires', 0)) }}$
+                    {{ (stats.get('ca_total', 0) - stats.get('taxes', 0) - stats.get('total_salaires', 0)) | round(2) }}$
                 </p>
             </div>
         </div>
