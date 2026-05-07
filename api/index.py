@@ -12,6 +12,9 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 app = Flask(__name__, template_folder='../templates')
 app.secret_key = 'shinoza_ultraze_v2'
 
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['SESSION_COOKIE_SECURE'] = True
+
 ENTREPRISES_LISTE = [
     "Restaurant Vinewood", "Burger Shot", "REX Diner + LTD", "Pop Chiken",
     "Unicorn", "Bahamas", "Fête Forraine", "Agence d'évènementiel", "Le Clown",
