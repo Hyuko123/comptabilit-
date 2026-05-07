@@ -80,15 +80,16 @@ def add_user():
 
 @app.route('/dashboard')
 def dashboard():
+    # 1. Sécurité Session
     if 'user' not in session:
         return redirect(url_for('login'))
     
-    # On récupère l'entreprise, avec une sécurité si la session est bancale
     user_ent = session['user'].get('entreprise', 'Inconnue')
     user_name = session['user'].get('name', 'Utilisateur')
 
-    # Initialisation par défaut pour éviter le "has no attribute"
-    stats = {
+    # 2. INITIALISATION PAR DÉFAUT (Indispensable pour éviter l'erreur "no attribute")
+    # On pré-remplit avec des 0 pour que le HTML ait toujours des données à lire
+    stats_data = {
         'ca_total': 0,
         'taxes': 0,
         'total_salaires': 0,
@@ -98,26 +99,30 @@ def dashboard():
     ventes_list = []
 
     try:
-        # 1. Tentative de récupération des données
-        res = supabase.table("ventes").select("*").eq("entreprise", user_ent).execute()
+        # 3. RÉCUPÉRATION SUPABASE
+        # On essaie de récupérer les montants pour l'entreprise de l'utilisateur
+        res = supabase.table("ventes").select("montant_net").eq("entreprise", user_ent).execute()
         
         if res.data:
-            ventes_list = res.data
-            # Calcul du CA avec conversion sécurisée en float
-            total_ca = sum(float(v.get('montant_net', 0)) for v in ventes_list)
+            # Calcul du CA (on force la conversion en float pour éviter les bugs de type)
+            total_ca = sum(float(v.get('montant_net', 0)) for v in res.data)
             
-            # Mise à jour du dictionnaire stats
-            stats['ca_total'] = total_ca
-            stats['taxes'] = round(total_ca * 0.35, 2)
-            # On peut ajouter ici le calcul des salaires si nécessaire
+            # Mise à jour des stats avec les vrais chiffres
+            stats_data['ca_total'] = total_ca
+            stats_data['taxes'] = round(total_ca * 0.35, 2)
+            # stats_data['total_salaires'] = ... (à ajouter si tu as une table salaires)
+
+        # 4. RÉCUPÉRATION DES 5 DERNIÈRES VENTES POUR LE TABLEAU
+        res_ventes = supabase.table("ventes").select("*").eq("entreprise", user_ent).order("id", desc=True).limit(5).execute()
+        ventes_list = res_ventes.data if res_ventes.data else []
 
     except Exception as e:
-        # Si ça plante (ex: erreur de connexion Supabase), on print l'erreur
-        print(f"DEBUG ERROR: {e}")
-        # Mais on ne fait rien : 'stats' garde ses valeurs par défaut (0)
-    
-    # On envoie toujours stats et ventes, même vides
-    return render_template('dashboard.html', stats=stats, ventes=ventes_list)
+        # Si ça plante ici, on print l'erreur dans les logs Vercel pour debug
+        print(f"ERREUR CRITIQUE DASHBOARD : {e}")
+        # Mais on ne crash pas ! stats_data contient déjà ses valeurs par défaut (0)
+
+    # 5. ENVOI AU TEMPLATE (Note : on utilise bien 'stats=stats_data')
+    return render_template('dashboard.html', stats=stats_data, ventes=ventes_list)
 
 @app.route('/types-ventes')
 def types_ventes_page():
