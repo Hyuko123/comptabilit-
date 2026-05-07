@@ -50,16 +50,17 @@ def logout():
     session.clear()
     return redirect(url_for('login'))
 
+# Dans ton api/index.py
 @app.route('/add_user', methods=['POST'])
 def add_user():
-    if 'user' not in session: return redirect(url_for('login'))
+    # Ces noms doivent être IDENTIQUES aux 'name' du fichier HTML
+    username = request.form.get('new_username') # Utilise 'new_username' ici
+    name = request.form.get('new_name')
+    password = request.form.get('new_password')
+    role = request.form.get('new_role')
+    entreprise = request.form.get('new_entreprise')
     
-    # Récupération des données du formulaire
-    username = request.form.get('username')
-    name = request.form.get('name')
-    password = request.form.get('password')
-    role = request.form.get('role')
-    entreprise = request.form.get('entreprise')
+    # ... code d'insertion Supabase ...
 
     if username and name and password:
         try:
