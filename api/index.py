@@ -79,25 +79,45 @@ def add_user():
 
 # --- DASHBOARD ---
 
+# --- DASHBOARD ---
+
 @app.route('/dashboard')
 def dashboard():
-    # 1. Tes calculs (exemple)
-    total_ca = 150000 
-    total_taxes = 52500
-    total_salaires = 45000
+    # 1. Sécurité : Si pas connecté, retour au login
+    if 'user' not in session: 
+        return redirect(url_for('login'))
+    
+    user_ent = session['user'].get('entreprise')
 
-    # 2. LA DÉFINITION DU DICTIONNAIRE (C'est ici que ça foire !)
-    stats = {
-        'ca_total': total_ca,       # <--- EST-CE QUE TU AS BIEN ÉCRIT 'ca_total' ICI ?
-        'taxes': total_taxes,       # Pas 'ca', pas 'total_ca_brut', vraiment 'ca_total'
-        'total_salaires': total_salaires,
-        'nom_user': session['user']['name'],
-        'entreprise': session['user']['entreprise']
-    }
+    try:
+        # 2. RÉCUPÉRATION DES VRAIES DONNÉES (Pour éviter l'erreur 'ventes' non défini)
+        res_ventes = supabase.table("ventes").select("*").eq("entreprise", user_ent).order("id", desc=True).execute()
+        ventes = res_ventes.data or []
 
-    # 3. L'ENVOI AU TEMPLATE
-    # Est-ce que tu envoies bien le dictionnaire 'stats' ?
-    return render_template('dashboard.html', stats=stats, ventes=ventes)
+        # 3. CALCULS RÉELS (Au lieu de valeurs fixes)
+        total_ca = sum(float(v['montant_net']) for v in ventes)
+        total_taxes = round(total_ca * 0.35, 2)
+        
+        # On calcule aussi les salaires pour le bénéfice net
+        # (Optionnel : tu peux laisser à 0 si tu ne veux pas le détail ici)
+        total_salaires = 0 
+
+        # 4. LE DICTIONNAIRE (Parfaitement nommé pour le HTML)
+        stats = {
+            'ca_total': total_ca,
+            'taxes': total_taxes,
+            'total_salaires': total_salaires,
+            'nom_user': session['user'].get('name', 'Utilisateur'),
+            'entreprise': user_ent
+        }
+
+        # 5. L'ENVOI (Les variables stats et ventes existent maintenant toutes les deux)
+        return render_template('dashboard.html', stats=stats, ventes=ventes)
+
+    except Exception as e:
+        print(f"Erreur Dashboard : {e}")
+        # En cas d'erreur, on envoie des données vides pour ne pas crash la page
+        return render_template('dashboard.html', stats={'ca_total':0, 'taxes':0, 'total_salaires':0}, ventes=[])
 
 @app.route('/types-ventes')
 def types_ventes_page():
