@@ -79,44 +79,38 @@ def add_user():
 
 @app.route('/dashboard')
 def dashboard():
-    # 1. Vérification de la session
     if 'user' not in session:
         return redirect(url_for('login'))
     
-    user_ent = session['user'].get('entreprise')
+    user_ent = session['user'].get('entreprise', 'Inconnue')
 
     try:
-        # 2. RÉCUPÉRATION DES VENTES (Indispensable pour calculer le CA)
+        # Récupération des ventes
         res_ventes = supabase.table("ventes").select("*").eq("entreprise", user_ent).order("id", desc=True).execute()
-        ventes = res_ventes.data if res_ventes.data else []
+        ventes_data = res_ventes.data if res_ventes.data else []
 
-        # 3. CALCULS (Basés sur les vraies données)
-        # On s'assure que le montant est bien traité comme un nombre
-        total_ca = sum(float(v.get('montant_net', 0)) for v in ventes)
+        # Calculs avec sécurité si montant_net est manquant
+        total_ca = sum(float(v.get('montant_net', 0)) for v in ventes_data)
         total_taxes = round(total_ca * 0.35, 2)
-        
-        # Pour l'instant on laisse à 0, ou tu peux le calculer si tu as une table salaires
-        total_salaires = 0 
+        total_salaires = 0 # À adapter selon tes besoins
 
-        # 4. CONSTRUCTION DU DICTIONNAIRE STATS
-        # C'est ce dictionnaire que ton HTML 'dashboard.html' attend
-        stats = {
-            'ca_total': total_ca,        # <--- LA CLÉ MANQUANTE ÉTAIT ICI
+        # On prépare le dictionnaire
+        stats_dict = {
+            'ca_total': total_ca,
             'taxes': total_taxes,
             'total_salaires': total_salaires,
             'nom_user': session['user'].get('name', 'Utilisateur'),
             'entreprise': user_ent
         }
 
-        # 5. ENVOI AU TEMPLATE
-        # On passe 'stats' ET 'ventes' (pour le tableau des dernières ventes)
-        return render_template('dashboard.html', stats=stats, ventes=ventes)
+        return render_template('dashboard.html', stats=stats_dict, ventes=ventes_data)
 
     except Exception as e:
-        # Si une erreur survient (ex: Supabase down), on affiche l'erreur dans la console
-        print(f"ERREUR DASHBOARD : {e}")
-        # Et on renvoie une page vide sécurisée pour éviter le crash 500
-        return render_template('dashboard.html', stats={'ca_total': 0, 'taxes': 0, 'total_salaires': 0}, ventes=[])
+        print(f"DEBUG: Erreur Dashboard -> {e}")
+        # En cas d'erreur critique, on envoie un dictionnaire vide mais AVEC les clés
+        return render_template('dashboard.html', 
+                               stats={'ca_total': 0, 'taxes': 0, 'total_salaires': 0, 'entreprise': user_ent, 'nom_user': 'Erreur'}, 
+                               ventes=[])
 
 @app.route('/types-ventes')
 def types_ventes_page():
