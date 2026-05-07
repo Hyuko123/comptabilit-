@@ -27,7 +27,7 @@
         <header class="mb-12">
             <h2 class="text-4xl font-light">Gestion du <span class="font-black italic text-[#f06292]">Catalogue</span></h2>
             <p class="text-pink-300 font-bold italic mt-2 uppercase text-xs tracking-widest">
-                Entreprise actuelle : {{ session['user']['entreprise'] }}
+                Entreprise actuelle : <span class="text-[#ad1457]">{{ session['user']['entreprise'] }}</span>
             </p>
         </header>
 
@@ -56,7 +56,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="w-full bg-[#f06292] text-white font-black py-5 rounded-2xl shadow-lg hover:bg-[#ad1457] transition-all uppercase tracking-widest text-sm">
+                    <button type="submit" class="w-full bg-[#f06292] text-white font-black py-5 rounded-2xl shadow-lg hover:bg-[#ad1457] active:scale-95 transition-all uppercase tracking-widest text-sm">
                         Ajouter au catalogue
                     </button>
                 </form>
@@ -76,30 +76,32 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-pink-50">
-                            {% for item in catalogue %}
-                            <tr class="group hover:bg-pink-50/20 transition-all">
-                                <td class="py-5 px-4 font-bold text-[#ad1457]">{{ item.nom }}</td>
-                                <td class="py-5 font-black text-gray-600">{{ item.prix }}$</td>
-                                <td class="py-5">
-                                    <span class="px-3 py-1 rounded-full text-[10px] font-bold {% if item.stock > 0 %}bg-green-50 text-green-500{% else %}bg-red-50 text-red-400{% endif %}">
-                                        {{ item.stock }} en réserve
-                                    </span>
-                                </td>
-                                <td class="py-5 text-right px-4">
-                                    <a href="/delete_catalogue/{{ item.id }}" 
-                                       onclick="return confirm('Supprimer cet article ?')"
-                                       class="text-red-200 hover:text-red-500 transition font-bold italic text-xs">
-                                        Supprimer
-                                    </a>
-                                </td>
-                            </tr>
+                            {% if catalogue %}
+                                {% for item in catalogue %}
+                                <tr class="group hover:bg-pink-50/20 transition-all">
+                                    <td class="py-5 px-4 font-bold text-[#ad1457]">{{ item.nom }}</td>
+                                    <td class="py-5 font-black text-gray-600">{{ item.prix }}$</td>
+                                    <td class="py-5">
+                                        <span class="px-3 py-1 rounded-full text-[10px] font-bold {% if item.stock and item.stock > 0 %}bg-green-50 text-green-500{% else %}bg-red-50 text-red-400{% endif %}">
+                                            {{ item.stock if item.stock else 0 }} en réserve
+                                        </span>
+                                    </td>
+                                    <td class="py-5 text-right px-4">
+                                        <a href="/delete_catalogue/{{ item.id }}" 
+                                           onclick="return confirm('Voulez-vous vraiment supprimer cet article ?')"
+                                           class="text-red-200 hover:text-red-500 transition font-bold italic text-xs uppercase">
+                                            Supprimer
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
                             {% else %}
-                            <tr>
-                                <td colspan="4" class="py-20 text-center text-pink-200 italic font-medium">
-                                    Votre catalogue est vide. Ajoutez votre premier article !
-                                </td>
-                            </tr>
-                            {% endfor %}
+                                <tr>
+                                    <td colspan="4" class="py-20 text-center text-pink-200 italic font-medium">
+                                        Votre catalogue est vide. Ajoutez votre premier article !
+                                    </td>
+                                </tr>
+                            {% endif %}
                         </tbody>
                     </table>
                 </div>
