@@ -269,12 +269,12 @@ def irs_page():
 @app.route('/utilisateurs')
 def utilisateurs():
     if 'user' not in session: return redirect(url_for('login'))
-    ent = session['user'].get('entreprise')
-    try:
-        res = supabase.table("utilisateurs").select("*").eq("entreprise", ent).execute()
-        return render_template('utilisateurs.html', all_users_list=res.data)
-    except Exception as e:
-        return f"Erreur employés : {e}", 500
+    
+    # RÉCUPÉRATION VITALE :
+    response = supabase.table("utilisateurs").select("*").execute()
+    users_list = response.data # C'est cette liste qu'on envoie au HTML
+    
+    return render_template('utilisateurs.html', all_users=users_list)
 
 @app.route('/admin/select_entreprise', methods=['POST'])
 def admin_select_entreprise():
