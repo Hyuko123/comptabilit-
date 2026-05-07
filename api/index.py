@@ -129,16 +129,14 @@ def add_to_catalog():
             return f"Erreur ajout catalogue : {e}", 500
     return redirect(url_for('types_ventes_page'))
 
-@app.route('/delete_catalogue/<id>')
-def delete_catalogue(id):
+@app.route('/delete_user/<id>')
+def delete_user(id):
     if 'user' not in session: return redirect(url_for('login'))
     try:
-        # On force la conversion en entier au cas où
-        supabase.table("catalogue").delete().eq("id", int(id)).execute()
+        supabase.table("utilisateurs").delete().eq("id", id).execute()
     except Exception as e:
-        # Si c'est déjà un texte, on essaie sans conversion
-        supabase.table("catalogue").delete().eq("id", str(id)).execute()
-    return redirect(url_for('types_ventes_page'))
+        print(f"Erreur suppression : {e}")
+    return redirect(url_for('utilisateurs'))
 
 @app.route('/update_stock/<id>', methods=['POST'])
 def update_stock(id):
