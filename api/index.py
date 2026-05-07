@@ -89,14 +89,12 @@ def ventes_page():
     user_ent = session['user'].get('entreprise')
     
     try:
-        # On récupère les données
+        # On ne récupère QUE les ventes de CETTE entreprise
         res_ventes = supabase.table("ventes").select("*").eq("entreprise", user_ent).order("id", desc=True).execute()
-        res_cat = supabase.table("catalogue").select("*").order("nom").execute()
         
-        # On vérifie si Supabase a renvoyé une erreur de permission
-        if hasattr(res_ventes, 'error') and res_ventes.error:
-            return f"Erreur Supabase (Ventes): {res_ventes.error}", 500
-            
+        # CRUCIAL : On ne récupère QUE le catalogue de CETTE entreprise
+        res_cat = supabase.table("catalogue").select("*").eq("entreprise", user_ent).order("nom").execute()
+        
         return render_template('ventes.html', 
                                ventes=res_ventes.data or [], 
                                catalogue=res_cat.data or [],
@@ -108,20 +106,24 @@ def ventes_page():
 def add_vente():
     if 'user' not in session: return redirect(url_for('login'))
     
+    user_ent = session['user'].get('entreprise') # On récupère l'entreprise en session
     article = request.form.get('article')
     quantite = int(request.form.get('quantite') or 1)
     montant = float(request.form.get('montant') or 0)
     
-    supabase.table("ventes").insert({
-        "vendeur": session['user']['name'],
-        "entreprise": session['user']['entreprise'],
-        "article": article,
-        "quantite": quantite,
-        "montant_net": montant,
-        "date": time.strftime("%d/%m %H:%M")
-    }).execute()
-    
-    return redirect(url_for('ventes_page'))
+    try:
+        supabase.table("ventes").insert({
+            "vendeur": session['user']['name'],
+            "entreprise": user_ent, # Verrouille la vente à l'entreprise actuelle
+            "article": article,
+            "quantite": quantite,
+            "montant_net": montant,
+            "date": time.strftime("%d/%m %H:%M")
+        }).execute()
+        
+        return redirect(url_for('ventes_page'))
+    except Exception as e:
+        return f"Erreur lors de l'ajout de la vente : {e}", 500
 
 @app.route('/add_to_catalog', methods=['POST'])
 def add_to_catalog():
