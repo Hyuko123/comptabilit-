@@ -127,15 +127,19 @@ def add_vente():
 
 @app.route('/add_to_catalog', methods=['POST'])
 def add_to_catalog():
+    if 'user' not in session: return redirect(url_for('login'))
+    
     nom = request.form.get('item_name')
     prix = request.form.get('item_price')
     stock = request.form.get('item_stock')
-    
+    user_ent = session['user'].get('entreprise') # <--- RÉCUPÈRE L'ENTREPRISE ICI
+
     if nom and prix:
         supabase.table("catalogue").insert({
             "nom": nom, 
             "prix": float(prix),
-            "stock": int(stock or 0)
+            "stock": int(stock or 0),
+            "entreprise": user_ent # <--- AJOUTE L'ENTREPRISE DANS L'INSERT
         }).execute()
     return redirect('/types-ventes')
 
@@ -261,6 +265,14 @@ def admin_select_entreprise():
         print(f"Switch réussi vers : {entreprise_choisie}")
         
     return redirect(url_for('dashboard'))
+
+@app.route('/delete_catalogue/<int:item_id>')
+def delete_catalogue(item_id):
+    if 'user' not in session:
+        return redirect(url_for('login'))
+        
+    supabase.table('catalogue').delete().eq('id', item_id).execute()
+    return redirect(url_for('types_ventes'))
 
 if __name__ == '__main__':
     app.run(debug=True)
