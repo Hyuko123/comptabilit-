@@ -270,11 +270,21 @@ def irs_page():
 def utilisateurs():
     if 'user' not in session: return redirect(url_for('login'))
     
-    # RÉCUPÉRATION VITALE :
-    response = supabase.table("utilisateurs").select("*").execute()
-    users_list = response.data # C'est cette liste qu'on envoie au HTML
-    
-    return render_template('utilisateurs.html', all_users=users_list)
+    # 1. On récupère les entreprises pour le menu déroulant
+    # (Soit via un JSON, soit via Supabase)
+    entreprises = ["Restaurant Vinewood", "Unicorn", "Pop Chiken"] 
+
+    # 2. On récupère la liste des employés DEPUIS Supabase
+    try:
+        response = supabase.table("utilisateurs").select("*").execute()
+        all_users = response.data
+    except Exception as e:
+        print(f"Erreur de lecture : {e}")
+        all_users = []
+
+    return render_template('utilisateurs.html', 
+                           all_users=all_users, 
+                           entreprises=entreprises)
 
 @app.route('/admin/select_entreprise', methods=['POST'])
 def admin_select_entreprise():
