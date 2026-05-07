@@ -132,32 +132,30 @@ def add_to_catalog():
             return f"Erreur ajout catalogue : {e}", 500
     return redirect(url_for('types_ventes_page'))
 
-# ... (tes imports et configurations restent identiques)
-
-@app.route('/update_stock/<id>', methods=['POST'])
+@app.route('/update_stock/<string:id>', methods=['POST'])
 def update_stock(id):
     if 'user' not in session: return redirect(url_for('login'))
     nouveau_stock = request.form.get('nouveau_stock')
-    if nouveau_stock is not None:
-        try:
-            # On s'assure que l'ID est bien passé à la requête Supabase
-            supabase.table("catalogue").update({"stock": int(nouveau_stock)}).eq("id", id).execute()
-        except Exception as e:
-            return f"Erreur stock : {e}", 500
-    return redirect(url_for('types_ventes_page'))
+    try:
+        # On s'assure que nouveau_stock est un entier
+        valeur_stock = int(nouveau_stock) if nouveau_stock else 0
+        supabase.table("catalogue").update({"stock": valeur_stock}).eq("id", id).execute()
+        return redirect(url_for('types_ventes_page'))
+    except Exception as e:
+        print(f"Erreur stock : {e}")
+        return f"Erreur lors de la mise à jour : {e}", 500
 
-@app.route('/delete_catalogue/<id>')
+@app.route('/delete_catalogue/<string:id>')
 def delete_catalogue(id):
     if 'user' not in session: return redirect(url_for('login'))
     try:
-        # On supprime l'article correspondant à l'ID
-        supabase.table("catalogue").delete().eq("id", id).execute()
+        # On vérifie que l'ID n'est pas vide
+        if id:
+            supabase.table("catalogue").delete().eq("id", id).execute()
+        return redirect(url_for('types_ventes_page'))
     except Exception as e:
-        print(f"Erreur suppression catalogue : {e}")
-        return f"Erreur suppression : {e}", 500
-    return redirect(url_for('types_ventes_page'))
-
-# ... (le reste de tes routes)
+        print(f"Erreur suppression : {e}")
+        return f"Erreur lors de la suppression : {e}", 500
 
 @app.route('/ventes')
 def ventes_page():
