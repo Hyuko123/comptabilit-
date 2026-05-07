@@ -22,19 +22,15 @@
                 <a href="{{ url_for('dashboard') }}" class="flex items-center gap-3 px-6 py-4 font-bold rounded-2xl transition hover:bg-pink-50 {{ 'bg-pink-50 text-[#ad1457] italic' if request.endpoint == 'dashboard' else 'text-gray-400' }}">
                     Dashboard
                 </a>
-                
                 <a href="{{ url_for('ventes_page') }}" class="flex items-center gap-3 px-6 py-4 font-bold rounded-2xl transition hover:bg-pink-50 {{ 'bg-pink-50 text-[#ad1457] italic' if request.endpoint == 'ventes_page' else 'text-gray-400' }}">
                     Ventes
                 </a>
-                
                 <a href="{{ url_for('salaires_page') }}" class="flex items-center gap-3 px-6 py-4 font-bold rounded-2xl transition hover:bg-pink-50 {{ 'bg-pink-50 text-[#ad1457] italic' if request.endpoint == 'salaires_page' else 'text-gray-400' }}">
                     Salaires
                 </a>
-                
                 <a href="{{ url_for('utilisateurs') }}" class="flex items-center gap-3 px-6 py-4 font-bold rounded-2xl transition hover:bg-pink-50 {{ 'bg-pink-50 text-[#ad1457] italic' if request.endpoint == 'utilisateurs' else 'text-gray-400' }}">
                     Utilisateurs
                 </a>
-
                 <a href="{{ url_for('types_ventes_page') }}" class="flex items-center gap-3 px-6 py-4 font-bold rounded-2xl transition hover:bg-pink-50 {{ 'bg-pink-50 text-[#ad1457] italic' if request.endpoint == 'types_ventes_page' else 'text-gray-400' }}">
                     Catalogue
                 </a>
@@ -45,7 +41,6 @@
                 <a href="{{ url_for('clotures') }}" class="flex items-center gap-3 px-6 py-4 font-bold rounded-2xl transition hover:bg-pink-50 {{ 'bg-pink-50 text-[#ad1457] italic' if request.endpoint == 'clotures' else 'text-gray-400' }}">
                     Clôtures
                 </a>
-
                 <a href="{{ url_for('irs') }}" class="flex items-center gap-3 px-6 py-4 font-bold rounded-2xl transition hover:bg-orange-50 {{ 'bg-orange-50 text-orange-600 italic' if request.endpoint == 'irs' else 'text-orange-400' }}">
                     Avertissement IRS
                 </a>
@@ -54,9 +49,6 @@
             <div class="mt-auto pb-10">
                 <div class="h-px bg-pink-50 mb-6 mx-6"></div>
                 <a href="{{ url_for('logout') }}" class="flex items-center gap-3 px-6 py-2 text-gray-300 text-[10px] font-black hover:text-red-500 transition uppercase tracking-[0.15em]">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
                     Déconnexion
                 </a>
             </div>
@@ -67,8 +59,8 @@
         
         <header class="mb-12 flex justify-between items-center">
             <div>
-                <p class="text-pink-400 font-bold uppercase tracking-widest text-[10px] mb-2">{{ stats.entreprise }}</p>
-                <h2 class="text-5xl font-light">Bienvenue, <span class="font-black italic text-[#f06292]">{{ stats.nom_user }}</span></h2>
+                <p class="text-pink-400 font-bold uppercase tracking-widest text-[10px] mb-2">{{ stats.entreprise | default('Entreprise inconnue') }}</p>
+                <h2 class="text-5xl font-light">Bienvenue, <span class="font-black italic text-[#f06292]">{{ stats.nom_user | default('Utilisateur') }}</span></h2>
             </div>
             
             {% if session['user']['role'] == 'MASTER' %}
@@ -94,22 +86,23 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
             <div class="bg-[#ad1457] p-8 rounded-[40px] text-white shadow-xl shadow-pink-100">
                 <p class="text-xs font-bold uppercase opacity-60">Chiffre d'Affaires Brut</p>
-                <p class="text-5xl font-black italic mt-2">{{ stats.ca_total }}$</p>
+                <p class="text-5xl font-black italic mt-2">{{ stats.ca_total | default(0) }}$</p>
             </div>
             
             <div class="bg-white p-8 rounded-[40px] border border-pink-50 shadow-sm">
                 <p class="text-xs font-bold text-pink-300 uppercase">Taxes à reverser (35%)</p>
-                <p class="text-5xl font-black italic text-red-400 mt-2">{{ stats.taxes }}$</p>
+                <p class="text-5xl font-black italic text-red-400 mt-2">{{ stats.taxes | default(0) }}$</p>
             </div>
             
             <div class="bg-white p-8 rounded-[40px] border border-pink-50 shadow-sm">
                 <p class="text-xs font-bold text-pink-300 uppercase">Bénéfice Réel (Net)</p>
-                <p class="text-5xl font-black italic text-green-500 mt-2">{{ stats.ca_total - stats.taxes - stats.total_salaires }}$</p>
+                <p class="text-5xl font-black italic text-green-500 mt-2">
+                    {{ (stats.ca_total | default(0)) - (stats.taxes | default(0)) - (stats.total_salaires | default(0)) }}$
+                </p>
             </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-             
             <div class="bg-white p-10 rounded-[45px] shadow-sm border border-pink-50">
                 <h3 class="text-xl font-black mb-6 italic text-[#ad1457]">Dernières Ventes</h3>
                 <div class="space-y-4">
@@ -121,6 +114,8 @@
                         </div>
                         <p class="font-black text-[#f06292] text-lg">+{{ v.montant_net }}$</p>
                     </div>
+                    {% else %}
+                    <p class="text-gray-400 italic text-sm text-center py-4">Aucune vente enregistrée.</p>
                     {% endfor %}
                 </div>
             </div>
@@ -146,7 +141,7 @@
                 </div>
                 
                 <div class="mt-8">
-                    <a href="/ventes" class="block w-full text-center bg-[#f06292] text-white py-5 rounded-3xl font-black uppercase tracking-widest shadow-lg hover:bg-[#ad1457] hover:scale-[1.02] transition-all">
+                    <a href="{{ url_for('ventes_page') }}" class="block w-full text-center bg-[#f06292] text-white py-5 rounded-3xl font-black uppercase tracking-widest shadow-lg hover:bg-[#ad1457] hover:scale-[1.02] transition-all">
                         Enregistrer une vente
                     </a>
                 </div>
