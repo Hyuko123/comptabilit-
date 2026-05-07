@@ -2,13 +2,22 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>Utilisateurs | Ultraze</title>
+    <title>Effectifs | Ultraze V2</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); }
+    </style>
 </head>
 <body class="bg-[#fff9fa] flex min-h-screen text-[#880e4f]">
-    <aside class="w-72 bg-white border-r border-pink-50 flex flex-col fixed h-full z-50">
-        <div class="p-10 mb-6"><h1 class="text-[#f06292] text-2xl font-black italic">ULTRAZE V2</h1></div>
-        <nav class="flex-1 px-4 space-y-1">
+
+    <aside class="w-72 bg-white border-r border-pink-100 flex flex-col fixed h-full z-50 shadow-sm">
+        <div class="p-10 mb-6">
+            <h1 class="text-[#f06292] text-2xl font-black italic tracking-tighter">ULTRAZE V2</h1>
+        </div>
+        <nav class="flex-1 px-4 space-y-2">
             <a href="{{ url_for('dashboard') }}" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Dashboard</a>
             <a href="{{ url_for('ventes_page') }}" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Ventes</a>
             <a href="{{ url_for('salaires_page') }}" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Salaires</a>
@@ -17,89 +26,114 @@
             <div class="h-px bg-pink-50 my-6 mx-6"></div>
             <a href="{{ url_for('clotures_page') }}" class="flex items-center gap-3 px-6 py-4 text-pink-400 font-bold hover:bg-pink-50 rounded-2xl transition">Clôtures</a>
             <a href="{{ url_for('irs_page') }}" class="flex items-center gap-3 px-6 py-4 text-red-400 font-bold hover:bg-red-50 rounded-2xl transition italic">IRS</a>
-            <a href="{{ url_for('logout') }}" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-red-50 hover:text-red-500 rounded-2xl transition mt-auto">Déconnexion</a>
+            <a href="{{ url_for('logout') }}" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-red-50 hover:text-red-500 rounded-2xl transition mt-10">Déconnexion</a>
         </nav>
     </aside>
 
     <main class="ml-72 flex-1 p-12">
-        <header class="mb-12">
-            <h2 class="text-4xl font-light">Gestion des <span class="font-black italic text-[#f06292]">Effectifs</span></h2>
+        <header class="mb-12 flex justify-between items-end">
+            <div>
+                <h2 class="text-4xl font-light">Gestion des <span class="font-black italic text-[#f06292]">Effectifs</span></h2>
+                <p class="text-pink-300 font-bold mt-2 uppercase text-xs tracking-widest">Recrutement et hiérarchie</p>
+            </div>
+            <div class="text-right">
+                <span class="bg-pink-100 text-[#f06292] px-4 py-2 rounded-full text-sm font-black">
+                    {{ all_users|length if all_users else 0 }} Employés
+                </span>
+            </div>
         </header>
 
         <div class="grid grid-cols-1 xl:grid-cols-3 gap-10">
             
-            <div class="bg-white p-10 rounded-[45px] shadow-xl border border-pink-50 h-fit">
-                <h3 class="text-xl font-black mb-8 italic text-[#ad1457]">Recruter un employé</h3>
+            <div class="bg-white p-8 rounded-[40px] shadow-2xl shadow-pink-100/50 border border-pink-50 h-fit">
+                <h3 class="text-xl font-black mb-8 italic text-[#ad1457] flex items-center gap-2">
+                    <span class="w-2 h-8 bg-[#f06292] rounded-full"></span>
+                    Recruter
+                </h3>
                 
-                <form action="{{ url_for('add_user') }}" method="POST" class="space-y-5">
-                    <div>
-                        <label class="text-[10px] font-bold text-pink-300 uppercase px-2 italic">Identifiant (UID)</label>
-                        <input type="text" name="username" placeholder="ex: shinoza" required class="w-full p-4 rounded-2xl bg-pink-50/50 border-none outline-none mt-1 font-bold text-[#ad1457]">
+                <form action="{{ url_for('add_user') }}" method="POST" class="space-y-6">
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black text-pink-300 uppercase px-2">Identifiant Unique (UID)</label>
+                        <input type="text" name="username" placeholder="ex: fabien_shelby" required 
+                               class="w-full p-4 rounded-2xl bg-pink-50/50 border-2 border-transparent focus:border-pink-200 outline-none transition font-bold text-[#ad1457]">
                     </div>
 
-                    <div>
-                        <label class="text-[10px] font-bold text-pink-300 uppercase px-2 italic">Nom complet RP</label>
-                        <input type="text" name="name" placeholder="ex: Shinoza S" required class="w-full p-4 rounded-2xl bg-pink-50/50 border-none outline-none mt-1 font-bold">
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black text-pink-300 uppercase px-2">Nom Complet RP</label>
+                        <input type="text" name="name" placeholder="ex: Fabien Shelby" required 
+                               class="w-full p-4 rounded-2xl bg-pink-50/50 border-2 border-transparent focus:border-pink-200 outline-none transition font-bold">
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="text-[10px] font-bold text-pink-300 uppercase px-2 italic">Mot de passe</label>
-                            <input type="password" name="password" placeholder="****" required class="w-full p-4 rounded-2xl bg-pink-50/50 border-none outline-none mt-1">
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-black text-pink-300 uppercase px-2">Pass</label>
+                            <input type="password" name="password" placeholder="****" required 
+                                   class="w-full p-4 rounded-2xl bg-pink-50/50 border-2 border-transparent focus:border-pink-200 outline-none transition">
                         </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-pink-300 uppercase px-2 italic">Grade</label>
-                            <select name="role" class="w-full p-4 rounded-2xl bg-pink-50/50 border-none outline-none mt-1 font-bold">
-                                <option value="Employé">Employé</option>
-                                <option value="Manager">Manager</option>
-                                <option value="Co patron">Co patron</option>
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-black text-pink-300 uppercase px-2">Grade</label>
+                            <select name="role" class="w-full p-4 rounded-2xl bg-pink-50/50 border-2 border-transparent focus:border-pink-200 outline-none transition font-bold text-[#ad1457]">
                                 <option value="Patron">Patron</option>
+                                <option value="Co patron">Co patron</option>
+                                <option value="Manager">Manager</option>
+                                <option value="Employé" selected>Employé</option>
                             </select>
                         </div>
                     </div>
 
-                    <div>
-                        <label class="text-[10px] font-bold text-pink-400 uppercase px-2 italic">Entreprise</label>
-                        <select name="entreprise" class="w-full p-4 rounded-2xl bg-pink-50 border-none outline-none text-[#ad1457] font-bold mt-1">
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black text-pink-400 uppercase px-2 italic">Entreprise d'affectation</label>
+                        <select name="entreprise" class="w-full p-4 rounded-2xl bg-pink-50 border-2 border-pink-100 outline-none text-[#ad1457] font-black">
                             {% if entreprises %}
                                 {% for ent in entreprises %}
                                     <option value="{{ ent }}">{{ ent }}</option>
                                 {% endfor %}
                             {% else %}
-                                <option disabled>Aucune entreprise configurée</option>
+                                <option disabled>Aucune entreprise</option>
                             {% endif %}
                         </select>
                     </div>
 
-                    <button type="submit" class="w-full bg-[#f06292] text-white font-black py-5 rounded-2xl shadow-lg shadow-pink-100 hover:scale-[1.02] transition uppercase tracking-widest">
-                        VALIDER LE RECRUTEMENT
+                    <button type="submit" class="w-full bg-[#f06292] text-white font-black py-5 rounded-2xl shadow-lg shadow-pink-200 hover:bg-[#ad1457] hover:-translate-y-1 transition-all duration-300 uppercase tracking-widest">
+                        Confirmer l'embauche
                     </button>
                 </form>
             </div>
 
-            <div class="xl:col-span-2 bg-white p-10 rounded-[45px] shadow-xl border border-pink-50">
-                <h3 class="text-xl font-black mb-8 italic text-[#ad1457]">Liste des employés</h3>
+            <div class="xl:col-span-2 bg-white p-10 rounded-[40px] shadow-2xl shadow-pink-100/50 border border-pink-50">
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="text-xl font-black italic text-[#ad1457]">Effectifs Actifs</h3>
+                </div>
                 
-                <div class="space-y-4">
+                <div class="grid grid-cols-1 gap-4">
                     {% if all_users %}
                         {% for user in all_users %}
-                        <div class="group bg-white p-6 rounded-3xl border border-pink-50 flex justify-between items-center hover:bg-pink-50/30 transition-all duration-300">
-                            <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 bg-pink-100 rounded-2xl flex items-center justify-center text-[#f06292] font-black">
+                        <div class="group bg-white p-5 rounded-3xl border border-pink-50 flex justify-between items-center hover:shadow-xl hover:shadow-pink-100/50 hover:border-pink-200 transition-all duration-300">
+                            <div class="flex items-center gap-5">
+                                <div class="w-14 h-14 {% if user.role == 'Patron' %}bg-pink-600 text-white{% else %}bg-pink-100 text-[#f06292]{% endif %} rounded-2xl flex items-center justify-center font-black text-xl shadow-inner">
                                     {{ user.name[0] | upper }}
                                 </div>
                                 <div>
-                                    <p class="font-bold text-[#ad1457] text-lg">{{ user.name }}</p>
-                                    <p class="text-[10px] uppercase font-bold text-pink-300 tracking-widest">
-                                        {{ user.entreprise }} • <span class="text-[#f06292]">{{ user.role }}</span>
-                                    </p>
+                                    <p class="font-black text-[#ad1457] text-lg leading-tight">{{ user.name }}</p>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <span class="text-[9px] uppercase font-black px-2 py-0.5 bg-pink-50 text-pink-400 rounded-md tracking-tighter">
+                                            {{ user.entreprise }}
+                                        </span>
+                                        <span class="text-[9px] uppercase font-black px-2 py-0.5 {% if user.role == 'Patron' %}bg-amber-100 text-amber-600{% else %}bg-blue-50 text-blue-400{% endif %} rounded-md tracking-tighter">
+                                            {{ user.role }}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                             
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-3">
+                                <div class="text-right mr-4 hidden md:block">
+                                    <p class="text-[10px] font-bold text-gray-300 uppercase leading-none">Identifiant</p>
+                                    <p class="text-xs font-bold text-pink-200 tracking-wide">{{ user.username }}</p>
+                                </div>
                                 <a href="{{ url_for('delete_user', id=user.id) }}" 
-                                   onclick="return confirm('Voulez-vous vraiment licencier {{ user.name }} ?')"
-                                   class="opacity-0 group-hover:opacity-100 bg-red-50 text-red-400 hover:bg-red-500 hover:text-white p-3 rounded-2xl transition-all duration-300">
+                                   onclick="return confirm('Licencier définitivement {{ user.name }} ?')"
+                                   class="opacity-0 group-hover:opacity-100 bg-red-50 text-red-400 hover:bg-red-500 hover:text-white w-12 h-12 flex items-center justify-center rounded-2xl transition-all duration-300 transform hover:rotate-12">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                     </svg>
@@ -108,8 +142,14 @@
                         </div>
                         {% endfor %}
                     {% else %}
-                        <div class="text-center p-20 bg-pink-50/30 rounded-[35px] border-2 border-dashed border-pink-100">
-                            <p class="text-pink-300 italic font-medium">Aucun employé dans cette entreprise pour le moment.</p>
+                        <div class="text-center py-24 bg-pink-50/20 rounded-[40px] border-4 border-dashed border-pink-50">
+                            <div class="w-20 h-20 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-pink-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                            </div>
+                            <p class="text-[#ad1457] font-black text-xl italic">Aucun employé actif</p>
+                            <p class="text-pink-300 text-sm font-bold uppercase tracking-widest mt-1">Utilisez le formulaire pour recruter</p>
                         </div>
                     {% endif %}
                 </div>
@@ -117,5 +157,6 @@
 
         </div>
     </main>
+
 </body>
 </html>
