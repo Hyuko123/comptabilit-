@@ -180,27 +180,31 @@ def delete_vente(vente_id):
 @app.route('/executer_cloture', methods=['POST'])
 def executer_cloture():
     if 'user' not in session: return redirect(url_for('login'))
-    user_ent = session['user']['entreprise']
+    user_ent = session['user'].get('entreprise')
 
-    # 1. Calculer les totaux actuels avant de supprimer
-    res = supabase.table("ventes").select("montant_net").eq("entreprise", user_ent).execute()
-    ca_total = sum(float(v['montant_net']) for v in res.data)
-    taxes = ca_total * 0.35 # Ton taux de 35% sur le screen
-
-    # 2. Archiver dans la table clotures
-    supabase.table("clotures").insert({
-        "semaine_nom": "Semaine " + datetime.now().strftime("%U"),
-        "ca_total": ca_total,
-        "taxes_totales": taxes,
-        "entreprise": user_ent
-    }).execute()
-
-    # 3. REMISE À ZÉRO : On supprime les ventes de cette entreprise
-    supabase.table("ventes").delete().eq("entreprise", user_ent).execute()
-
-    return redirect(url_for('dashboard'))
+    try:
+        # Récupération des ventes actuelles
+        res = supabase.table("ventes").select("montant_net").eq("entreprise", user_ent).execute()
         
-    return redirect(url_for('ventes_page'))
+        # Calcul sécurisé du total
+        ca_total = sum(float(v['montant_net']) for v in res.data) if res.data else 0
+        taxes = round(ca_total * 0.35, 2)
+
+        # Insertion dans les archives
+        supabase.table("clotures").insert({
+            "semaine_nom": "Clôture Semaine " + datetime.now().strftime("%U"),
+            "ca_total": ca_total,
+            "taxes_totales": taxes,
+            "entreprise": user_ent
+        }).execute()
+
+        # Suppression des ventes (Reset)
+        supabase.table("ventes").delete().eq("entreprise", user_ent).execute()
+
+        return redirect(url_for('dashboard'))
+    except Exception as e:
+        # Affiche l'erreur réelle au lieu d'une page blanche
+        return f"Erreur lors de la clôture : {str(e)}", 500
 
 @app.route('/clotures')
 def clotures_page():
