@@ -2,10 +2,12 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Dashboard | Ultraze V2</title>
 </head>
-<body class="bg-[#fff9fa] flex min-h-screen font-sans">
+<body class="bg-[#fff9fa] flex min-h-screen font-sans text-[#880e4f]">
+    
     <aside class="w-72 bg-white border-r border-pink-50 flex flex-col fixed h-full z-50">
         <div class="p-10 mb-6"><h1 class="text-[#f06292] text-2xl font-black italic">ULTRAZE V2</h1></div>
         <nav class="flex-1 px-4 space-y-1">
@@ -19,28 +21,115 @@
         <div class="p-8 border-t border-pink-50"><a href="/logout" class="text-[10px] font-black text-gray-300 uppercase tracking-widest">Déconnexion</a></div>
     </aside>
 
-    <main class="ml-72 flex-1 p-16">
-        <header class="mb-12">
-            <p class="text-pink-400 font-bold uppercase tracking-widest text-[10px] mb-2">{{ stats.entreprise }}</p>
-            <h2 class="text-5xl font-light text-[#880e4f]">Bienvenue, <span class="font-black italic text-[#f06292]">{{ stats.nom_user }}</span></h2>
+    <main class="ml-72 flex-1 p-12">
+        
+        <header class="flex justify-between items-end mb-10">
+            <div>
+                <p class="text-pink-400 font-bold uppercase tracking-widest text-[10px] mb-2">{{ stats.entreprise }}</p>
+                <h2 class="text-5xl font-light">Bienvenue, <span class="font-black italic text-[#f06292]">{{ stats.nom_user }}</span></h2>
+            </div>
+            <div class="bg-white px-6 py-4 rounded-2xl border border-pink-50 shadow-sm text-right">
+                <p class="text-[10px] font-bold text-pink-300 uppercase italic">Période en cours</p>
+                <p class="font-black text-sm">Semaine 19 — 07/05/26 au 13/05/26</p>
+            </div>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="bg-white p-10 rounded-[45px] shadow-xl border border-pink-50">
-                <p class="text-[10px] font-bold text-pink-300 uppercase mb-4 tracking-widest italic">Chiffre d'Affaires</p>
-                <h3 class="text-5xl font-black text-[#ad1457] italic">{{ stats.ca }} $</h3>
+        <div class="grid grid-cols-1 md:grid-cols-6 gap-4 mb-8">
+            <div class="bg-white p-6 rounded-3xl border border-pink-50 shadow-sm">
+                <p class="text-[9px] font-bold text-pink-300 uppercase mb-1">CA Net Taxable</p>
+                <p class="text-2xl font-black text-[#ad1457]">{{ stats.ca }}$</p>
             </div>
-            
-            <div class="bg-white p-10 rounded-[45px] shadow-xl border border-pink-50">
-                <p class="text-[10px] font-bold text-pink-300 uppercase mb-4 tracking-widest italic">Taxes IRS</p>
-                <h3 class="text-5xl font-black text-red-400 italic">{{ stats.taxes }} $</h3>
+            <div class="bg-white p-6 rounded-3xl border border-pink-50 shadow-sm">
+                <p class="text-[9px] font-bold text-pink-300 uppercase mb-1">Salaires</p>
+                <p class="text-2xl font-black text-purple-400">0$</p>
             </div>
-
-            <div class="bg-[#f06292] p-10 rounded-[45px] text-white shadow-2xl shadow-pink-200">
-                <p class="text-[10px] font-bold opacity-70 uppercase mb-4 tracking-widest italic">Bénéfice Net</p>
-                <h3 class="text-5xl font-black italic">{{ stats.benefice }} $</h3>
+            <div class="bg-white p-6 rounded-3xl border border-pink-50 shadow-sm">
+                <p class="text-[9px] font-bold text-pink-300 uppercase mb-1">Taxes</p>
+                <p class="text-2xl font-black text-red-400">{{ stats.taxes }}$</p>
+            </div>
+            <div class="bg-white p-6 rounded-3xl border border-pink-50 shadow-sm">
+                <p class="text-[9px] font-bold text-pink-300 uppercase mb-1">Achats</p>
+                <p class="text-2xl font-black text-orange-400">0$</p>
+            </div>
+            <div class="bg-white p-6 rounded-3xl border border-pink-50 shadow-sm">
+                <p class="text-[9px] font-bold text-pink-300 uppercase mb-1">Bénéfice</p>
+                <p class="text-2xl font-black text-green-500">{{ stats.benefice }}$</p>
+            </div>
+            <div class="bg-[#ad1457] p-6 rounded-3xl shadow-lg text-white">
+                <p class="text-[9px] font-bold opacity-70 uppercase mb-1 italic">Détail CA net</p>
+                <p class="text-xs font-bold leading-tight">RUN : <span class="text-green-300">0$</span></p>
+                <p class="text-xs font-bold leading-tight">Citoyen : <span class="text-pink-300">0$</span></p>
             </div>
         </div>
+
+        <div class="bg-white p-6 rounded-[35px] border border-pink-50 shadow-sm mb-10 flex justify-between items-center">
+            <div>
+                <h4 class="text-sm font-black italic mb-1 uppercase">Alertes rapides</h4>
+                <p class="text-xs text-gray-400">9 stock(s) produit(s) négatif(s). Cette alerte sert uniquement au suivi.</p>
+            </div>
+            <button class="bg-[#ad1457] text-white text-[10px] font-bold px-6 py-3 rounded-xl uppercase tracking-widest hover:scale-105 transition">Voir stocks</button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-10">
+            <div class="bg-white p-10 rounded-[45px] border border-pink-50 shadow-xl">
+                <h3 class="text-xl font-black italic mb-8 border-b border-pink-50 pb-4">Résumé</h3>
+                <div class="space-y-4">
+                    <div class="flex justify-between text-sm font-bold border-b border-pink-50/50 pb-2"><span class="text-gray-400 uppercase text-[10px]">CA net taxable</span><span>{{ stats.ca }} $</span></div>
+                    <div class="flex justify-between text-sm font-bold border-b border-pink-50/50 pb-2"><span class="text-gray-400 uppercase text-[10px]">Salaires</span><span>0 $</span></div>
+                    <div class="flex justify-between text-sm font-bold border-b border-pink-50/50 pb-2"><span class="text-gray-400 uppercase text-[10px]">CA brut encaissé</span><span>{{ stats.ca }} $</span></div>
+                    <div class="flex justify-between text-sm font-bold border-b border-pink-50/50 pb-2"><span class="text-gray-400 uppercase text-[10px]">Taxes</span><span class="text-red-400">{{ stats.taxes }} $</span></div>
+                    <div class="flex justify-between text-sm font-bold pt-2"><span class="text-[#ad1457] uppercase text-[10px]">Bénéfice</span><span class="text-green-500">{{ stats.benefice }} $</span></div>
+                </div>
+            </div>
+
+            <div class="bg-white p-10 rounded-[45px] border border-pink-50 shadow-xl">
+                <h3 class="text-xl font-black italic mb-8 border-b border-pink-50 pb-4">Graphique CA</h3>
+                <div class="space-y-6">
+                    <div>
+                        <div class="flex justify-between text-[10px] font-bold uppercase mb-2"><span>RUN</span><span>0$</span></div>
+                        <div class="w-full bg-pink-50 h-2 rounded-full overflow-hidden"><div class="bg-[#ad1457] h-full w-[0%]"></div></div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-[10px] font-bold uppercase mb-2"><span>Citoyen</span><span>0$</span></div>
+                        <div class="w-full bg-pink-50 h-2 rounded-full overflow-hidden"><div class="bg-pink-300 h-full w-[0%]"></div></div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-[10px] font-bold uppercase mb-2"><span>Achats</span><span>0$</span></div>
+                        <div class="w-full bg-pink-50 h-2 rounded-full overflow-hidden"><div class="bg-orange-300 h-full w-[0%]"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-10 rounded-[45px] border border-pink-50 shadow-xl">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-xl font-black italic">Taux appliqués</h3>
+                <div class="bg-[#ad1457] text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest">Taxes 35%</div>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <div class="bg-pink-50/50 p-6 rounded-3xl border border-pink-50">
+                    <p class="text-[9px] font-bold text-pink-300 uppercase mb-1">Patron</p>
+                    <p class="text-xl font-black">65%</p>
+                </div>
+                <div class="bg-pink-50/50 p-6 rounded-3xl border border-pink-50">
+                    <p class="text-[9px] font-bold text-pink-300 uppercase mb-1">Co Patron</p>
+                    <p class="text-xl font-black">63%</p>
+                </div>
+                <div class="bg-pink-50/50 p-6 rounded-3xl border border-pink-50">
+                    <p class="text-[9px] font-bold text-pink-300 uppercase mb-1">Manager</p>
+                    <p class="text-xl font-black">60%</p>
+                </div>
+                <div class="bg-pink-50/50 p-6 rounded-3xl border border-pink-50">
+                    <p class="text-[9px] font-bold text-pink-300 uppercase mb-1">Employé</p>
+                    <p class="text-xl font-black">55%</p>
+                </div>
+                <div class="bg-pink-50/50 p-6 rounded-3xl border border-pink-50">
+                    <p class="text-[9px] font-bold text-pink-300 uppercase mb-1">Recrue</p>
+                    <p class="text-xl font-black">50%</p>
+                </div>
+            </div>
+        </div>
+
     </main>
 </body>
 </html>
