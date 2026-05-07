@@ -50,6 +50,32 @@ def logout():
     session.clear()
     return redirect(url_for('login'))
 
+@app.route('/add_user', methods=['POST'])
+def add_user():
+    if 'user' not in session: return redirect(url_for('login'))
+    
+    # Récupération des données du formulaire
+    username = request.form.get('username')
+    name = request.form.get('name')
+    password = request.form.get('password')
+    role = request.form.get('role')
+    entreprise = request.form.get('entreprise')
+
+    if username and name and password:
+        try:
+            supabase.table("utilisateurs").insert({
+                "username": username,
+                "name": name,
+                "password": password,
+                "role": role,
+                "entreprise": entreprise
+            }).execute()
+        except Exception as e:
+            print(f"Erreur insertion utilisateur : {e}")
+            return f"Erreur : {e}", 500
+            
+    return redirect(url_for('utilisateurs'))
+
 # --- DASHBOARD ---
 
 @app.route('/dashboard')
