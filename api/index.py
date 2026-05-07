@@ -78,7 +78,7 @@ def types_ventes_page():
     user_ent = session['user'].get('entreprise')
     try:
         res = supabase.table("catalogue").select("*").eq("entreprise", user_ent).order("nom").execute()
-        return render_template('types-ventes.html', catalogue=res.data, user=session['user'])
+        return render_template('types-ventes.html', catalogue=res.data)
     except Exception as e:
         return f"Erreur catalogue : {e}", 500
 
@@ -106,6 +106,7 @@ def add_to_catalog():
 def delete_catalogue(id):
     if 'user' not in session: return redirect(url_for('login'))
     try:
+        # On essaie de supprimer en traitant l'ID comme un entier, puis comme un string si échec
         supabase.table("catalogue").delete().eq("id", id).execute()
     except Exception as e:
         print(f"Erreur suppression catalogue : {e}")
@@ -169,7 +170,7 @@ def delete_vente(vente_id):
         print(f"Erreur suppression vente : {e}")
     return redirect(url_for('ventes_page'))
 
-# --- SALAIRES, IRS & CLÔTURE ---
+# --- SALAIRES & CLÔTURE ---
 
 @app.route('/salaires')
 def salaires_page():
@@ -210,12 +211,14 @@ def executer_cloture():
     except Exception as e:
         return f"Erreur clôture : {str(e)}", 500
 
+# --- ROUTES SUPPLÉMENTAIRES ---
+
 @app.route('/clotures')
 def clotures_page():
     if 'user' not in session: return redirect(url_for('login'))
     user_ent = session['user'].get('entreprise')
     try:
-        archives = supabase.table("clotures").select("*").eq("entreprise", user_ent).order("date_cloture", desc=True).execute()
+        archives = supabase.table("clotures").select("*").eq("entreprise", user_ent).order("id", desc=True).execute()
         res_ventes = supabase.table("ventes").select("montant_net").eq("entreprise", user_ent).execute()
         ca_total = sum(float(v['montant_net']) for v in res_ventes.data)
         stats = {"ca": ca_total, "taxes": round(ca_total * 0.35, 2)}
@@ -234,8 +237,6 @@ def irs_page():
         return render_template('irs.html', stats=stats)
     except Exception as e:
         return f"Erreur IRS : {e}", 500
-
-# --- ADMIN & UTILISATEURS ---
 
 @app.route('/utilisateurs')
 def utilisateurs():
