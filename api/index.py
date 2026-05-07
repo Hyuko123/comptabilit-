@@ -81,15 +81,19 @@ def add_user():
 
 @app.route('/dashboard')
 def dashboard():
-    # ... ta logique de calcul ...
+    # ... tes calculs de base de données ici ...
+    
+    # IMPORTANT : Toutes les clés ci-dessous doivent correspondre au HTML
     stats = {
-        'ca_total': total_ca,  # Assure-toi que le nom est EXACTEMENT ca_total
-        'taxes': total_taxes,
-        'total_salaires': total_salaires,
+        'ca_total': total_ca or 0,        # L'erreur vient souvent d'ici
+        'taxes': total_taxes or 0,
+        'total_salaires': total_salaires or 0,
         'nom_user': session['user']['name'],
         'entreprise': session['user']['entreprise']
     }
-    return render_template('dashboard.html', stats=stats)
+    
+    # Assure-toi de bien envoyer 'stats' et 'ventes'
+    return render_template('dashboard.html', stats=stats, ventes=toutes_les_ventes)
 
 @app.route('/types-ventes')
 def types_ventes_page():
