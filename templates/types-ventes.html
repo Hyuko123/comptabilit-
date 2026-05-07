@@ -32,6 +32,7 @@
         </header>
 
         <div class="grid grid-cols-1 xl:grid-cols-3 gap-10">
+            
             <div class="bg-white p-10 rounded-[45px] shadow-xl border border-pink-50 h-fit">
                 <h3 class="text-xl font-black mb-8 italic text-[#ad1457]">Nouvel Article</h3>
                 <form action="{{ url_for('add_to_catalog') }}" method="POST" class="space-y-6">
@@ -79,7 +80,7 @@
                                     
                                     <td class="py-5">
                                         <form action="{{ url_for('update_stock', id=item.id) }}" method="POST" class="flex items-center gap-2">
-                                            <input type="number" name="nouveau_stock" value="{{ item.stock if item.stock else 0 }}" 
+                                            <input type="number" name="nouveau_stock" value="{{ item.stock if item.stock is not none else 0 }}" 
                                                    class="w-20 p-2 rounded-xl bg-pink-50 border border-pink-100 text-center font-bold text-[#f06292] focus:ring-2 focus:ring-pink-300 outline-none transition">
                                             <button type="submit" class="p-2 bg-pink-100 text-[#f06292] rounded-xl hover:bg-[#f06292] hover:text-white transition shadow-sm">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
