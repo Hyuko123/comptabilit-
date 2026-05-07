@@ -55,12 +55,12 @@ def logout():
 def add_user():
     if 'user' not in session: return redirect(url_for('login'))
     
-    # On récupère les noms EXACTS définis dans les balises <input name="..."> du HTML
-    username = request.form.get('username')  # Retrait du 'new_'
-    name = request.form.get('name')          # Retrait du 'new_'
-    password = request.form.get('password')  # Retrait du 'new_'
-    role = request.form.get('role')          # Retrait du 'new_'
-    entreprise = request.form.get('entreprise') # Retrait du 'new_'
+    # Récupération des données du formulaire (doit matcher avec 'name' dans le HTML)
+    username = request.form.get('username')
+    name = request.form.get('name')
+    password = request.form.get('password')
+    role = request.form.get('role')
+    entreprise = request.form.get('entreprise')
     
     if username and name and password:
         try:
@@ -72,8 +72,8 @@ def add_user():
                 "entreprise": entreprise
             }).execute()
         except Exception as e:
-            print(f"Erreur insertion utilisateur : {e}")
-            return f"Erreur : {e}", 500
+            print(f"Erreur Supabase Insertion : {e}")
+            return f"Erreur lors de l'insertion : {e}", 500
             
     return redirect(url_for('utilisateurs'))
 
@@ -133,9 +133,11 @@ def add_to_catalog():
 def delete_user(id):
     if 'user' not in session: return redirect(url_for('login'))
     try:
+        # On supprime par ID (Supabase utilise souvent des ID numériques ou UUID)
         supabase.table("utilisateurs").delete().eq("id", id).execute()
     except Exception as e:
-        print(f"Erreur suppression : {e}")
+        print(f"Erreur Supabase Suppression : {e}")
+        
     return redirect(url_for('utilisateurs'))
 
 @app.route('/update_stock/<id>', methods=['POST'])
@@ -269,23 +271,22 @@ def utilisateurs():
     if 'user' not in session: return redirect(url_for('login'))
     
     try:
-        # On utilise la liste globale définie en haut de ton fichier
-        # Cela garantit que le menu déroulant est toujours rempli
-        
+        # On récupère tous les utilisateurs
         response = supabase.table("utilisateurs").select("*").execute()
         users_list = response.data if response.data else []
         
-        # Tri par Grade
+        # Tri par Grade (Ordre logique : MASTER -> Patron -> Co patron -> Manager -> Employé)
         ordre_grades = {"MASTER": 1, "Patron": 2, "Co patron": 3, "Manager": 4, "Employé": 5}
         users_list.sort(key=lambda x: ordre_grades.get(x.get('role'), 99))
         
+        # On utilise la liste globale ENTREPRISES_LISTE définie en haut de ton fichier
         return render_template('utilisateurs.html', 
                                all_users=users_list, 
-                               entreprises=ENTREPRISES_LISTE) # Utilise la GRANDE liste
+                               entreprises=ENTREPRISES_LISTE)
                                
     except Exception as e:
-        print(f"Erreur critique : {e}")
-        return f"Erreur serveur : {e}", 500
+        print(f"Erreur Page Utilisateurs : {e}")
+        return f"Erreur : {e}", 500
 
 @app.route('/admin/select_entreprise', methods=['POST'])
 def admin_select_entreprise():
