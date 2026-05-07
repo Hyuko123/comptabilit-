@@ -106,10 +106,11 @@ def add_to_catalog():
 def delete_catalogue(id):
     if 'user' not in session: return redirect(url_for('login'))
     try:
-        # On essaie de supprimer en traitant l'ID comme un entier, puis comme un string si échec
-        supabase.table("catalogue").delete().eq("id", id).execute()
+        # On force la conversion en entier au cas où
+        supabase.table("catalogue").delete().eq("id", int(id)).execute()
     except Exception as e:
-        print(f"Erreur suppression catalogue : {e}")
+        # Si c'est déjà un texte, on essaie sans conversion
+        supabase.table("catalogue").delete().eq("id", str(id)).execute()
     return redirect(url_for('types_ventes_page'))
 
 @app.route('/update_stock/<id>', methods=['POST'])
@@ -118,11 +119,11 @@ def update_stock(id):
     nouveau_stock = request.form.get('nouveau_stock')
     if nouveau_stock is not None:
         try:
-            supabase.table("catalogue").update({
-                "stock": int(nouveau_stock)
-            }).eq("id", id).execute()
-        except Exception as e:
-            print(f"Erreur mise à jour stock : {e}")
+            # On force l'ID en entier et le stock en entier
+            supabase.table("catalogue").update({"stock": int(nouveau_stock)}).eq("id", int(id)).execute()
+        except:
+            # Si l'ID est un texte (UUID)
+            supabase.table("catalogue").update({"stock": int(nouveau_stock)}).eq("id", str(id)).execute()
     return redirect(url_for('types_ventes_page'))
 
 # --- VENTES ---
