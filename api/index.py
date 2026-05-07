@@ -202,5 +202,42 @@ def executer_cloture():
         
     return redirect(url_for('ventes_page'))
 
+@app.route('/clotures')
+def clotures_page():
+    if 'user' not in session: return redirect(url_for('login'))
+    user_ent = session['user'].get('entreprise')
+    
+    try:
+        # Récupère l'historique des clôtures pour l'entreprise
+        archives = supabase.table("clotures").select("*").eq("entreprise", user_ent).order("date_cloture", desc=True).execute()
+        
+        # Récupère les stats actuelles (CA et Taxes) avant clôture
+        res_ventes = supabase.table("ventes").select("montant_net").eq("entreprise", user_ent).execute()
+        ca_total = sum(float(v['montant_net']) for v in res_ventes.data)
+        
+        stats = {
+            "ca": ca_total,
+            "taxes": round(ca_total * 0.35, 2)
+        }
+        
+        return render_template('clotures.html', archives=archives.data, stats=stats)
+    except Exception as e:
+        return f"Erreur : {e}", 500
+
+@app.route('/irs')
+def irs_page():
+    if 'user' not in session: return redirect(url_for('login'))
+    user_ent = session['user'].get('entreprise')
+    
+    # Récupère le CA actuel pour calculer les taxes en temps réel
+    res_ventes = supabase.table("ventes").select("montant_net").eq("entreprise", user_ent).execute()
+    ca_total = sum(float(v['montant_net']) for v in res_ventes.data)
+    
+    stats = {
+        "taxes": round(ca_total * 0.35, 2)
+    }
+    
+    return render_template('irs.html', stats=stats)
+
 if __name__ == '__main__':
     app.run(debug=True)
