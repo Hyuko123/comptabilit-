@@ -53,15 +53,15 @@ def logout():
 # Dans ton api/index.py
 @app.route('/add_user', methods=['POST'])
 def add_user():
-    # Ces noms doivent être IDENTIQUES aux 'name' du fichier HTML
-    username = request.form.get('new_username') # Utilise 'new_username' ici
-    name = request.form.get('new_name')
-    password = request.form.get('new_password')
-    role = request.form.get('new_role')
-    entreprise = request.form.get('new_entreprise')
+    if 'user' not in session: return redirect(url_for('login'))
     
-    # ... code d'insertion Supabase ...
-
+    # On récupère les noms EXACTS définis dans les balises <input name="..."> du HTML
+    username = request.form.get('username')  # Retrait du 'new_'
+    name = request.form.get('name')          # Retrait du 'new_'
+    password = request.form.get('password')  # Retrait du 'new_'
+    role = request.form.get('role')          # Retrait du 'new_'
+    entreprise = request.form.get('entreprise') # Retrait du 'new_'
+    
     if username and name and password:
         try:
             supabase.table("utilisateurs").insert({
@@ -270,26 +270,24 @@ def irs_page():
 def utilisateurs():
     if 'user' not in session: return redirect(url_for('login'))
     
-    # 1. Récupération des entreprises
-    entreprises = ["Restaurant Vinewood", "Unicorn", "Pop Chiken", "Bahamas"] 
-
-    # 2. Récupération des utilisateurs depuis Supabase
     try:
+        # On utilise la liste globale définie en haut de ton fichier
+        # Cela garantit que le menu déroulant est toujours rempli
+        
         response = supabase.table("utilisateurs").select("*").execute()
-        users_list = response.data
+        users_list = response.data if response.data else []
         
-        # 3. Tri par Grade (du plus haut au plus bas)
-        # On définit l'ordre d'importance
+        # Tri par Grade
         ordre_grades = {"MASTER": 1, "Patron": 2, "Co patron": 3, "Manager": 4, "Employé": 5}
-        
-        # On trie la liste : si le grade n'est pas dans la liste, on le met à la fin (99)
         users_list.sort(key=lambda x: ordre_grades.get(x.get('role'), 99))
         
+        return render_template('utilisateurs.html', 
+                               all_users=users_list, 
+                               entreprises=ENTREPRISES_LISTE) # Utilise la GRANDE liste
+                               
     except Exception as e:
-        print(f"Erreur Supabase : {e}")
-        users_list = []
-
-    return render_template('utilisateurs.html', all_users=users_list, entreprises=entreprises)
+        print(f"Erreur critique : {e}")
+        return f"Erreur serveur : {e}", 500
 
 @app.route('/admin/select_entreprise', methods=['POST'])
 def admin_select_entreprise():
