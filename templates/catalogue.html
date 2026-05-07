@@ -1,54 +1,111 @@
-<main class="ml-72 flex-1 p-12">
-    <header class="mb-12">
-        <h2 class="text-4xl font-light">Gestion du <span class="font-black italic text-[#f06292]">Stock</span></h2>
-    </header>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Catalogue | Ultraze V2</title>
+</head>
+<body class="bg-[#fff9fa] flex min-h-screen text-[#880e4f]">
 
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-10">
-        <div class="bg-white p-10 rounded-[45px] shadow-xl border border-pink-50 h-fit">
-            <h3 class="text-xl font-black mb-8 italic text-[#ad1457]">Nouvel Article</h3>
-            <form action="/add_to_catalog" method="POST" class="space-y-5">
-                <div>
-                    <label class="text-[10px] font-bold text-pink-300 uppercase px-2 italic">Nom de l'objet</label>
-                    <input type="text" name="item_name" placeholder="ex: Kit de réparation" required class="w-full p-4 rounded-2xl bg-pink-50/50 border-none outline-none mt-1 font-bold text-[#ad1457]">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-[10px] font-bold text-pink-300 uppercase px-2 italic">Prix ($)</label>
-                        <input type="number" name="item_price" placeholder="500" required class="w-full p-4 rounded-2xl bg-pink-50/50 border-none outline-none mt-1 font-bold">
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-pink-300 uppercase px-2 italic">Stock initial</label>
-                        <input type="number" name="item_stock" placeholder="10" required class="w-full p-4 rounded-2xl bg-pink-50/50 border-none outline-none mt-1 font-bold">
-                    </div>
-                </div>
-                <button type="submit" class="w-full bg-[#f06292] text-white font-black py-5 rounded-2xl shadow-lg shadow-pink-100 hover:scale-[1.02] transition uppercase tracking-widest">
-                    AJOUTER AU COMMERCE
-                </button>
-            </form>
+    <aside class="w-72 bg-white border-r border-pink-50 flex flex-col fixed h-full z-50">
+        <div class="p-10 mb-6">
+            <h1 class="text-[#f06292] text-2xl font-black italic">ULTRAZE V2</h1>
         </div>
+        <nav class="flex-1 px-4 space-y-1">
+            <a href="/dashboard" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Dashboard</a>
+            <a href="/ventes" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Ventes</a>
+            <a href="/salaires" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Salaires</a>
+            <a href="/utilisateurs" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Utilisateurs</a>
+            <a href="/types-ventes" class="flex items-center gap-3 px-6 py-4 bg-pink-50 text-[#ad1457] font-bold rounded-2xl italic">Catalogue</a>
+            <div class="h-px bg-pink-50 my-6 mx-6"></div>
+            <a href="/logout" class="flex items-center gap-3 px-6 py-4 text-red-400 font-bold hover:bg-red-50 rounded-2xl transition italic">Déconnexion</a>
+        </nav>
+    </aside>
 
-        <div class="xl:col-span-2 bg-white p-10 rounded-[45px] shadow-xl border border-pink-50">
-            <h3 class="text-xl font-black mb-8 italic text-[#ad1457]">Inventaire</h3>
-            <div class="space-y-4">
-                {% for item in catalogue %}
-                <div class="flex items-center justify-between p-6 bg-pink-50/20 rounded-3xl border border-pink-50 group hover:bg-pink-50/40 transition">
+    <main class="ml-72 flex-1 p-12">
+        <header class="mb-12">
+            <h2 class="text-4xl font-light">Gestion du <span class="font-black italic text-[#f06292]">Catalogue</span></h2>
+            <p class="text-pink-300 font-bold italic mt-2 uppercase text-xs tracking-widest">
+                Entreprise actuelle : {{ session['user']['entreprise'] }}
+            </p>
+        </header>
+
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-10">
+            
+            <div class="bg-white p-10 rounded-[45px] shadow-xl border border-pink-50 h-fit">
+                <h3 class="text-xl font-black mb-8 italic text-[#ad1457]">Nouvel Article</h3>
+                
+                <form action="/add_to_catalog" method="POST" class="space-y-6">
                     <div>
-                        <p class="font-black text-[#ad1457] text-lg">{{ item.nom }}</p>
-                        <p class="text-xs font-bold text-pink-300 uppercase tracking-widest">{{ item.prix }}$ / unité</p>
+                        <label class="text-[10px] font-bold text-pink-300 uppercase px-2 italic">Nom du produit / service</label>
+                        <input type="text" name="item_name" placeholder="Ex: Kit de réparation" required 
+                               class="w-full p-4 rounded-2xl bg-pink-50/50 border-none outline-none mt-1 font-bold text-[#ad1457] focus:ring-2 focus:ring-pink-200 transition">
                     </div>
-                    <div class="flex items-center gap-6">
-                        <div class="text-center">
-                            <p class="text-[10px] font-bold text-gray-400 uppercase">Quantité</p>
-                            <p class="text-2xl font-black text-[#f06292]">{{ item.stock }}</p>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-[10px] font-bold text-pink-300 uppercase px-2 italic">Prix de vente ($)</label>
+                            <input type="number" name="item_price" placeholder="0" required
+                                   class="w-full p-4 rounded-2xl bg-pink-50/50 border-none outline-none mt-1 font-bold text-[#ad1457]">
                         </div>
-                        <div class="flex gap-2">
-                            <a href="/update_stock/{{ item.nom }}/remove" class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-red-400 font-bold hover:bg-red-500 hover:text-white transition">-</a>
-                            <a href="/update_stock/{{ item.nom }}/add" class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-green-400 font-bold hover:bg-green-500 hover:text-white transition">+</a>
+                        <div>
+                            <label class="text-[10px] font-bold text-pink-300 uppercase px-2 italic">Stock initial</label>
+                            <input type="number" name="item_stock" value="0"
+                                   class="w-full p-4 rounded-2xl bg-pink-50/50 border-none outline-none mt-1 font-bold text-[#ad1457]">
                         </div>
                     </div>
+
+                    <button type="submit" class="w-full bg-[#f06292] text-white font-black py-5 rounded-2xl shadow-lg hover:bg-[#ad1457] transition-all uppercase tracking-widest text-sm">
+                        Ajouter au catalogue
+                    </button>
+                </form>
+            </div>
+
+            <div class="xl:col-span-2 bg-white p-10 rounded-[45px] shadow-xl border border-pink-50">
+                <h3 class="text-xl font-black mb-8 italic text-[#ad1457]">Articles disponibles</h3>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="text-[10px] uppercase font-bold text-pink-200 tracking-widest border-b border-pink-50">
+                                <th class="pb-4 px-4">Nom de l'article</th>
+                                <th class="pb-4">Prix Unitaire</th>
+                                <th class="pb-4">Stock</th>
+                                <th class="pb-4 text-right px-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-pink-50">
+                            {% for item in catalogue %}
+                            <tr class="group hover:bg-pink-50/20 transition-all">
+                                <td class="py-5 px-4 font-bold text-[#ad1457]">{{ item.nom }}</td>
+                                <td class="py-5 font-black text-gray-600">{{ item.prix }}$</td>
+                                <td class="py-5">
+                                    <span class="px-3 py-1 rounded-full text-[10px] font-bold {% if item.stock > 0 %}bg-green-50 text-green-500{% else %}bg-red-50 text-red-400{% endif %}">
+                                        {{ item.stock }} en réserve
+                                    </span>
+                                </td>
+                                <td class="py-5 text-right px-4">
+                                    <a href="/delete_catalogue/{{ item.id }}" 
+                                       onclick="return confirm('Supprimer cet article ?')"
+                                       class="text-red-200 hover:text-red-500 transition font-bold italic text-xs">
+                                        Supprimer
+                                    </a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="py-20 text-center text-pink-200 italic font-medium">
+                                    Votre catalogue est vide. Ajoutez votre premier article !
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-                {% endfor %}
             </div>
         </div>
-    </div>
-</main>
+    </main>
+
+</body>
+</html>
