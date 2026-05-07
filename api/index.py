@@ -99,11 +99,14 @@ def dashboard():
 
 # --- CATALOGUE & STOCK ---
 
+# --- CATALOGUE & STOCK ---
+
 @app.route('/types-ventes')
 def types_ventes_page():
     if 'user' not in session: return redirect(url_for('login'))
     user_ent = session['user'].get('entreprise')
     try:
+        # Récupère le catalogue filtré par entreprise
         res = supabase.table("catalogue").select("*").eq("entreprise", user_ent).order("nom").execute()
         return render_template('types-ventes.html', catalogue=res.data)
     except Exception as e:
@@ -129,31 +132,25 @@ def add_to_catalog():
             return f"Erreur ajout catalogue : {e}", 500
     return redirect(url_for('types_ventes_page'))
 
-@app.route('/delete_user/<id>')
-def delete_user(id):
-    if 'user' not in session: return redirect(url_for('login'))
-    try:
-        # On supprime par ID (Supabase utilise souvent des ID numériques ou UUID)
-        supabase.table("utilisateurs").delete().eq("id", id).execute()
-    except Exception as e:
-        print(f"Erreur Supabase Suppression : {e}")
-        
-    return redirect(url_for('utilisateurs'))
-
 @app.route('/update_stock/<id>', methods=['POST'])
 def update_stock(id):
     if 'user' not in session: return redirect(url_for('login'))
     nouveau_stock = request.form.get('nouveau_stock')
     if nouveau_stock is not None:
         try:
-            # On force l'ID en entier et le stock en entier
-            supabase.table("catalogue").update({"stock": int(nouveau_stock)}).eq("id", int(id)).execute()
-        except:
-            # Si l'ID est un texte (UUID)
-            supabase.table("catalogue").update({"stock": int(nouveau_stock)}).eq("id", str(id)).execute()
+            supabase.table("catalogue").update({"stock": int(nouveau_stock)}).eq("id", id).execute()
+        except Exception as e:
+            return f"Erreur stock : {e}", 500
     return redirect(url_for('types_ventes_page'))
 
-# --- VENTES ---
+@app.route('/delete_catalogue/<id>')
+def delete_catalogue(id):
+    if 'user' not in session: return redirect(url_for('login'))
+    try:
+        supabase.table("catalogue").delete().eq("id", id).execute()
+    except Exception as e:
+        print(f"Erreur suppression catalogue : {e}")
+    return redirect(url_for('types_ventes_page'))
 
 @app.route('/ventes')
 def ventes_page():
