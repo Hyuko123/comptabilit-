@@ -107,7 +107,7 @@ def dashboard():
         
         if res.data:
             # Calcul du CA (on force la conversion en float pour éviter les bugs de type)
-            total_ca = sum(float(v.get('montant_net', 0)) for v in res.data)
+           total_ca = sum(float(v.get('montant_net') or 0) for v in res.data)
             
             # Mise à jour des stats avec les vrais chiffres
             stats_data['ca_total'] = total_ca
@@ -251,7 +251,7 @@ def executer_cloture():
     user_ent = session['user'].get('entreprise')
     try:
         res = supabase.table("ventes").select("montant_net").eq("entreprise", user_ent).execute()
-        ca_total = sum(float(v['montant_net']) for v in res.data) if res.data else 0
+        ca_total = sum(float(v['montant_net'] or 0) for v in res.data) if res.data else 0
         taxes = round(ca_total * 0.35, 2)
         supabase.table("clotures").insert({
             "semaine_nom": "Clôture Semaine " + datetime.now().strftime("%U"),
@@ -273,7 +273,7 @@ def clotures_page():
     try:
         archives = supabase.table("clotures").select("*").eq("entreprise", user_ent).order("id", desc=True).execute()
         res_ventes = supabase.table("ventes").select("montant_net").eq("entreprise", user_ent).execute()
-        ca_total = sum(float(v['montant_net']) for v in res_ventes.data)
+        ca_total = sum(float(v['montant_net'] or 0) for v in res_ventes.data)
         stats = {"ca": ca_total, "taxes": round(ca_total * 0.35, 2)}
         return render_template('clotures.html', archives=archives.data, stats=stats)
     except Exception as e:
@@ -285,7 +285,7 @@ def irs_page():
     user_ent = session['user'].get('entreprise')
     try:
         res_ventes = supabase.table("ventes").select("montant_net").eq("entreprise", user_ent).execute()
-        ca_total = sum(float(v['montant_net']) for v in res_ventes.data)
+        ca_total = sum(float(v['montant_net'] or 0) for v in res_ventes.data)
         stats = {"taxes": round(ca_total * 0.35, 2)}
         return render_template('irs.html', stats=stats)
     except Exception as e:
