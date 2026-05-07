@@ -134,8 +134,9 @@ def update_stock(name):
     except Exception as e:
         return f"Erreur stock : {e}", 500
 
-@app.route('/delete_catalogue/<name>')
-def delete_catalogue(name):
+@app.route('/catalogue/delete/<int:id>')
+def delete_item_catalogue(id): # <--- C'est ce nom qui compte
+    # ... logique ...
     if 'user' not in session: return redirect(url_for('login'))
     try:
         # On filtre par "nom" au lieu de "id"
