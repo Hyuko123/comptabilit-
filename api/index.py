@@ -127,21 +127,31 @@ def add_vente():
 
 @app.route('/add_to_catalog', methods=['POST'])
 def add_to_catalog():
-    if 'user' not in session: return redirect(url_for('login'))
+    if 'user' not in session: 
+        return redirect(url_for('login'))
     
+    # On récupère les données du formulaire
+    # Note : Vérifie que dans type-ventes.html tes <input> ont bien ces 'name'
     nom = request.form.get('item_name')
     prix = request.form.get('item_price')
     stock = request.form.get('item_stock')
-    user_ent = session['user'].get('entreprise') # <--- RÉCUPÈRE L'ENTREPRISE ICI
+    user_ent = session['user'].get('entreprise')
 
     if nom and prix:
-        supabase.table("catalogue").insert({
-            "nom": nom, 
-            "prix": float(prix),
-            "stock": int(stock or 0),
-            "entreprise": user_ent # <--- AJOUTE L'ENTREPRISE DANS L'INSERT
-        }).execute()
-    return redirect('/types-ventes')
+        try:
+            # Insertion avec l'entreprise pour l'unicité du catalogue
+            supabase.table("catalogue").insert({
+                "nom": nom, 
+                "prix": float(prix),
+                "stock": int(stock or 0),
+                "entreprise": user_ent 
+            }).execute()
+        except Exception as e:
+            # Affiche l'erreur si la colonne 'entreprise' manque encore dans Supabase
+            return f"Erreur lors de l'ajout au catalogue : {e}", 500
+
+    # Redirection vers la page du catalogue (ton @app.route('/types-ventes'))
+    return redirect(url_for('types_ventes_page'))
 
 @app.route('/types-ventes')
 def types_ventes_page():
