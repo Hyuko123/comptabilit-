@@ -270,21 +270,26 @@ def irs_page():
 def utilisateurs():
     if 'user' not in session: return redirect(url_for('login'))
     
-    # 1. On récupère les entreprises pour le menu déroulant
-    # (Soit via un JSON, soit via Supabase)
-    entreprises = ["Restaurant Vinewood", "Unicorn", "Pop Chiken"] 
+    # 1. Récupération des entreprises
+    entreprises = ["Restaurant Vinewood", "Unicorn", "Pop Chiken", "Bahamas"] 
 
-    # 2. On récupère la liste des employés DEPUIS Supabase
+    # 2. Récupération des utilisateurs depuis Supabase
     try:
         response = supabase.table("utilisateurs").select("*").execute()
-        all_users = response.data
+        users_list = response.data
+        
+        # 3. Tri par Grade (du plus haut au plus bas)
+        # On définit l'ordre d'importance
+        ordre_grades = {"MASTER": 1, "Patron": 2, "Co patron": 3, "Manager": 4, "Employé": 5}
+        
+        # On trie la liste : si le grade n'est pas dans la liste, on le met à la fin (99)
+        users_list.sort(key=lambda x: ordre_grades.get(x.get('role'), 99))
+        
     except Exception as e:
-        print(f"Erreur de lecture : {e}")
-        all_users = []
+        print(f"Erreur Supabase : {e}")
+        users_list = []
 
-    return render_template('utilisateurs.html', 
-                           all_users=all_users, 
-                           entreprises=entreprises)
+    return render_template('utilisateurs.html', all_users=users_list, entreprises=entreprises)
 
 @app.route('/admin/select_entreprise', methods=['POST'])
 def admin_select_entreprise():
