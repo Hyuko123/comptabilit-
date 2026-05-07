@@ -1,45 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Dashboard | Ultraze V2</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
 </head>
-<body class="bg-[#fff9fa] flex min-h-screen font-sans text-[#880e4f]">
-    
-    <aside class="w-72 bg-white border-r border-pink-50 flex flex-col fixed h-full z-50">
-        <div class="p-10 mb-6"><h1 class="text-[#f06292] text-2xl font-black italic">ULTRAZE V2</h1></div>
 <body class="bg-[#fff9fa] flex min-h-screen text-[#880e4f]">
-
+    
     <aside class="w-72 bg-white border-r border-pink-50 flex flex-col fixed h-full z-50 shadow-sm">
-        <div class="p-10 mb-6">
-            <h1 class="text-[#f06292] text-2xl font-black italic tracking-tighter">ULTRAZE V2</h1>
+        <div class="p-10 mb-2">
+            <h1 class="text-[#f06292] text-2xl font-black italic tracking-tighter uppercase">ULTRAZE V2</h1>
         </div>
-        <nav class="flex-1 px-4 space-y-1">
-            <a href="/dashboard" class="flex items-center gap-3 px-6 py-4 bg-pink-50 text-[#ad1457] font-bold rounded-2xl italic transition">Dashboard</a>
-            <a href="/ventes" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Ventes</a>
-            <a href="/salaires" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Salaires</a>
-            <a href="/utilisateurs" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Utilisateurs</a>
-            <div class="h-px bg-pink-50 my-6 mx-6"></div>
-            <a href="/clotures" class="flex items-center gap-3 px-6 py-4 text-pink-400 font-bold hover:bg-pink-50 rounded-2xl transition">Clôtures</a>
-            <a href="/irs" class="flex items-center gap-3 px-6 py-4 text-red-400 font-bold hover:bg-red-50 rounded-2xl transition">Alertes IRS</a>
-            <a href="/dashboard" class="flex items-center gap-3 px-6 py-4 bg-pink-50 text-[#ad1457] font-bold rounded-2xl italic">Dashboard</a>
-            <a href="/ventes" class="flex items-center gap-3 px-6 py-4 font-bold rounded-2xl transition hover:bg-pink-50 text-gray-400">Ventes</a>
-            <a href="/salaires" class="flex items-center gap-3 px-6 py-4 font-bold rounded-2xl transition hover:bg-pink-50 text-gray-400">Salaires</a>
-            <a href="/utilisateurs" class="flex items-center gap-3 px-6 py-4 font-bold rounded-2xl transition hover:bg-pink-50 text-gray-400">Utilisateurs</a>
-            <a href="/types-ventes" class="flex items-center gap-3 px-6 py-4 font-bold rounded-2xl transition hover:bg-pink-50 text-gray-400">Catalogue</a>
-            <a href="/clotures" class="flex items-center gap-3 px-6 py-4 text-gray-400 font-bold hover:bg-pink-50 rounded-2xl transition">Clôtures</a>
-            <a href="/irs" class="flex items-center gap-3 px-6 py-4 text-orange-400 font-bold hover:bg-orange-50 rounded-2xl transition">Alertes IRS</a>
+        
+        <nav class="flex-1 px-4 flex flex-col">
+            <div class="space-y-1">
+                <a href="{{ url_for('dashboard') }}" class="flex items-center gap-3 px-6 py-4 font-bold rounded-2xl transition hover:bg-pink-50 {{ 'bg-pink-50 text-[#ad1457] italic' if request.endpoint == 'dashboard' else 'text-gray-400' }}">
+                    Dashboard
+                </a>
+                
+                <a href="{{ url_for('ventes_page') }}" class="flex items-center gap-3 px-6 py-4 font-bold rounded-2xl transition hover:bg-pink-50 {{ 'bg-pink-50 text-[#ad1457] italic' if request.endpoint == 'ventes_page' else 'text-gray-400' }}">
+                    Ventes
+                </a>
+                
+                <a href="{{ url_for('salaires_page') }}" class="flex items-center gap-3 px-6 py-4 font-bold rounded-2xl transition hover:bg-pink-50 {{ 'bg-pink-50 text-[#ad1457] italic' if request.endpoint == 'salaires_page' else 'text-gray-400' }}">
+                    Salaires
+                </a>
+                
+                <a href="{{ url_for('utilisateurs') }}" class="flex items-center gap-3 px-6 py-4 font-bold rounded-2xl transition hover:bg-pink-50 {{ 'bg-pink-50 text-[#ad1457] italic' if request.endpoint == 'utilisateurs' else 'text-gray-400' }}">
+                    Utilisateurs
+                </a>
 
-            <div class="pt-10 mt-auto">
-                <div class="h-px bg-pink-50 my-4 mx-6"></div>
-                <a href="/logout" class="flex items-center gap-3 px-6 py-3 text-gray-400 text-xs font-black hover:text-red-500 transition uppercase tracking-widest">Déconnexion</a>
+                <a href="{{ url_for('types_ventes_page') }}" class="flex items-center gap-3 px-6 py-4 font-bold rounded-2xl transition hover:bg-pink-50 {{ 'bg-pink-50 text-[#ad1457] italic' if request.endpoint == 'types_ventes_page' else 'text-gray-400' }}">
+                    Catalogue
+                </a>
+            </div>
+
+            <div class="mt-8 pt-8 border-t border-pink-50 space-y-1">
+                <p class="px-6 mb-2 text-[10px] font-black text-pink-200 uppercase tracking-[0.2em]">Comptabilité</p>
+                <a href="{{ url_for('clotures') }}" class="flex items-center gap-3 px-6 py-4 font-bold rounded-2xl transition hover:bg-pink-50 {{ 'bg-pink-50 text-[#ad1457] italic' if request.endpoint == 'clotures' else 'text-gray-400' }}">
+                    Clôtures
+                </a>
+
+                <a href="{{ url_for('irs') }}" class="flex items-center gap-3 px-6 py-4 font-bold rounded-2xl transition hover:bg-orange-50 {{ 'bg-orange-50 text-orange-600 italic' if request.endpoint == 'irs' else 'text-orange-400' }}">
+                    Avertissement IRS
+                </a>
+            </div>
+
+            <div class="mt-auto pb-10">
+                <div class="h-px bg-pink-50 mb-6 mx-6"></div>
+                <a href="{{ url_for('logout') }}" class="flex items-center gap-3 px-6 py-2 text-gray-300 text-[10px] font-black hover:text-red-500 transition uppercase tracking-[0.15em]">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Déconnexion
+                </a>
             </div>
         </nav>
-        <div class="p-8 border-t border-pink-50">
-            <a href="/logout" class="text-[10px] font-black text-gray-300 uppercase tracking-widest hover:text-red-400 transition">Déconnexion</a>
-        </div>
     </aside>
 
     <main class="ml-72 flex-1 p-12">
         
-        <header class="flex justify-between items-end mb-10">
         <header class="mb-12 flex justify-between items-center">
             <div>
                 <p class="text-pink-400 font-bold uppercase tracking-widest text-[10px] mb-2">{{ stats.entreprise }}</p>
@@ -47,170 +72,85 @@
             </div>
             
             {% if session['user']['role'] == 'MASTER' %}
-            <div class="bg-white px-6 py-4 rounded-3xl border-2 border-[#ad1457] shadow-lg flex flex-col gap-2">
-                <p class="text-[9px] font-black text-[#ad1457] uppercase tracking-tighter italic">Mode Administrateur : Changer d'entreprise</p>
+            <div class="bg-white px-6 py-4 rounded-3xl border-2 border-[#ad1457] shadow-lg">
+                <p class="text-[9px] font-black text-[#ad1457] uppercase tracking-tighter italic mb-2">Changer d'entreprise (Master)</p>
                 <form action="/admin/select_entreprise" method="POST" class="flex gap-2">
                     <select name="entreprise_choisie" class="bg-pink-50 border-none rounded-xl px-4 py-2 text-xs font-bold text-[#ad1457] focus:ring-2 focus:ring-pink-200 outline-none">
-                        {% for ent in [
-                            "Restaurant Vinewood", "Burger Shot", "REX Diner + LTD", "Pop Chiken",
-                            "Unicorn", "Bahamas", "Fête Forraine", "Agence d'évènementiel", "Le Clown",
-                            "Benny's", "LS Custom", "Garage Paleto", "REX Garage", "Custom Mirror", 
-                            "Auto Repair 68", "Dynasty 8", "LTD Little Seoul", "LTD Groove Street", 
-                            "Ammunation", "Car Dealer", "Taxi", "Psychologue", "Transport et livraison", 
-                            "Salon de tatouage Aguja", "Salon de tatouage Vespucci"
-                        ] %}
+                        {% for ent in ["Restaurant Vinewood", "Burger Shot", "REX Diner + LTD", "Pop Chiken", "Unicorn", "Bahamas", "Benny's", "LS Custom", "Dynasty 8", "Ammunation", "Taxi"] %}
                             <option value="{{ ent }}" {% if stats.entreprise == ent %}selected{% endif %}>{{ ent }}</option>
                         {% endfor %}
                     </select>
-                    <button type="submit" class="bg-[#ad1457] text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase hover:bg-[#880e4f] transition shadow-md">
-                        Switcher
-                    </button>
+                    <button type="submit" class="bg-[#ad1457] text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase hover:bg-[#880e4f] transition shadow-md">Switcher</button>
                 </form>
-                <h2 class="text-4xl font-light italic">Tableau de <span class="font-black text-[#f06292]">Bord</span></h2>
-                <p class="text-pink-300 font-bold mt-1 uppercase text-xs tracking-widest">{{ session['user']['entreprise'] }}</p>
             </div>
             {% else %}
-            <div class="bg-white px-6 py-4 rounded-2xl border border-pink-50 shadow-sm text-right">
-                <p class="text-[10px] font-bold text-pink-300 uppercase italic">Période en cours</p>
-                <p class="font-black text-sm">Semaine 19 — 07/05/26 au 13/05/26</p>
-            <div class="bg-white px-6 py-4 rounded-3xl border border-pink-50 shadow-sm">
-                <p class="text-[10px] font-black text-pink-300 uppercase">Bienvenue,</p>
-                <p class="text-lg font-black text-[#ad1457] italic">{{ session['user']['name'] }}</p>
+            <div class="bg-white px-6 py-4 rounded-3xl border border-pink-50 shadow-sm text-right">
+                <p class="text-[10px] font-black text-pink-300 uppercase">Période en cours</p>
+                <p class="font-black text-sm italic text-[#ad1457]">Semaine 19 — 07/05/26 au 13/05/26</p>
             </div>
             {% endif %}
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-6 gap-4 mb-8">
-            <div class="bg-white p-6 rounded-3xl border border-pink-50 shadow-sm">
-                <p class="text-[9px] font-bold text-pink-300 uppercase mb-1">CA Net Taxable</p>
-                <p class="text-2xl font-black text-[#ad1457]">{{ stats.ca }}$</p>
-            </div>
-            <div class="bg-white p-6 rounded-3xl border border-pink-50 shadow-sm">
-                <p class="text-[9px] font-bold text-pink-300 uppercase mb-1">Salaires</p>
-                <p class="text-2xl font-black text-purple-400">0$</p>
-            </div>
-            <div class="bg-white p-6 rounded-3xl border border-pink-50 shadow-sm">
-                <p class="text-[9px] font-bold text-pink-300 uppercase mb-1">Taxes (35%)</p>
-                <p class="text-2xl font-black text-red-400">{{ stats.taxes }}$</p>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-            <div class="bg-[#ad1457] p-8 rounded-[40px] text-white shadow-xl">
-                <p class="text-xs font-bold uppercase opacity-60">Chiffre d'Affaires</p>
+            <div class="bg-[#ad1457] p-8 rounded-[40px] text-white shadow-xl shadow-pink-100">
+                <p class="text-xs font-bold uppercase opacity-60">Chiffre d'Affaires Brut</p>
                 <p class="text-5xl font-black italic mt-2">{{ stats.ca_total }}$</p>
             </div>
-            <div class="bg-white p-6 rounded-3xl border border-pink-50 shadow-sm">
-                <p class="text-[9px] font-bold text-pink-300 uppercase mb-1">Achats</p>
-                <p class="text-2xl font-black text-orange-400">0$</p>
+            
             <div class="bg-white p-8 rounded-[40px] border border-pink-50 shadow-sm">
-                <p class="text-xs font-bold text-pink-300 uppercase">Taxes en attente</p>
-                <p class="text-5xl font-black italic text-[#f06292] mt-2">{{ stats.taxes }}$</p>
+                <p class="text-xs font-bold text-pink-300 uppercase">Taxes à reverser (35%)</p>
+                <p class="text-5xl font-black italic text-red-400 mt-2">{{ stats.taxes }}$</p>
             </div>
-            <div class="bg-white p-6 rounded-3xl border border-pink-50 shadow-sm">
-                <p class="text-[9px] font-bold text-pink-300 uppercase mb-1">Bénéfice</p>
-                <p class="text-2xl font-black text-green-500">{{ stats.benefice }}$</p>
+            
             <div class="bg-white p-8 rounded-[40px] border border-pink-50 shadow-sm">
-                <p class="text-xs font-bold text-pink-300 uppercase">Bénéfice Réel</p>
+                <p class="text-xs font-bold text-pink-300 uppercase">Bénéfice Réel (Net)</p>
                 <p class="text-5xl font-black italic text-green-500 mt-2">{{ stats.ca_total - stats.taxes - stats.total_salaires }}$</p>
             </div>
-            <div class="bg-[#ad1457] p-6 rounded-3xl shadow-lg text-white">
-                <p class="text-[9px] font-bold opacity-70 uppercase mb-1 italic">Détail CA net</p>
-                <p class="text-xs font-bold leading-tight">RUN : <span class="text-green-300">0$</span></p>
-                <p class="text-xs font-bold leading-tight">Citoyen : <span class="text-pink-300">0$</span></p>
-            </div>
         </div>
 
-        <div class="bg-white p-6 rounded-[35px] border border-pink-50 shadow-sm mb-10 flex justify-between items-center">
-            <div>
-                <h4 class="text-sm font-black italic mb-1 uppercase">Alertes rapides</h4>
-                <p class="text-xs text-gray-400">Suivi des stocks en temps réel pour {{ stats.entreprise }}.</p>
-            </div>
-            <button class="bg-[#ad1457] text-white text-[10px] font-bold px-6 py-3 rounded-xl uppercase tracking-widest hover:scale-105 transition">Voir stocks</button>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-10">
-            <div class="bg-white p-10 rounded-[45px] border border-pink-50 shadow-xl">
-                <h3 class="text-xl font-black italic mb-8 border-b border-pink-50 pb-4">Résumé Financier</h3>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-             <div class="bg-white p-10 rounded-[45px] shadow-sm border border-pink-50">
-                <h3 class="text-xl font-black mb-6 italic text-[#ad1457]">Activité Récente</h3>
+             
+            <div class="bg-white p-10 rounded-[45px] shadow-sm border border-pink-50">
+                <h3 class="text-xl font-black mb-6 italic text-[#ad1457]">Dernières Ventes</h3>
                 <div class="space-y-4">
-                    <div class="flex justify-between text-sm font-bold border-b border-pink-50/50 pb-2">
-                        <span class="text-gray-400 uppercase text-[10px]">CA Brut Encaissé</span>
-                        <span>{{ stats.ca }} $</span>
-                    </div>
-                    <div class="flex justify-between text-sm font-bold border-b border-pink-50/50 pb-2">
-                        <span class="text-gray-400 uppercase text-[10px]">TVA / Taxes (35%)</span>
-                        <span class="text-red-400">- {{ stats.taxes }} $</span>
-                    </div>
-                    <div class="flex justify-between text-sm font-bold border-b border-pink-50/50 pb-2">
-                        <span class="text-gray-400 uppercase text-[10px]">Salaires versés</span>
-                        <span>0 $</span>
-                    </div>
-                    <div class="flex justify-between text-sm font-bold pt-4">
-                        <span class="text-[#ad1457] uppercase text-xs font-black">Bénéfice Net Entreprise</span>
-                        <span class="text-green-500 text-lg">{{ stats.benefice }} $</span>
                     {% for v in ventes[:5] %}
-                    <div class="flex justify-between items-center p-4 bg-pink-50/30 rounded-2xl">
+                    <div class="flex justify-between items-center p-4 bg-pink-50/30 rounded-2xl border border-transparent hover:border-pink-100 transition">
                         <div>
                             <p class="font-black text-[#ad1457]">{{ v.vendeur }}</p>
-                            <p class="text-xs text-pink-300 italic">{{ v.article }}</p>
+                            <p class="text-[10px] text-pink-300 font-bold uppercase tracking-widest">{{ v.article }}</p>
                         </div>
-                        <p class="font-black text-[#f06292]">+{{ v.montant_net }}$</p>
+                        <p class="font-black text-[#f06292] text-lg">+{{ v.montant_net }}$</p>
                     </div>
                     {% endfor %}
                 </div>
             </div>
 
-            <div class="bg-white p-10 rounded-[45px] border border-pink-50 shadow-xl">
-                <h3 class="text-xl font-black italic mb-8 border-b border-pink-50 pb-4">Répartition CA</h3>
-                <div class="space-y-6">
-                    <div>
-                        <div class="flex justify-between text-[10px] font-bold uppercase mb-2"><span>Ventes RUN</span><span>0$</span></div>
-                        <div class="w-full bg-pink-50 h-2 rounded-full overflow-hidden"><div class="bg-[#ad1457] h-full w-[0%]"></div></div>
+            <div class="bg-white p-10 rounded-[45px] border border-pink-50 shadow-sm">
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="text-xl font-black italic">Grille des Salaires (%)</h3>
+                    <span class="bg-red-50 text-red-400 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-tighter">Taxe IRS 35% fixe</span>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-pink-50/50 p-6 rounded-3xl border border-pink-50 group hover:bg-pink-100 transition text-center">
+                        <p class="text-[9px] font-bold text-pink-300 uppercase mb-1">Patron</p>
+                        <p class="text-xl font-black">65%</p>
                     </div>
-                    <div>
-                        <div class="flex justify-between text-[10px] font-bold uppercase mb-2"><span>Ventes Citoyens</span><span>0$</span></div>
-                        <div class="w-full bg-pink-50 h-2 rounded-full overflow-hidden"><div class="bg-pink-300 h-full w-[0%]"></div></div>
+                    <div class="bg-pink-50/50 p-6 rounded-3xl border border-pink-50 group hover:bg-pink-100 transition text-center">
+                        <p class="text-[9px] font-bold text-pink-300 uppercase mb-1">Manager</p>
+                        <p class="text-xl font-black">60%</p>
                     </div>
-                    <div>
-                        <div class="flex justify-between text-[10px] font-bold uppercase mb-2"><span>Taxes IRS</span><span class="text-red-400">{{ stats.taxes }}$</span></div>
-                        <div class="w-full bg-pink-50 h-2 rounded-full overflow-hidden"><div class="bg-red-200 h-full w-[35%]"></div></div>
+                    <div class="bg-pink-50/50 p-6 rounded-3xl border border-pink-50 group hover:bg-pink-100 transition text-center col-span-2">
+                        <p class="text-[9px] font-bold text-pink-300 uppercase mb-1 text-center">Recrue / Employé</p>
+                        <p class="text-xl font-black">50% - 55%</p>
                     </div>
+                </div>
+                
+                <div class="mt-8">
+                    <a href="/ventes" class="block w-full text-center bg-[#f06292] text-white py-5 rounded-3xl font-black uppercase tracking-widest shadow-lg hover:bg-[#ad1457] hover:scale-[1.02] transition-all">
+                        Enregistrer une vente
+                    </a>
                 </div>
             </div>
-        </div>
-             </div>
-
-        <div class="bg-white p-10 rounded-[45px] border border-pink-50 shadow-xl">
-            <div class="flex justify-between items-center mb-8">
-                <h3 class="text-xl font-black italic">Grille des Salaires (%)</h3>
-                <div class="bg-[#ad1457] text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest italic">Taxe IRS 35% fixe</div>
-            </div>
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-                <div class="bg-pink-50/50 p-6 rounded-3xl border border-pink-50 group hover:bg-pink-100 transition">
-                    <p class="text-[9px] font-bold text-pink-300 uppercase mb-1">Patron</p>
-                    <p class="text-xl font-black">65%</p>
-                </div>
-                <div class="bg-pink-50/50 p-6 rounded-3xl border border-pink-50 group hover:bg-pink-100 transition">
-                    <p class="text-[9px] font-bold text-pink-300 uppercase mb-1">Co-Patron</p>
-                    <p class="text-xl font-black">63%</p>
-                </div>
-                <div class="bg-pink-50/50 p-6 rounded-3xl border border-pink-50 group hover:bg-pink-100 transition">
-                    <p class="text-[9px] font-bold text-pink-300 uppercase mb-1">Manager</p>
-                    <p class="text-xl font-black">60%</p>
-                </div>
-                <div class="bg-pink-50/50 p-6 rounded-3xl border border-pink-50 group hover:bg-pink-100 transition">
-                    <p class="text-[9px] font-bold text-pink-300 uppercase mb-1">Employé</p>
-                    <p class="text-xl font-black">55%</p>
-                </div>
-                <div class="bg-pink-50/50 p-6 rounded-3xl border border-pink-50 group hover:bg-pink-100 transition">
-                    <p class="text-[9px] font-bold text-pink-300 uppercase mb-1">Recrue</p>
-                    <p class="text-xl font-black">50%</p>
-                </div>
-            </div>
-             <div class="bg-pink-100/20 p-10 rounded-[45px] border-2 border-dashed border-pink-100 flex flex-col justify-center text-center">
-                <h3 class="text-2xl font-light italic text-[#ad1457] mb-4">Prêt pour une nouvelle <span class="font-black">vente</span> ?</h3>
-                <a href="/ventes" class="bg-[#f06292] text-white py-5 px-10 rounded-3xl font-black uppercase tracking-widest shadow-lg hover:bg-[#ad1457] transition-all">Enregistrer une transaction</a>
-             </div>
         </div>
 
     </main>
