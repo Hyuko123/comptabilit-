@@ -81,25 +81,15 @@ def add_user():
 
 @app.route('/dashboard')
 def dashboard():
-    if 'user' not in session: return redirect(url_for('login'))
-    user_ent = session['user'].get('entreprise')
-    try:
-        res = supabase.table("ventes").select("montant_net").eq("entreprise", user_ent).execute()
-        ca = sum(v.get('montant_net', 0) for v in res.data)
-        stats = {
-            'ca': ca,
-            'taxes': int(ca * 0.15),
-            'benefice': int(ca * 0.85),
-            'nom_user': session['user'].get('name'),
-            'entreprise': user_ent
-        }
-        return render_template('dashboard.html', stats=stats)
-    except Exception as e:
-        return f"Erreur Dashboard : {e}", 500
-
-# --- CATALOGUE & STOCK ---
-
-# --- CATALOGUE & STOCK ---
+    # ... ta logique de calcul ...
+    stats = {
+        'ca_total': total_ca,  # Assure-toi que le nom est EXACTEMENT ca_total
+        'taxes': total_taxes,
+        'total_salaires': total_salaires,
+        'nom_user': session['user']['name'],
+        'entreprise': session['user']['entreprise']
+    }
+    return render_template('dashboard.html', stats=stats)
 
 @app.route('/types-ventes')
 def types_ventes_page():
